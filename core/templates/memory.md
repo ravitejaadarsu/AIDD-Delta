@@ -13,3 +13,7 @@ Long-lived facts agents should know. Maintained by the orchestrator; pruned by h
 ## Known constraints
 
 <!-- e.g. "payments module is frozen until Q3 audit" -->
+
+## Health
+
+<!-- Retro-maintained: stale facts, contradicted decisions, dangling citations to verify or prune. -->

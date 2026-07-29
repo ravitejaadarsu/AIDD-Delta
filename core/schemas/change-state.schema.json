@@ -49,7 +49,8 @@
         "perf_within_budget": { "enum": ["pending", "passed", "failed", "na"] },
         "acs_verified": { "enum": ["pending", "passed", "failed", "na"] },
         "evidence_captured": { "enum": ["pending", "passed", "failed", "na"] },
-        "supervision_compliant": { "enum": ["pending", "passed", "failed", "na"] }
+        "supervision_compliant": { "enum": ["pending", "passed", "failed", "na"] },
+        "critic_approved": { "enum": ["pending", "passed", "failed", "na"] }
       }
     },
     "stories": {

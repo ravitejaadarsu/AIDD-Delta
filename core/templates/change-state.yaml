@@ -21,6 +21,7 @@ quality_gates:
   acs_verified: pending
   evidence_captured: pending
   supervision_compliant: pending
+  critic_approved: pending
 stories: {}
 fix_loop:
   iteration: 0

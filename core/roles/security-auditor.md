@@ -24,7 +24,7 @@ The Construction diff, repo, lockfiles, `constitution.md` security rules.
    whichever applies and is installed; record tool + versions; missing tool → `na` +
    reason.
 3. OWASP checklist scoped to the diff (injection, authn/z, data exposure,
-   SSRF/deserialization).
+   SSRF/deserialization). Also record a **threat matrix**: each material risk with its CWE id and CVSS v3.1 vector + score.
 4. SBOM (e.g. `npx @cyclonedx/cyclonedx-npm`, `pip freeze` fallback) + license summary;
    flag incompatibles.
 5. Findings in `qa-findings.md` format; CRITICAL/HIGH feed adversarial verification like

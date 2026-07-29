@@ -5,8 +5,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ## [Unreleased]
 
+## [0.2.0]
+
 ### Added
 
+- Governance & impact capabilities: `impact-analyst`
+  (multi-lens blast-radius analysis, Inception + `/aidd:impact`), `independent-thinker`
+  (counter-arguments before G2), and `critic` (consolidated APPROVE / APPROVE WITH
+  CONDITIONS / REJECT verdict at G3 via the `critic_approved` gate). Security auditor
+  gains a CWE/CVSS threat matrix; Retro gains a memory-health pass. `docs/impact-analysis.md`,
+  `docs/governance.md`. Counts: 22 roles / 17 commands / 22 agents.
 - Test Engineer role (`test-engineer`) — a team of senior testers that designs
   and executes an exhaustive test matrix (happy path, negative, boundary,
   impossible/abuse, API-contract, concurrency, regression, performance) per

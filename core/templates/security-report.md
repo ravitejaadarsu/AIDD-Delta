@@ -21,6 +21,11 @@
 
 <!-- Generated SBOM path + license summary; incompatible licenses flagged. -->
 
+## Threat matrix (CWE / CVSS)
+
+| Risk | CWE | CVSS v3.1 vector | Score | Notes |
+|---|---|---|---|---|
+
 ## Findings
 
 <!-- Same table format as qa-findings.md; CRITICAL/HIGH feed adversarial verification. -->

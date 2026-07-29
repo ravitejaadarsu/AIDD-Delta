@@ -11,6 +11,7 @@ The Retro Learner mines the completed change for:
 - Fix-loop root causes (construction patterns to avoid).
 - Supervision violations (process steps that need reinforcement).
 - Friction events (missing commands, flaky verification, unclear templates).
+- Memory health: stale or contradicted lessons, and citations whose evidence artifact no longer exists.
 
 ## learnings.md format
 

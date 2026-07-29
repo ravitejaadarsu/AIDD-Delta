@@ -20,7 +20,7 @@ assumptions), existing `learnings.md`.
 ## Protocol
 
 1. Extract candidates: refuted-finding patterns (damping), wrong take-care assumptions
-   (question sharpening), fix-loop root causes, supervision violations, friction events.
+   (question sharpening), fix-loop root causes, supervision violations, friction events, and memory-health checks (stale/contradicted lessons, dangling citations).
 2. Distill each into an imperative rule a future agent can apply directly.
 3. Deduplicate against existing lessons (merge, don't repeat).
 4. Append with fresh L-ids; nothing learned → append an explicit "no new lessons"

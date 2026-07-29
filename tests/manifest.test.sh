@@ -33,16 +33,16 @@ for auto in ('agents', 'hooks/hooks.json'):
         errors.append(f"auto-discovered path missing on disk: {auto}")
 
 cmds = sorted(f for f in os.listdir('commands') if f.endswith('.md'))
-if len(cmds) != 16:
-    errors.append(f"expected 16 commands, found {len(cmds)}")
+if len(cmds) != 17:
+    errors.append(f"expected 17 commands, found {len(cmds)}")
 for f in cmds:
     text = open(f'commands/{f}', encoding='utf-8').read()
     if not text.startswith('---') or 'description:' not in text.split('---')[1]:
         errors.append(f"commands/{f}: missing description frontmatter")
 
 agents = sorted(f for f in os.listdir('agents') if f.endswith('.md'))
-if len(agents) != 19:
-    errors.append(f"expected 19 agents, found {len(agents)}")
+if len(agents) != 22:
+    errors.append(f"expected 22 agents, found {len(agents)}")
 for f in agents:
     role = f.replace('aidd-', '').replace('.md', '')
     if not os.path.isfile(f'core/roles/{role}.md'):
