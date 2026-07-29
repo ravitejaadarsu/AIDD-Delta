@@ -1,0 +1,7 @@
+# Fixture: INVALID — 'deploy' is not a phase; 'sprinting' is not a status.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth"
+mode: take-care
+phase: deploy
+phase_status: sprinting

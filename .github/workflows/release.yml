@@ -1,0 +1,30 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify version matches tag
+        run: |
+          V="$(tr -d '[:space:]' < VERSION)"
+          [ "v${V}" = "${GITHUB_REF_NAME}" ] || { echo "VERSION ${V} != tag ${GITHUB_REF_NAME}"; exit 1; }
+      - name: Self-tests
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y shellcheck
+          npm install -g markdownlint-cli2
+          bash tests/run.sh
+      - name: Package core
+        run: tar -czf aidd-core.tar.gz core install.sh VERSION LICENSE
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            aidd-core.tar.gz
+            install.sh

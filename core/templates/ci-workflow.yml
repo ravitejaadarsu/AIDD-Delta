@@ -1,0 +1,26 @@
+# AIDD Delta — CI template emitted into target repos by the Delivery phase.
+# The Delivery Agent replaces the verification commands with the canonical ones
+# from architecture.md before committing.
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # setup: REPLACE with stack setup (actions/setup-node, setup-python, …)
+      - name: Build
+        run: echo "REPLACE with build command"
+      - name: Test
+        run: echo "REPLACE with test command"
+      - name: Lint
+        run: echo "REPLACE with lint command"
+      - name: Validate AIDD state
+        run: |
+          if [ -f .aidd/state.yaml ]; then
+            python3 .aidd/framework/scripts/aidd-validate.py \
+              .aidd/framework/schemas/state.schema.json .aidd/state.yaml
+          fi

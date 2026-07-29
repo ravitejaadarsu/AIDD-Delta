@@ -1,0 +1,32 @@
+# Fixture: change just created, nothing run yet.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth with session management"
+mode: let-me-look
+phase: inception
+phase_status: not_started
+step: null
+jira:
+  ticket: null
+  sync: false
+gates: {}
+quality_gates:
+  tests_green: pending
+  qa_findings_resolved: pending
+  e2e_verified: pending
+  mutation_floor_met: pending
+  security_clean: pending
+  perf_within_budget: pending
+  acs_verified: pending
+  evidence_captured: pending
+  supervision_compliant: pending
+stories: {}
+fix_loop:
+  iteration: 0
+  max: 3
+backflow_used: false
+supervision: {}
+scores: {}
+blocked_reason: null
+history: []
+updated_at: "2026-07-29T13:00:00Z"

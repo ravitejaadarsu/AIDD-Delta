@@ -1,0 +1,9 @@
+{
+  // AIDD Delta markdown lint policy: strict structure, relaxed prose width.
+  "default": true,
+  "MD013": false, // line length — playbooks favor readable long lines
+  "MD033": false, // inline HTML — needed for details/summary in reports
+  "MD041": false, // first-line heading — templates start with frontmatter
+  "MD024": { "siblings_only": true },
+  "MD036": false  // emphasis-as-heading — used in gate digests
+}

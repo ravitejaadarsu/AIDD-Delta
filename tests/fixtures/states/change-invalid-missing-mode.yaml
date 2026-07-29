@@ -1,0 +1,7 @@
+# Fixture: INVALID — required 'mode' missing, unknown key present.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth"
+phase: inception
+phase_status: in_progress
+speed: maximum

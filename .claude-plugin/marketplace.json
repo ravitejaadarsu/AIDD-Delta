@@ -1,0 +1,14 @@
+{
+  "name": "aidd-delta",
+  "owner": {
+    "name": "AIDD Delta contributors"
+  },
+  "plugins": [
+    {
+      "name": "aidd",
+      "source": "./",
+      "description": "AIDD Delta \u2014 one intent to production-ready delivery.",
+      "version": "0.1.0"
+    }
+  ]
+}

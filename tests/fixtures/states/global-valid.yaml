@@ -1,0 +1,8 @@
+# Fixture: freshly initialized global state.
+schema: 1
+aidd_version: "0.1.0"
+default_mode: let-me-look
+active_change: null
+constitution: present
+changes:
+  2026-07-29-user-auth: in_progress

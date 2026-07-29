@@ -1,0 +1,31 @@
+# Fixture: paused at G1 in let-me-look mode.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth with session management"
+mode: let-me-look
+phase: inception
+phase_status: awaiting_gate
+step: "G1 digest presented"
+gates:
+  g1_prd:
+    status: awaiting
+    artifact: prd.md
+    artifact_sha256: "ab12cd34ab12cd34"
+    approved_by: null
+    at: null
+    notes: null
+quality_gates:
+  tests_green: pending
+  qa_findings_resolved: pending
+  e2e_verified: pending
+  mutation_floor_met: pending
+  security_clean: pending
+  perf_within_budget: pending
+  acs_verified: pending
+  evidence_captured: pending
+  supervision_compliant: pending
+stories: {}
+history:
+  - at: "2026-07-29T13:40:00Z"
+    event: "prd drafted; G1 awaiting human"
+updated_at: "2026-07-29T13:41:00Z"

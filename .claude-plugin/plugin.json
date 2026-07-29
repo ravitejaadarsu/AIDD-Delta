@@ -1,0 +1,11 @@
+{
+  "name": "aidd",
+  "version": "0.1.0",
+  "description": "AIDD Delta \u2014 one intent to production-ready delivery. Multi-agent pipeline: Master, Inception, Construction, QA, Delivery with gates, adversarial verification, and evidence capture.",
+  "author": {
+    "name": "AIDD Delta contributors"
+  },
+  "commands": "./commands",
+  "agents": "./agents",
+  "hooks": "./hooks/hooks.json"
+}

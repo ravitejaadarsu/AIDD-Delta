@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AIDD Delta per-change state (.aidd/changes/<id>/state.yaml)",
+  "type": "object",
+  "required": ["schema", "change_id", "intent", "mode", "phase", "phase_status"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "type": "integer", "enum": [1] },
+    "change_id": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$" },
+    "intent": { "type": "string" },
+    "mode": { "enum": ["take-care", "let-me-look"] },
+    "phase": { "enum": ["document", "master", "inception", "construction", "qa", "delivery", "retro", "done"] },
+    "phase_status": { "enum": ["not_started", "in_progress", "awaiting_gate", "blocked", "complete"] },
+    "step": { "type": ["string", "null"] },
+    "jira": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ticket": { "type": ["string", "null"] },
+        "sync": { "type": "boolean" }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "additionalProperties": false,
+        "properties": {
+          "status": { "enum": ["pending", "awaiting", "approved", "revised", "stale", "aborted"] },
+          "artifact": { "type": ["string", "null"] },
+          "artifact_sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{8,64}$" },
+          "approved_by": { "enum": ["human", "auto", null] },
+          "at": { "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "quality_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tests_green": { "enum": ["pending", "passed", "failed", "na"] },
+        "qa_findings_resolved": { "enum": ["pending", "passed", "failed", "na"] },
+        "e2e_verified": { "enum": ["pending", "passed", "failed", "na"] },
+        "mutation_floor_met": { "enum": ["pending", "passed", "failed", "na"] },
+        "security_clean": { "enum": ["pending", "passed", "failed", "na"] },
+        "perf_within_budget": { "enum": ["pending", "passed", "failed", "na"] },
+        "acs_verified": { "enum": ["pending", "passed", "failed", "na"] },
+        "evidence_captured": { "enum": ["pending", "passed", "failed", "na"] },
+        "supervision_compliant": { "enum": ["pending", "passed", "failed", "na"] }
+      }
+    },
+    "stories": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "additionalProperties": false,
+        "properties": {
+          "status": { "enum": ["queued", "ready", "in_progress", "built", "blocked", "failed", "done"] },
+          "attempts": { "type": "integer", "minimum": 0 },
+          "wave": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "fix_loop": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "iteration": { "type": "integer", "minimum": 0 },
+        "max": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "backflow_used": { "type": "boolean" },
+    "supervision": {
+      "type": "object",
+      "additionalProperties": { "enum": ["pending", "compliant", "violations"] }
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "verdict": { "enum": ["PASS", "CONCERNS", "FAIL"] },
+          "score": { "type": "integer", "minimum": 0, "maximum": 100 }
+        }
+      }
+    },
+    "blocked_reason": { "type": ["string", "null"] },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["at", "event"],
+        "additionalProperties": false,
+        "properties": {
+          "at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+          "event": { "type": "string" }
+        }
+      }
+    },
+    "updated_at": { "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" }
+  }
+}
