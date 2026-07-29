@@ -19,11 +19,18 @@ if plugin['version'] != version:
 for p in market.get('plugins', []):
     if p.get('version') != version:
         errors.append(f"marketplace plugin version {p.get('version')} != VERSION {version}")
-for key in ('commands', 'agents'):
-    if not os.path.isdir(plugin[key]):
-        errors.append(f"plugin.json {key} dir missing: {plugin[key]}")
-if not os.path.isfile(plugin['hooks']):
-    errors.append(f"plugin.json hooks file missing: {plugin['hooks']}")
+# commands/skills are declared as arrays of dir paths; agents + hooks/hooks.json
+# are auto-discovered by Claude Code and must NOT be declared in the manifest.
+for key in ('commands', 'skills'):
+    val = plugin.get(key)
+    if not isinstance(val, list) or not all(os.path.isdir(d) for d in val):
+        errors.append(f"plugin.json {key} must be a list of existing dirs, got: {val}")
+for forbidden in ('agents', 'hooks'):
+    if forbidden in plugin:
+        errors.append(f"plugin.json must not declare '{forbidden}' (auto-discovered)")
+for auto in ('agents', 'hooks/hooks.json'):
+    if not os.path.exists(auto):
+        errors.append(f"auto-discovered path missing on disk: {auto}")
 
 cmds = sorted(f for f in os.listdir('commands') if f.endswith('.md'))
 if len(cmds) != 16:
