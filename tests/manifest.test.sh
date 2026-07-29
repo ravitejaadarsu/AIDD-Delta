@@ -26,16 +26,16 @@ if not os.path.isfile(plugin['hooks']):
     errors.append(f"plugin.json hooks file missing: {plugin['hooks']}")
 
 cmds = sorted(f for f in os.listdir('commands') if f.endswith('.md'))
-if len(cmds) != 15:
-    errors.append(f"expected 15 commands, found {len(cmds)}")
+if len(cmds) != 16:
+    errors.append(f"expected 16 commands, found {len(cmds)}")
 for f in cmds:
     text = open(f'commands/{f}', encoding='utf-8').read()
     if not text.startswith('---') or 'description:' not in text.split('---')[1]:
         errors.append(f"commands/{f}: missing description frontmatter")
 
 agents = sorted(f for f in os.listdir('agents') if f.endswith('.md'))
-if len(agents) != 18:
-    errors.append(f"expected 18 agents, found {len(agents)}")
+if len(agents) != 19:
+    errors.append(f"expected 19 agents, found {len(agents)}")
 for f in agents:
     role = f.replace('aidd-', '').replace('.md', '')
     if not os.path.isfile(f'core/roles/{role}.md'):

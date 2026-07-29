@@ -5,6 +5,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ## [Unreleased]
 
+### Added
+
+- Test Engineer role (`test-engineer`) — a team of senior testers that designs
+  and executes an exhaustive test matrix (happy path, negative, boundary,
+  impossible/abuse, API-contract, concurrency, regression, performance) per
+  fix/story/implementation, writes the end-results file `qa/test-report.md`, feeds
+  failures into the QA fix loop, and links the report into the story on approval
+  (`g_test_report` gate). New `/aidd:test` command, `exhaustive_tests_passed`
+  quality gate, and `docs/testing.md`.
+
 ## [0.1.0]
 
 ### Added

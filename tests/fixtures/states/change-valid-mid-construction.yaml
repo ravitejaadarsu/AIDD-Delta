@@ -26,6 +26,7 @@ gates:
     notes: null
 quality_gates:
   tests_green: pending
+  exhaustive_tests_passed: pending
   qa_findings_resolved: pending
   e2e_verified: pending
   mutation_floor_met: pending

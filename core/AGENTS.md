@@ -18,6 +18,7 @@ follow it exactly. **Never improvise phase logic.**
 | "AIDD: approve" / "AIDD: revise — <notes>" | Follow `.aidd/framework/protocol/gates.md` |
 | "AIDD: set mode take-care/let-me-look" | Update mode per `protocol/autonomy-modes.md` |
 | "AIDD: run <document/master/inception/construction/qa/delivery>" | Run the matching `prompts/<phase>.md` |
+| "AIDD: test <story/fix>" | Run `prompts/test.md` (exhaustive test-engineer team) |
 
 ## Ground rules
 

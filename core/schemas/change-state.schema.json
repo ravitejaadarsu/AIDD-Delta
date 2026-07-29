@@ -41,6 +41,7 @@
       "additionalProperties": false,
       "properties": {
         "tests_green": { "enum": ["pending", "passed", "failed", "na"] },
+        "exhaustive_tests_passed": { "enum": ["pending", "passed", "failed", "na"] },
         "qa_findings_resolved": { "enum": ["pending", "passed", "failed", "na"] },
         "e2e_verified": { "enum": ["pending", "passed", "failed", "na"] },
         "mutation_floor_met": { "enum": ["pending", "passed", "failed", "na"] },
