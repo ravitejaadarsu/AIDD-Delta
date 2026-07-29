@@ -1,11 +1,13 @@
 # AIDD Delta
 
-**One intent → production-ready delivery.**
+**An autonomous multi-agent engineering fabric — one prompt to a merge-ready, CI-green PR.**
 
-AIDD Delta is a multi-agent, AI-driven development framework. You give it a single
-intent — a feature request, a Jira ticket, a bug report — and it drives the full
-lifecycle: requirements, architecture, parallel TDD implementation, adversarially
-verified review, evidence-backed QA, and a merged-ready pull request with green CI.
+AIDD Delta is an orchestrated fleet of specialist agents that carries a single intent —
+a feature request, a Jira ticket, a bug report — end to end: spec synthesis, judged
+architecture, parallel test-first implementation, adversarially verified review,
+exhaustive test generation, and evidence-backed sign-off, ending in a merge-ready pull
+request with green CI. It self-audits the entire run, so nothing ships on assertion —
+only on evidence.
 
 It runs natively on **Claude Code** (true parallel subagents, hook-enforced guardrails)
 and portably on **Codex CLI or any agent CLI** (the same playbooks, executed sequentially).
@@ -14,16 +16,18 @@ and portably on **Codex CLI or any agent CLI** (the same playbooks, executed seq
 
 ## Why AIDD Delta
 
-- **Precision over speed.** Clarifying questions before generation. TDD with recorded
-  failing-test evidence. Every review finding must survive an adversarial verifier that
-  tries to refute it. Nothing ships on assertion — only on evidence.
-- **Five phases, three gates.** Master → Inception → Construction → QA → Delivery, with
-  human approval gates (PRD, Plan, Pre-merge) — or fully autonomous `take-care` mode
-  with an identical audit trail.
-- **A Master Supervisor** audits every agent flow at every phase boundary. The process
-  itself is QA'd.
-- **Portable core.** All logic is plain markdown in `core/`. The Claude Code plugin is a
-  thin shell; a Codex user runs literally the same playbooks.
+- **Precision over speed.** Requirements are clarified before anything is generated.
+  Implementation is test-first with recorded failing-test evidence. Every review finding
+  must survive an adversarial verifier that tries to refute it — only confirmed defects
+  block. An exhaustive tester team then attacks each change with the possible and the
+  impossible cases.
+- **Staged, gated, resumable.** The run advances through discrete, evidence-gated stages
+  with human checkpoints (requirements, plan, pre-merge) — or full autonomy with an
+  identical audit trail. State is schema-validated and every step is resumable.
+- **A supervisor over the supervisors.** An independent auditor inspects every agent
+  hand-off at each stage boundary; the process itself is held to account, not just the code.
+- **Portable core.** All logic is plain markdown in `core/`. The Claude Code integration
+  is a thin shell; any agent CLI runs literally the same playbooks.
 
 ## Quickstart
 

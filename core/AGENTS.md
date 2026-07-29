@@ -1,8 +1,8 @@
 <!-- AIDD:BEGIN — managed block; install.sh updates between these markers -->
 # AIDD Delta
 
-This repository uses [AIDD Delta](https://github.com/aidd-delta/AIDD-Delta) —
-one intent → production-ready delivery.
+This repository uses [AIDD Delta](https://github.com/ravitejaadarsu/AIDD-Delta) —
+an autonomous multi-agent engineering fabric: one prompt to a merge-ready, CI-green PR.
 
 ## Routing rule (for any AI coding agent)
 

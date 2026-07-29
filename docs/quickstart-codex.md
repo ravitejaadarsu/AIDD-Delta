@@ -5,7 +5,7 @@ The same pipeline, no plugin required. Everything the agent needs is plain markd
 ## 1. Install into your repo
 
 ```bash
-git clone https://github.com/aidd-delta/AIDD-Delta.git ~/AIDD-Delta
+git clone https://github.com/ravitejaadarsu/AIDD-Delta.git ~/AIDD-Delta
 cd your-project
 ~/AIDD-Delta/install.sh
 ```

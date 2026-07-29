@@ -5,7 +5,7 @@ Five minutes from zero to your first AIDD change.
 ## 1. Install the plugin
 
 ```bash
-git clone https://github.com/aidd-delta/AIDD-Delta.git ~/AIDD-Delta
+git clone https://github.com/ravitejaadarsu/AIDD-Delta.git ~/AIDD-Delta
 ```
 
 In Claude Code: `/plugin marketplace add ~/AIDD-Delta` → install the **aidd** plugin.
