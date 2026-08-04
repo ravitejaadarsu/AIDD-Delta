@@ -28,7 +28,9 @@ log and artifacts against the phase checklist in the corresponding playbook. Che
   respected — interrogation ≤ 2 rounds per subject, negotiation ≤ 2 exchanges per disputed
   AC, counters in change-state `audit` matching the artifacts on disk.
 - QA: every CRITICAL/HIGH finding has a verdict; fix loop within budget; E2E clean-state
-  evidence; post captures present; AC matrix complete; debate records present
+  evidence; post captures present; AC matrix complete; a Master Agent monitoring note
+  present per QA batch (review, test, verification) (`audit/monitoring/qa-*.md`);
+  debate records present
   (`audit/debate/*`) with their budget arithmetic consistent with change-state
   `audit.debate` (exchanges counted in the records equal `exchanges_used`, within `max`);
   tally complete (`qa/tally.md`) with zero unwaived `GAP` rows and no unrouted orphans;

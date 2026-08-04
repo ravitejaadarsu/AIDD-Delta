@@ -47,7 +47,9 @@ FAIL. The ladder is designed to terminate early wherever it honestly can:
   Agent's monitoring note already agrees the work is deficient — the **short-circuit**
   rule sends the AC straight to the fix loop as a `DEFECT`, no position, no response.
   A DISPUTED AC with no monitoring note covering the subject also short-circuits
-  straight to the fix loop, recorded as one negotiation-log line (who ruled: short-circuit).
+  straight to the fix loop, recorded as one negotiation-log line
+  (who ruled: short-circuit (no monitoring note) — distinct from the monitoring-concurs
+  trigger above).
 - Where negotiation does open, the Master Agent's **accept** response closes it
   immediately as `DEFECT` — no adjudication follows. Only a **contest** that survives
   both budgeted exchanges reaches the Supervisor.

@@ -39,6 +39,7 @@ audit:
   negotiation:
     exchanges_used: 0
     max: 2
+    rulings: []          # one row per disputed AC closed: {ac_id, ruling, ruled_by}
   debate:
     exchanges_used: 0
     max: 6

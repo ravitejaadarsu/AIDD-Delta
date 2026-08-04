@@ -36,8 +36,9 @@ frontmatter + Builder Reports, the Construction diff (`git diff`), `qa/test-repo
 4. Orphan scan: any diff file not owned by any story's `file_scope.owns`/`creates`
    (`../protocol/file-scope.md`) is an orphan — list it under `## Orphans`.
 5. Route, never block: a missing AC proof becomes a note for the AC-matrix fix loop —
-   write the AC-proof note into the relevant row's `note` column AND list it under a
-   `## Routed` section of `qa/tally.md` addressed to the AC matrix fix loop. An orphaned
+   record `na` plus the stated reason in the affected row's missing column (the
+   `RECONCILED` rule of step 3) AND list the AC-proof note under a `## Routed` section of
+   `qa/tally.md` (its `note` column) addressed to the AC matrix fix loop. An orphaned
    diff becomes a finding for adversarial verification — write each orphaned-diff finding
    as one row in qa-findings.md format (severity, file:line, claim, concrete failure
    scenario) inside the `## Orphans` section's `note` column so the orchestrator can

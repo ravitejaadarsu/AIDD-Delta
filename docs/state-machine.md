@@ -18,6 +18,10 @@ registry only: `schema`, `aidd_version`, `default_mode`, `active_change`,
 - `quality_gates`: fourteen mode-independent checks (see `core/protocol/gates.md`)
 - `stories.<id>`: status/attempts/wave · `fix_loop` · `backflow_used` ·
   `supervision.<phase>` · `scores.<phase>` · `history[]` (append-only audit)
+- `audit`: Layer-2 budget counters — `interrogation` (rounds_used/max),
+  `negotiation` (exchanges_used/max plus `rulings[]`: per-AC `ac_id`/`ruling`/`ruled_by`),
+  `debate` (exchanges_used/max); see `core/protocol/interrogation.md`,
+  `core/protocol/negotiation.md`, `core/protocol/test-debate.md`
 
 ## Why two files
 

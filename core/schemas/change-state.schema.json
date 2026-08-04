@@ -101,7 +101,23 @@
           "properties": { "rounds_used": {"type":"integer","minimum":0}, "max": {"type":"integer","minimum":1} },
           "required": ["rounds_used","max"] },
         "negotiation":   { "type": "object", "additionalProperties": false,
-          "properties": { "exchanges_used": {"type":"integer","minimum":0}, "max": {"type":"integer","minimum":1} },
+          "properties": {
+            "exchanges_used": {"type":"integer","minimum":0},
+            "max": {"type":"integer","minimum":1},
+            "rulings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["ac_id", "ruling", "ruled_by"],
+                "additionalProperties": false,
+                "properties": {
+                  "ac_id": { "type": "string" },
+                  "ruling": { "enum": ["PROVEN", "DEFECT", "UNRESOLVABLE"] },
+                  "ruled_by": { "enum": ["negotiation", "Supervisor adjudication", "short-circuit", "short-circuit (no monitoring note)"] }
+                }
+              }
+            }
+          },
           "required": ["exchanges_used","max"] },
         "debate":        { "type": "object", "additionalProperties": false,
           "properties": { "exchanges_used": {"type":"integer","minimum":0}, "max": {"type":"integer","minimum":1} },

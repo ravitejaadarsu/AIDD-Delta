@@ -15,7 +15,7 @@ the work covering that AC.
 deficient, the orchestrator skips negotiation entirely — the DISPUTED AC becomes a
 fix-loop defect directly, with no position, no response, no adjudication. The
 orchestrator still appends exactly one log line to `negotiation-log.md` and mirrors it
-to change state: no disputed AC's fate goes untracked.
+to change state (`audit.negotiation.rulings`): no disputed AC's fate goes untracked.
 
 A second trigger short-circuits the same way: at the QA final audit
 (`../playbooks/40-qa.md` step 12), a DISPUTED AC's subject may have no covering
@@ -38,7 +38,7 @@ One file for the whole change. Every disputed AC that reaches this protocol — 
 it negotiates or short-circuits — appends its own section; never a separate file, never
 an overwrite.
 
-Template: `templates/negotiation-log.md`.
+Template: `../templates/negotiation-log.md`.
 
 ## Position
 
@@ -97,5 +97,6 @@ adjudication); the short-circuit path always yields `DEFECT` (who ruled: short-c
 stop in both autonomy modes, take-care included, before the change can proceed.
 
 Every outcome — short-circuit, accept, or Supervisor ruling — is exactly one log line
-appended to `negotiation-log.md` and mirrored to change state (`audit.negotiation`);
-each is itself a history event. Nothing exits this protocol unlogged.
+appended to `negotiation-log.md` and mirrored to change state
+(`audit.negotiation.rulings`, one row per closed AC: `ac_id`, `ruling`, `ruled_by` —
+schema shipped); each is itself a history event. Nothing exits this protocol unlogged.

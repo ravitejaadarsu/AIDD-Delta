@@ -7,8 +7,10 @@
 
 ## AC-<id>
 
-<!-- Short-circuit ACs (Master Agent's monitoring already concurs the work is
-     deficient) skip Position/Response entirely and go straight to Ruling. -->
+<!-- Short-circuit ACs skip Position/Response entirely and go straight to Ruling — two
+     distinct triggers: the Master Agent's monitoring already concurs the work is
+     deficient, OR no monitoring note covers the subject at all (nothing to negotiate
+     against). Record which one in the Ruling's who-ruled value. -->
 
 ### Position — exchange <N> (starting at 1)
 
@@ -33,9 +35,11 @@
 
 ### Ruling
 
-<!-- PROVEN\|DEFECT\|UNRESOLVABLE, and who ruled: `negotiation` (Master Agent accepted),
-     `Supervisor adjudication`, or `short-circuit` (orchestrator appended when Master Agent's
-     monitoring concurred deficiency). UNRESOLVABLE forces a human gate in both autonomy
-     modes, take-care included. -->
+<!-- PROVEN\|DEFECT\|UNRESOLVABLE, and who ruled — exactly one of `negotiation` (Master
+     Agent accepted), `Supervisor adjudication`, `short-circuit` (orchestrator appended
+     when the Master Agent's monitoring concurred deficiency), or
+     `short-circuit (no monitoring note)` (orchestrator appended when no monitoring note
+     covered the subject — distinct from the monitoring-concurs trigger). UNRESOLVABLE
+     forces a human gate in both autonomy modes, take-care included. -->
 
 <!-- Repeat the ## AC-<id> section for every disputed AC that reaches this protocol. -->

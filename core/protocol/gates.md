@@ -23,7 +23,8 @@ At a gate the orchestrator always:
    - `take-care`: disposition is `approve` recorded as `approved_by: auto` — UNLESS an
      escalation flag is set (open BLOCKING question, disjointness CONCERNS, unresolved
      pre-review CRITICAL, open CONFIRMED finding, open test FAIL, AC matrix FAIL, critic
-     REJECT, unresolved supervision VIOLATION), in which case this gate behaves exactly like
+     REJECT, unresolved supervision VIOLATION, UNRESOLVABLE adjudication ruling (disputed
+     AC without a PROVEN/DEFECT resolution)), in which case this gate behaves exactly like
      `let-me-look`.
 3. Appends the gate entry to `gates` in change state and advances.
 

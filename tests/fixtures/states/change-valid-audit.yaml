@@ -65,6 +65,10 @@ audit:
   negotiation:
     exchanges_used: 0
     max: 2
+    rulings:
+      - ac_id: AC-3
+        ruling: DEFECT
+        ruled_by: short-circuit (no monitoring note)
   debate:
     exchanges_used: 0
     max: 6

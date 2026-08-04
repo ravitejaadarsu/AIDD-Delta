@@ -27,7 +27,7 @@ A challenge names, for every disputed AC: the AC id, the evidence gap, and the e
 proof demanded. Vague challenges are invalid by format — "prove it" is rejected; "run
 the deleted-cart flow and paste the 404 response" is not.
 
-Template: `templates/interrogation-challenge.md`.
+Template: `../templates/interrogation-challenge.md`.
 
 ## Response
 
@@ -37,7 +37,7 @@ response. Every claim uses the mandatory evidence-block format from
 missing an evidence block for a demanded AC is rejected once with "evidence missing";
 a second miss on the same AC marks it DISPUTED for the round.
 
-Template: `templates/interrogation-response.md`.
+Template: `../templates/interrogation-response.md`.
 
 ## Dispatch
 
@@ -58,7 +58,7 @@ The counter tracks only the subject currently under interrogation: the orchestra
 After round 2, or earlier once every AC is settled, every AC the subject claims is
 exactly one of `PROVEN | DISPUTED`. PROVEN requires cited executed evidence; DISPUTED
 requires a named evidence gap. Written to `<subject-id>-verdict.md`
-(`templates/auditor-verdict.md`).
+(`../templates/auditor-verdict.md`).
 
 ## Routing
 

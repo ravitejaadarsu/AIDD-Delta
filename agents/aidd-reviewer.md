@@ -1,6 +1,6 @@
 ---
 name: aidd-reviewer
-description: AIDD parameterized reviewer: mode=pre (plan vs live codebase) or mode=post (the diff), one dimension per dispatch. Findings need concrete scenarios.
+description: AIDD parameterized reviewer: mode=pre (plan vs live codebase) or mode=post (the diff), one dimension per dispatch; or mode=delta (pre/post-bound review) — one dispatch covering intent-fidelity, structure-fit, and sigma-regression. Findings need concrete scenarios.
 tools: Read, Grep, Glob, Bash, Write
 ---
 
