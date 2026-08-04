@@ -27,11 +27,14 @@ delivery → retro → done. Strict order per `../protocol/state-protocol.md`.
 ## Three verification layers
 
 - **Layer 1 — workers**: every role that produces the product (Builder, Reviewer, Test
-  Engineer, Verifier, Evidence Capturer, AC Assessor, Critic).
-- **Layer 2 — adjudicators**, dispatched after every construction wave and every QA step
-  batch: Master Agent (`../roles/master-agent.md`) monitors work quality, Auditor
+  Engineer, Verifier, Evidence Capturer, AC Assessor, Security Auditor, Adversarial
+  Verifier).
+- **Layer 2 — adjudicators**: Master Agent (`../roles/master-agent.md`) monitors work
+  quality, dispatched after every construction wave and every QA step batch; Auditor
   (`../roles/auditor.md`) interrogates per-AC proof (`../protocol/interrogation.md` →
-  `../protocol/negotiation.md`), Tally (`../roles/tally.md`) reconciles tracked work items.
+  `../protocol/negotiation.md`), dispatched after every construction wave and once as the
+  QA final audit; Tally (`../roles/tally.md`) reconciles tracked work items, dispatched
+  once in QA (after post evidence, before the Critic).
 - **Layer 3 — Supervisor** (`../roles/supervisor.md`), dispatched at every phase boundary,
   audits process compliance over the **super-context**: all worker artifacts +
   `audit/monitoring/*` + `audit/interrogation/*` + `audit/negotiation-log.md` +

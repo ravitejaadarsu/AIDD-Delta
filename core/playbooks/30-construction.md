@@ -17,8 +17,9 @@ captured first.
       with the violation named.
    c. **Master Agent monitoring** — dispatch Master Agent (`../roles/master-agent.md`)
       `mode: monitor` over the wave's Builder Reports →
-      `audit/monitoring/construction-wave-<n>.md`: a substantive quality read of the work
-      itself (does the cited evidence actually support the claim? were corners cut?), never
+      `audit/monitoring/construction-wave-<n>.md` (the wave is the step token per
+      `<phase>-<step>`, master-agent.md): a substantive quality read of the work itself
+      (does the cited evidence actually support the claim? were corners cut?), never
       process compliance and never dispatch mechanics.
    d. **Auditor interrogation** — dispatch Auditor (`../roles/auditor.md`) over the wave's
       Builder Reports, one subject per report, max **2** challenge rounds per subject
@@ -27,6 +28,8 @@ captured first.
       `../protocol/negotiation.md` against this wave's monitoring note — unless that note
       already concurs the work is deficient, in which case the short-circuit rule skips
       negotiation and the AC becomes a fix-loop defect directly (still exactly one log line).
+      A DEFECT re-enters the story's remediation ladder (story back to ready, one
+      re-dispatch).
    e. **Wave integration check** (orchestrator): run canonical build + full test suite.
       Red → Build Fixer (`../roles/build-fixer.md`), max 3 attempts, then blocked path.
    f. **Snapshot rebuild** — `bash .aidd/framework/scripts/build-snapshot.sh post-wave-<n>`

@@ -29,14 +29,14 @@ At a gate the orchestrator always:
 
 ## The `g_test_report` sub-gate
 
-After the exhaustive test report is consolidated (QA step 9), the orchestrator seeks
+After the exhaustive test report is consolidated (QA step 14), the orchestrator seeks
 approval before annotating stories with the report. On approval it records `g_test_report`
 AND writes a `## Test Report` section into every affected story. In `take-care` this
 auto-approves unless an executed FAIL is still open.
 
 ## The critic verdict
 
-The Critic (QA step 11) returns APPROVE / APPROVE WITH CONDITIONS / REJECT, setting the
+The Critic (QA step 16) returns APPROVE / APPROVE WITH CONDITIONS / REJECT, setting the
 `critic_approved` quality gate: APPROVE→passed, CONDITIONS→passed (conditions recorded in
 the ledger + PR body), REJECT→failed (blocks G3; re-enter the fix loop or escalate).
 

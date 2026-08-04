@@ -47,9 +47,11 @@ record — this is what makes adjudication possible:
    (`../protocol/negotiation.md`), rule from the super-context above, not from the
    exchanged positions alone: exactly one of `PROVEN | DEFECT | UNRESOLVABLE` per AC.
    Append each ruling as one line to the negotiation log (who ruled: Supervisor
-   adjudication); the orchestrator mirrors it into change-state `audit`. `DEFECT` feeds the
-   QA fix loop like an executed FAIL; `UNRESOLVABLE` forces a human stop in both autonomy
-   modes, take-care included. Never live dialogue with either party.
+   adjudication); the orchestrator mirrors it into change-state `audit.negotiation`.
+   `DEFECT` feeds the fix loop like an executed FAIL — in Construction, a DEFECT re-enters
+   the story's remediation ladder (story back to ready, one re-dispatch); `UNRESOLVABLE`
+   forces a human stop in both autonomy modes, take-care included. Never live dialogue with
+   either party.
 5. Verdict: COMPLIANT, or VIOLATIONS with — per violation — the rule, the evidence of
    breach, and the exact remediation (which step re-runs). The phase verdict vocabulary is
    exactly `COMPLIANT | VIOLATIONS` — an adjudication ruling is a distinct additional
