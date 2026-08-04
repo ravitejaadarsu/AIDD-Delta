@@ -7,9 +7,11 @@ challenge coverage in one batched challenge artifact (`core/playbooks/40-qa.md` 
 **execution** — the
 Auditor contests specific TCs as each category's results land and the owning tester
 re-executes only those (inside step 5); **results** — disputed PASSes in the consolidated
-`qa/test-report.md` are re-proven **live** through **Playwright MCP** browser runs for
-UI-facing flows, with the screenshots as the item's evidence, and CLI/API transcripts
-otherwise (step 10). One exchange is one challenge artifact plus its response, as a pair; a
+`qa/test-report.md` are re-proven **live**: for UI-facing flows, where the host provides
+**Playwright MCP** they are re-driven in a real browser through it (screenshots as the
+item's evidence), otherwise the vendored `playwright-capture.mjs` script runs the
+fallback; non-UI flows re-run as CLI/API transcripts either way (step 10). One exchange
+is one challenge artifact plus its response, as a pair; a
 batched round covering every category counts as **1 exchange**. Per-surface caps are 2 / 2 / 2
 under a shared pool of **6 exchanges per change** that strictly dominates them, drawn in
 pipeline order, with no rollover of unused exchanges. Every debate item cites the AC id(s) the

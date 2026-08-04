@@ -27,7 +27,8 @@
 
 <!-- Mandatory: every debate item cites the AC id(s) the contested test evidences. On
      exhaustion an AC-mapped item goes DISPUTED into ../protocol/negotiation.md; an item
-     with no ac_ids is advisory — never blocks, never negotiates. Every row is terminal. -->
+     whose ac_ids is `na` or empty is advisory — never blocks, never negotiates. Every
+     row is terminal. -->
 
 ## Budget arithmetic
 

@@ -17,6 +17,15 @@ fix-loop defect directly, with no position, no response, no adjudication. The
 orchestrator still appends exactly one log line to `negotiation-log.md` and mirrors it
 to change state: no disputed AC's fate goes untracked.
 
+A second trigger short-circuits the same way: at the QA final audit
+(`../playbooks/40-qa.md` step 12), a DISPUTED AC's subject may have no covering
+monitoring note at all — Master Agent
+monitoring only runs per construction wave and per QA step batch, so a step-12 subject
+outside those batches has nothing to accept or concur with. With no monitoring note to
+open a negotiation against, the DISPUTED AC becomes a fix-loop defect directly, logged as
+one line with `who ruled: short-circuit (no monitoring note)` — distinct from the
+monitoring-concurs trigger above.
+
 ## Artifact layout
 
 Written under `.aidd/changes/<id>/audit/`:

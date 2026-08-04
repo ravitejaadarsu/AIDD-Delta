@@ -39,11 +39,11 @@ themselves on three surfaces, in pipeline order:
    re-executes **only** the contested TCs — max **2 exchanges total on the surface, not per
    category**.
 3. **Results** (step 10) — a disputed PASS in `qa/test-report.md` is re-proven **live**:
-   **Playwright MCP** drives UI-facing flows in a real browser and the screenshots become the
-   evidence; non-UI flows re-run as CLI/API transcripts. Re-citing the original run proves
-   nothing. Runtimes without Playwright MCP fall back to the vendored
-   `core/templates/playwright-capture.mjs` script, and the record says which path ran —
-   degradation is explicit, never silent.
+   where the host provides **Playwright MCP**, UI-facing flows are re-driven in a real
+   browser and the screenshots become the evidence; otherwise the vendored
+   `core/templates/playwright-capture.mjs` script runs the fallback. Non-UI flows re-run
+   as CLI/API transcripts either way. Re-citing the original run proves nothing, and the
+   record says which path ran — degradation is explicit, never silent.
 
 **Budgets are hard.** One exchange = one challenge artifact + its response, as a pair (a
 batched round covering every category is **1** exchange). Per-surface caps are 2 / 2 / 2, all

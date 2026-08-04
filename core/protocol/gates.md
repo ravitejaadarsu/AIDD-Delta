@@ -50,6 +50,6 @@ share an identical entry structure.
 
 `tests_green, exhaustive_tests_passed, qa_findings_resolved, e2e_verified,
 mutation_floor_met, security_clean, perf_within_budget, acs_verified, evidence_captured,
-supervision_compliant, critic_approved` — all must be `passed` (or explicitly `na` with a
-recorded reason) before Delivery pushes anything. Autonomy modes modulate human approval,
-never quality.
+supervision_compliant, critic_approved, auditor_approved, debate_complete,
+tally_reconciled` — all must be `passed` (or explicitly `na` with a recorded reason)
+before Delivery pushes anything. Autonomy modes modulate human approval, never quality.

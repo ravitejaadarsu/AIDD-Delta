@@ -1,7 +1,7 @@
 # FAQ
 
 **Does take-care mode lower the quality bar?** No. Autonomy modes change who approves
-gates, never the nine quality gates — those block delivery identically in both modes.
+gates, never the fourteen quality gates — those block delivery identically in both modes.
 
 **What if my project has no UI?** Evidence capture degrades to CLI/API transcripts,
 recorded explicitly in the manifest. No mutation tool for your stack? `mutation_floor_met`

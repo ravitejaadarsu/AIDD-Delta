@@ -7,4 +7,4 @@
 |---|---|---|---|
 
 <!-- PROVEN requires cited executed evidence; DISPUTED requires a named evidence gap.
-     Every DISPUTED row goes to the negotiation protocol (negotiation.md, Task 8). -->
+     Every DISPUTED row goes to the negotiation protocol (../protocol/negotiation.md). -->

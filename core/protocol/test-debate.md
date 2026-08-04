@@ -67,9 +67,12 @@ Written under `.aidd/changes/<id>/audit/debate/`:
 <category>.md
 ```
 
-One record per test category (`functional-happy-path` … `performance-smoke`), append-only
-across all three surfaces — never a file per surface, never an overwrite. Template:
-`../templates/debate-record.md`.
+One record per test category (`functional-happy-path` … `performance-smoke`), maintained
+across all three surfaces — never a file per surface. Append-only governs the Exchanges
+rows and the AC-mapping rows: new rows are added, never overwritten. The budget-arithmetic
+line is the one exception — orchestrator-owned, it is written or refreshed once per
+surface close (not appended as a new row) so it always carries the current change-global
+count. Template: `../templates/debate-record.md`.
 
 Ownership inside a record is strict: challengers append their own challenge rows, the owning
 Test Engineer appends its own responses, and the orchestrator owns the budget-arithmetic

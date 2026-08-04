@@ -15,7 +15,7 @@ registry only: `schema`, `aidd_version`, `default_mode`, `active_change`,
 - `step`: free-text breadcrumb making resume exact
 - `gates.<key>`: status (pending/awaiting/approved/revised/stale/aborted), artifact,
   artifact_sha256, approved_by (human|auto), at, notes
-- `quality_gates`: nine mode-independent checks (see `core/protocol/gates.md`)
+- `quality_gates`: fourteen mode-independent checks (see `core/protocol/gates.md`)
 - `stories.<id>`: status/attempts/wave · `fix_loop` · `backflow_used` ·
   `supervision.<phase>` · `scores.<phase>` · `history[]` (append-only audit)
 

@@ -62,5 +62,5 @@ requires a named evidence gap. Written to `<subject-id>-verdict.md`
 
 ## Routing
 
-Every DISPUTED AC goes to the negotiation protocol (`negotiation.md`, Task 8) between
+Every DISPUTED AC goes to the negotiation protocol (`../protocol/negotiation.md`) between
 the Auditor and the Master Agent. A PROVEN AC needs no further action.
