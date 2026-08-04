@@ -12,7 +12,7 @@ only on evidence.
 It runs natively on **Claude Code** (true parallel subagents, hook-enforced guardrails)
 and portably on **Codex CLI or any agent CLI** (the same playbooks, executed sequentially).
 
-> Status: v0.1.0 scaffold under active construction. See [ROADMAP.md](ROADMAP.md).
+> Status: v0.3.0 — three-layer verification, snapshot context, delta review, and test debate shipped; pre-1.0, under active development.
 
 ## Why AIDD Delta
 

@@ -24,7 +24,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 - Repo-level context snapshots (ADR 007): a gitignored `.aidd/context/` pack
   (`snapshot.md`, `quality-baseline.md`) rebuilt at every phase boundary and Construction
   wave; every role reads it first instead of re-crawling the repo. Pre-phase history
-  packs (`.aidd/context/history/pre-<phase>/`) feed the new delta review.
+  packs (`.aidd/context/history/<UTC-stamp>-pre-<phase>/`) feed the new delta review.
 - Reviewer `mode=delta` (ADR 008): a third mode on the existing parameterized Reviewer,
   dispatched once in QA step 1 alongside the `mode=post` dimension fan-out, binding
   intent-fidelity, structure-fit, and sigma-regression against the pre-phase snapshot
