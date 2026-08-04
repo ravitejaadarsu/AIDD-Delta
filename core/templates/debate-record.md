@@ -16,7 +16,9 @@
 <!-- `#` is the pool exchange number. `challenger` is master-agent | auditor (design rounds
      batch both into one artifact). `claim` names the contested TC id(s) and what is wrong,
      concretely — vague claims are invalid by format. `response` is the owning Test
-     Engineer's answer, citing evidence blocks (../protocol/evidence.md). -->
+     Engineer's answer, citing evidence blocks (../protocol/evidence.md). An exchange that
+     leaves an item contested keeps `outcome` empty at the exchange level — the terminal
+     disposition (DISPUTED | advisory) lives in the AC-mapping table below, not here. -->
 
 ## AC mapping
 
@@ -31,9 +33,14 @@
 
 exchanges: design <n>/2 · execution <n>/2 · results <n>/2 · pool <used>/6 · remaining <n>
 
-<!-- Orchestrator-owned. Per-surface counts plus the shared pool; an uncontested category
-     still gets its record, reading `pool 0/6` with an empty exchange table. The shared cap
-     dominates every per-surface allowance; unused exchanges never roll over. `pool <used>` must equal change-state
+<!-- Orchestrator-owned. CHANGE-GLOBAL: `design <n>/2`, `execution <n>/2`, and `results <n>/2`
+     are surface-global counts — total exchanges spent on that surface across the whole
+     change, mirroring per-surface spend — not per-category counts, and this line is
+     IDENTICAL across every category's record. An uncontested category still gets its
+     record, with an empty exchange table but the same change-global arithmetic line, reading
+     `pool 0/6` only when nothing at all was contested. The shared cap dominates every
+     per-surface allowance; unused exchanges never roll over. The `/6` denominator is the
+     shipped default and follows `audit.debate.max`. `pool <used>` must equal change-state
      `audit.debate.exchanges_used` counted as DISTINCT exchange numbers across
      audit/debate/* — the Supervisor checks this arithmetic (../protocol/supervision.md). -->
 

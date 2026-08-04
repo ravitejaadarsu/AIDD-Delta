@@ -43,10 +43,15 @@ caps: design **2**, execution **2** (total on the surface), results **2** — 2+
 subscribes the pool.
 
 - The shared cap **strictly dominates** every per-surface allowance: with the pool empty no
-  surface opens another exchange, even with its own allowance unspent.
+  surface opens another exchange, even with its own allowance unspent. This dominance only
+  binds when `audit.debate.max` is seeded below the 2+2+2 sum; at the shipped default of 6,
+  pool and per-surface sum coincide, so a fully-subscribing run never hits the shared cap
+  before its own per-surface caps.
 - Surfaces draw in pipeline order — design first, then execution, then results.
 - Unused exchanges do **not** roll over: an unspent design exchange never raises the
   execution or results allowance above 2.
+- The `/6` in each record's arithmetic line (`pool <used>/6`) is the shipped default; the
+  denominator always follows `audit.debate.max`, not a hardcoded 6.
 
 Tracked in change-state `audit.debate.exchanges_used` against `audit.debate.max` (schema
 shipped, seeded 6). This counter is **per change** and is never reset between surfaces or
@@ -71,10 +76,15 @@ Test Engineer appends its own responses, and the orchestrator owns the budget-ar
 line, the AC-mapping dispositions, and the change-state counter. No role edits another's
 entries.
 
-A record exists for every category under test even when nobody challenged it — empty exchange
-table, arithmetic line reading `pool 0/6`. Silence is recorded, not assumed: the Supervisor's
-QA checklist (`../protocol/supervision.md`) demands a record per category, so a missing record
-is a process violation rather than evidence of an uncontested matrix.
+An uncontested category still gets its record with an empty exchange table, carrying the same
+change-global arithmetic line — which reads `pool 0/6` only when nothing at all was contested.
+The budget-arithmetic line is CHANGE-GLOBAL: `design <n>/2 · execution <n>/2 · results <n>/2`
+are surface-global counts — total exchanges spent on that surface across the whole change,
+mirroring per-surface spend, not per-category — and the identical line is written into every
+category's record. Silence is recorded, not assumed: this protocol requires a record per
+category; the Supervisor's checklist (`../protocol/supervision.md`) verifies records are
+present with consistent arithmetic, so a missing record is a process violation rather than
+evidence of an uncontested matrix.
 
 ## Challenge
 
@@ -138,6 +148,10 @@ No item and no surface stays open. Every item ends as exactly one of **amended**
 **defended**, **DISPUTED** (exhausted, AC-mapped), or **advisory** (exhausted, unmapped). A
 surface is closed once every item on it holds one of those four dispositions — reached by
 response, or forced by exhaustion when the surface allowance or the shared pool is spent.
+
+A surface with no further challenge opened is treated as exhausted for its remaining items —
+the orchestrator declares the remaining allowance forfeit (it does not roll over) and applies
+the exhaustion rule to still-contested items.
 
 ## Gate
 

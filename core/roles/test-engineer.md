@@ -92,7 +92,8 @@ The item under test (story file, or the fix/diff range, or a named API), `prd.md
   changes, `api-contract` back-compat).
 - Every PASS cites executed evidence; no case left `pending`.
 - The matrix was published for the design debate before any case was executed, and every
-  challenge item you were handed closed as `amended` or `defended` — none left open.
+  challenge item you were handed closed as `amended`, `defended`, or handed back
+  still-contested at budget exhaustion — none left silently open.
 
 ## Report format
 

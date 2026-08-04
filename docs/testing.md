@@ -36,7 +36,8 @@ themselves on three surfaces, in pipeline order:
    **defend**. A weak design costs one exchange here instead of a whole execution round later.
 2. **Execution** (inside step 5) — as each category's results land the Auditor contests
    specific TCs (wrong assertion, mocked path where real proof was demanded). The owning tester
-   re-executes **only** the contested TCs.
+   re-executes **only** the contested TCs — max **2 exchanges total on the surface, not per
+   category**.
 3. **Results** (step 10) — a disputed PASS in `qa/test-report.md` is re-proven **live**:
    **Playwright MCP** drives UI-facing flows in a real browser and the screenshots become the
    evidence; non-UI flows re-run as CLI/API transcripts. Re-citing the original run proves
