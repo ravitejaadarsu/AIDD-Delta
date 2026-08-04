@@ -71,6 +71,30 @@ debate-record contributions, and appends `## Auditor Report` sections to story f
 - Jira access: read-only, reusing the existing pull ladder in
   `core/protocol/jira-sync.md` (MCP → REST → human paste). No new Jira surface.
 
+### Tally — the reconciliation agent (Layer 2, mechanical)
+
+**Tally** — `core/roles/tally.md` + `agents/aidd-tally.md`. `stage_class: mechanical`,
+tools: read-only code + Jira read ladder (per `core/protocol/jira-sync.md`); writes
+`qa/tally.md` only.
+
+- Dispatched once in QA, after post-evidence capture (so both `evidence/pre/` and
+  `evidence/post/` exist), before the Critic.
+- **Mission:** tally every tracked work item the change references — Jira stories,
+  tasks, bugs, and any custom issue type (e.g. "bolt") — against the implementation.
+  For each item: the ACs it carries, the stories that claimed it, the diff files that
+  realized it, the tests that prove it, and the **before/after evidence** links from
+  the evidence manifest.
+- **Output:** `qa/tally.md` (new template `core/templates/tally.md`) — one row per work
+  item: `item id | type | ACs | stories | diff files | tests | pre evidence |
+  post evidence | verdict RECONCILED / GAP`. Plus an **orphans section**: diff files
+  traceable to no work item.
+- **GAP routing:** gaps use existing channels — a missing AC proof feeds the AC-matrix
+  fix loop; an orphaned diff becomes a finding for adversarial verification. Tally
+  itself never blocks directly; the new mode-independent quality gate
+  `tally_reconciled` passes only when every row is RECONCILED and no orphans remain
+  (or gaps are explicitly waived at G3).
+- Tally's matrix joins the super-context consumed by the Critic and Supervisor.
+
 ### Layer 3 — Supervision (evolved)
 
 **Supervisor** — `core/roles/master-supervisor.md` is **renamed** to
@@ -230,7 +254,7 @@ in QA step 1 alongside the post dimensions.
 ## State, schema, and plumbing changes
 
 - **`core/schemas/change-state.schema.json`:**
-  - `quality_gates` gains `auditor_approved` and `debate_complete`
+  - `quality_gates` gains `auditor_approved`, `debate_complete`, and `tally_reconciled`
     (enum `pending|passed|failed|na`, mode-independent).
   - New `audit` block: interrogation round counters, negotiation exchange counters,
     debate budget spent (mirrors the `fix_loop {iteration, max}` shape).
@@ -243,10 +267,10 @@ in QA step 1 alongside the post dimensions.
   - `40-qa.md` — rewritten with renumbered steps in this order: post-review dimensions
     incl. `mode=delta` → collate/dedupe → adversarial verification → **test-design
     debate** → test execution (with **execution debate** per wave) → fix loop →
-    E2E verification → post evidence → AC matrix → **results debate** → **Auditor final
-    audit + interrogation** → **negotiation (if triggered)** → test-report approval →
-    QA verdict/score → Critic verdict → **Supervisor audit over the super-context** →
-    GATE G3. The spec intentionally avoids absolute step numbers; the playbook rewrite
+    E2E verification → post evidence → AC matrix → **results debate** → **Tally
+    reconciliation** → **Auditor final audit + interrogation** → **negotiation (if
+    triggered)** → test-report approval → QA verdict/score → Critic verdict →
+    **Supervisor audit over the super-context** → GATE G3. The spec intentionally avoids absolute step numbers; the playbook rewrite
     assigns them.
 - **Rename sweep:** `master-supervisor` → `supervisor` across roles/, agents/, playbooks,
   protocol, docs, skills, templates, **and tests/** (`tests/install.test.sh` asserts the
@@ -257,7 +281,7 @@ in QA step 1 alongside the post dimensions.
 - **Templates (new, in `core/templates/`):** `monitoring-report.md`,
   `interrogation-challenge.md`, `interrogation-response.md`, `auditor-verdict.md`,
   `negotiation-log.md`, `debate-record.md`, `snapshot.md`, `quality-baseline.md`,
-  `context-delta.md`.
+  `context-delta.md`, `tally.md`.
 - **ADRs (docs/design/decisions/):** 006 three-layer verification + DISPUTED blocking
   channel; 007 context snapshots; 008 delta review; 009 continuous test debate.
 - **Docs:** `docs/three-layer-verification.md`, `docs/context-snapshots.md`; updates to
@@ -280,8 +304,9 @@ in QA step 1 alongside the post dimensions.
 ## Build order (four sequentially shippable stages — each usable once its predecessors ship)
 
 1. **Snapshots** — script, protocol, hook, gitignore, role Inputs updates.
-2. **Layer 2** — Master Agent + Auditor roles/agents, interrogation + negotiation
-   protocols, Supervisor rename + super-context, schema `audit` block + gates, ADR 006.
+2. **Layer 2** — Master Agent + Auditor + Tally roles/agents, interrogation +
+   negotiation protocols, Supervisor rename + super-context, schema `audit` block +
+   gates (incl. `tally_reconciled`), `tally.md` template, ADR 006.
 3. **Delta review** — `mode=delta`, consumes snapshot history; ADR 008.
 4. **Test debate + Playwright MCP** — debate protocol, test-engineer updates, MCP
    execution path with script fallback; ADR 009.
