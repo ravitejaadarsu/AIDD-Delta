@@ -24,6 +24,8 @@ for d in playbooks prompts roles protocol templates schemas scripts; do
     fail=1
   fi
 done
+grep -qxF '.aidd/context/' "${TMP}/repo/.gitignore" \
+  || { echo ".gitignore missing .aidd/context/ after fresh install"; fail=1; }
 
 # 2. Idempotency + user-data preservation.
 python3 - "${TMP}/repo/.aidd/state.yaml" <<'PY'
@@ -38,6 +40,8 @@ PY
 grep -q '^default_mode: take-care' "${TMP}/repo/.aidd/state.yaml" || { echo "state clobbered on reinstall"; fail=1; }
 n=$(grep -c 'AIDD:BEGIN' "${TMP}/repo/AGENTS.md")
 [ "${n}" -eq 1 ] || { echo "AGENTS block count wrong after reinstall (${n})"; fail=1; }
+n=$(grep -cxF '.aidd/context/' "${TMP}/repo/.gitignore")
+[ "${n}" -eq 1 ] || { echo "gitignore .aidd/context/ line duplicated on reinstall (${n})"; fail=1; }
 
 # 3. Append-not-clobber on a pre-existing AGENTS.md; no duplication on re-run.
 mkdir -p "${TMP}/repo2"
