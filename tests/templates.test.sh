@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Template contract tests: YAML seed templates and the story template must be schema-valid.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 S=core/schemas
 T=core/templates
 fail=0

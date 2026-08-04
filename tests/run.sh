@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # AIDD Delta self-test runner. Zero hard dependencies: bash + python3 stdlib.
-# shellcheck and markdownlint-cli2 run only when installed (CI installs them).
+# Lint tools (ShellCheck, markdownlint-cli2) run only when installed; CI installs them.
+# NOTE: a comment must not begin with the word "shellcheck" — it parses as a directive.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 failures=0
 suites=0
@@ -28,7 +29,8 @@ shopt -u nullglob
 if command -v shellcheck >/dev/null 2>&1; then
   echo "── shellcheck"
   sh_targets=()
-  for f in install.sh scripts/*.sh hooks/scripts/*.sh tests/run.sh tests/*.test.sh; do
+  for f in install.sh scripts/*.sh hooks/scripts/*.sh core/scripts/*.sh \
+           core/templates/*.sh tests/run.sh tests/*.test.sh; do
     [ -e "${f}" ] && sh_targets+=("${f}")
   done
   if [ "${#sh_targets[@]}" -gt 0 ] && ! shellcheck -S warning "${sh_targets[@]}"; then

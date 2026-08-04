@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Plugin manifest integrity: JSON parses, versions in sync, wrappers reference real files.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 fail=0
 
 python3 - <<'PY' || fail=1

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Schema contract tests: valid fixtures must validate, invalid must be rejected.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 S=core/schemas
 F=tests/fixtures/states

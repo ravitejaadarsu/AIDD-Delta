@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Snapshot builder contract tests, run against the sample-project fixture.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 fail=0
 ROOT="$(pwd)"
 TMP="$(mktemp -d)"
@@ -16,16 +16,22 @@ check() { # desc, condition-exit-code
   if [ "$2" -ne 0 ]; then echo "FAIL: $1"; fail=1; fi
 }
 
+ok() { # desc, then the assertion as a command (keeps $? off a bare condition)
+  if "${@:2}"; then check "$1" 0; else check "$1" 1; fi
+}
+
 # 1. Builds all four artifacts
 ( cd "${TMP}" && bash "${ROOT}/core/scripts/build-snapshot.sh" post-wave-1 >/dev/null )
-[ -f "${TMP}/.aidd/context/snapshot.md" ];          check "snapshot.md created" $?
-[ -f "${TMP}/.aidd/context/quality-baseline.md" ];  check "quality-baseline.md created" $?
-[ -f "${TMP}/.aidd/context/delta.md" ];             check "delta.md created" $?
-ls "${TMP}/.aidd/context/history/" | grep -q -- "-post-wave-1$"; check "history dir tagged" $?
+ok "snapshot.md created"         test -f "${TMP}/.aidd/context/snapshot.md"
+ok "quality-baseline.md created" test -f "${TMP}/.aidd/context/quality-baseline.md"
+ok "delta.md created"            test -f "${TMP}/.aidd/context/delta.md"
+hist_tagged="$(find "${TMP}/.aidd/context/history" -maxdepth 1 -type d -name '*-post-wave-1' | head -1)"
+ok "history dir tagged" test -n "${hist_tagged}"
 
 # 2. Idempotent: second run succeeds and history accumulates
 ( cd "${TMP}" && bash "${ROOT}/core/scripts/build-snapshot.sh" post-wave-2 >/dev/null )
-[ "$(ls "${TMP}/.aidd/context/history/" | wc -l)" -ge 2 ]; check "history accumulates" $?
+hist_count="$(find "${TMP}/.aidd/context/history" -mindepth 1 -maxdepth 1 -type d | wc -l)"
+ok "history accumulates" test "${hist_count}" -ge 2
 
 # 3. delta.md references changes since previous snapshot
 grep -q "## Delta" "${TMP}/.aidd/context/delta.md"; check "delta section present" $?

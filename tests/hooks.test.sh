@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Hook script unit tests with fixture stdin payloads.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 ROOT="$(pwd)"
 fail=0
 TMP="tests/tmp/hooks-$$"
@@ -37,7 +37,7 @@ payload "/x/src/app.py" | bash hooks/scripts/guard-scope.sh >/dev/null 2>&1
 
 # session-log: appends a dispatch line when a change is active
 (
-  cd "${TMP}"
+  cd "${TMP}" || exit 1
   python3 - <<'PY'
 with open('.aidd/state.yaml', encoding='utf-8') as fh:
     src = fh.read()
@@ -68,6 +68,20 @@ grep -q 'aidd-builder | build ST-001' "${TMP}/.aidd/changes/2026-07-29-x/supervi
   code=$?
   [ "${code}" -eq 0 ] || { echo "build-snapshot exited ${code} outside an AIDD repo"; exit 1; }
   [ -e "${NOAIDD}/.aidd" ] && { echo "build-snapshot created .aidd outside an AIDD repo"; exit 1; }
+  exit 0
+) || fail=1
+
+# build-snapshot: .aidd/ present but no vendored script -> silent no-op, nothing written
+(
+  NOVENDOR="$(mktemp -d)"
+  trap 'rm -rf "${NOVENDOR}"' EXIT
+  cd "${NOVENDOR}" || exit 1
+  git init -q .
+  mkdir -p .aidd
+  bash "${ROOT}/hooks/scripts/build-snapshot.sh" >/dev/null 2>&1
+  code=$?
+  [ "${code}" -eq 0 ] || { echo "build-snapshot exited ${code} with .aidd but no vendored script"; exit 1; }
+  [ -e "${NOVENDOR}/.aidd/context" ] && { echo "build-snapshot created .aidd/context without a vendored script"; exit 1; }
   exit 0
 ) || fail=1
 

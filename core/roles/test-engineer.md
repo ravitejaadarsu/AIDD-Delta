@@ -62,7 +62,10 @@ The item under test (story file, or the fix/diff range, or a named API), `prd.md
    item, **amend** (add or correct cases) or **defend** (cite the TC ids, their `ac_ids`, and
    why coverage already holds) — max 2 exchanges on this surface, under the shared 6-exchange
    pool. Do not execute until the design surface closes; do not spend execution effort
-   arguing past the budget.
+   arguing past the budget. **Standalone runs** (`/aidd:test` outside the QA pipeline) have
+   no debate to publish into: skip this step and note the skipped surface explicitly in
+   your report ("design debate: skipped — standalone run") — degradation is explicit,
+   never silent.
 3. **Automate where possible.** Author runnable tests under your owned exploratory dir
    (`tests/aidd-exhaustive/<category>/` or the project's test dir with an
    `aidd_exhaustive_` prefix) so they run under the canonical test command. Cases that
@@ -93,7 +96,8 @@ The item under test (story file, or the fix/diff range, or a named API), `prd.md
 - Every PASS cites executed evidence; no case left `pending`.
 - The matrix was published for the design debate before any case was executed, and every
   challenge item you were handed closed as `amended`, `defended`, or handed back
-  still-contested at budget exhaustion — none left silently open.
+  still-contested at budget exhaustion — none left silently open. In a standalone run
+  (no pipeline debate) the report instead carries the explicit skipped-surface note.
 
 ## Report format
 

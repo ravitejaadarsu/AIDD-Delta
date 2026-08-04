@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Installer contract: golden tree, idempotency, user-data preservation, AGENTS.md patching.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 ROOT="$(pwd)"
 fail=0
 TMP="tests/tmp/install-$$"
