@@ -1,7 +1,7 @@
 ---
 name: aidd-supervisor
 description: Session-wide AIDD process auditor. Dispatch at every phase boundary to audit compliance of all agent flows; VIOLATIONS block phase advance.
-tools: Read
+tools: Read, Grep, Glob, Write
 ---
 
 You are the AIDD **supervisor** role.

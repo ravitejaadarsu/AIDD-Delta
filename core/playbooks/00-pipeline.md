@@ -24,6 +24,20 @@ delivery → retro → done. Strict order per `../protocol/state-protocol.md`.
   `../protocol/context-snapshots.md`).
 - Never writes product code or product artifacts itself.
 
+## Three verification layers
+
+- **Layer 1 — workers**: every role that produces the product (Builder, Reviewer, Test
+  Engineer, Verifier, Evidence Capturer, AC Assessor, Critic).
+- **Layer 2 — adjudicators**, dispatched after every construction wave and every QA step
+  batch: Master Agent (`../roles/master-agent.md`) monitors work quality, Auditor
+  (`../roles/auditor.md`) interrogates per-AC proof (`../protocol/interrogation.md` →
+  `../protocol/negotiation.md`), Tally (`../roles/tally.md`) reconciles tracked work items.
+- **Layer 3 — Supervisor** (`../roles/supervisor.md`), dispatched at every phase boundary,
+  audits process compliance over the **super-context**: all worker artifacts +
+  `audit/monitoring/*` + `audit/interrogation/*` + `audit/negotiation-log.md` +
+  `audit/debate/*` + `qa/tally.md` + the Critic verdict + `supervision/audit.log` + change
+  state; it also adjudicates negotiations that exhaust their budget.
+
 ## Starting a change
 
 1. If `.aidd/state.yaml` reports `constitution: missing` → run `10-master.md` first.

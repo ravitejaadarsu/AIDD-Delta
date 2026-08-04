@@ -1,6 +1,6 @@
 # Exhaustive Testing
 
-Canonical: `core/roles/test-engineer.md`; QA step 4 + 9 in `core/playbooks/40-qa.md`.
+Canonical: `core/roles/test-engineer.md`; QA step 5 + 14 in `core/playbooks/40-qa.md`.
 
 AIDD Delta runs a **team of senior test engineers** over every fix / user story /
 implementation — including pure API changes. It is deliberately dull and exhaustive: it
