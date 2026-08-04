@@ -51,7 +51,7 @@ ev() { # evidence block: command + trimmed output + exit code (evidence protocol
   echo "## Largest files (complexity hotspots proxy)"
   ev bash -c "git -C '${ROOT}' ls-files -z | xargs -0 wc -l 2>/dev/null | sort -rn | head -11 | tail -10"
   echo "## TODO/FIXME markers"
-  ev bash -c "git -C '${ROOT}' grep -nE 'TODO|FIXME' -- . 2>/dev/null | wc -l"
+  ev bash -c "git -C '${ROOT}' grep -nE 'TODO|FIXME' -- . 2>/dev/null | wc -l || true"
   echo
   echo "Project-specific sigmas (coverage %, lint, mutation) come from the canonical"
   echo "commands in architecture.md when a change is active; absent that, rows above"

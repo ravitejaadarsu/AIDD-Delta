@@ -39,4 +39,11 @@ rm -rf "${NOGIT}"
 # 5. quality-baseline rows carry evidence commands (evidence protocol)
 grep -q '\$' "${TMP}/.aidd/context/quality-baseline.md"; check "baseline shows commands" $?
 
+# 6. Verify zero-match exit codes are not recorded as [exit 1] (fix for grep pipefail bug)
+if ! grep -q '\[exit 1\]' "${TMP}/.aidd/context/quality-baseline.md"; then
+  check "baseline exit codes clean" 0
+else
+  check "baseline exit codes clean" 1
+fi
+
 exit "${fail}"
