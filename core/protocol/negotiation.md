@@ -79,7 +79,7 @@ responses), never live dialogue with either party. The ruling is exactly one of
 Whoever produces it, the final ruling on a disputed AC is always exactly one of
 `PROVEN | DEFECT | UNRESOLVABLE`. An **accept** can only ever close as `DEFECT` (who
 ruled: negotiation); the Supervisor may rule any of the three (who ruled: Supervisor
-adjudication).
+adjudication); the short-circuit path always yields `DEFECT` (who ruled: short-circuit).
 
 ## Routing
 

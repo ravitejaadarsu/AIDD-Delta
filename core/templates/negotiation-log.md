@@ -2,7 +2,7 @@
 
 <!-- One section per disputed AC that reaches this protocol (../protocol/negotiation.md).
      Auditor opens the section with the position; the re-dispatched Master Agent appends
-     the response; whoever ends it — Master Agent (accept) or Supervisor (adjudication)
+     the response; whoever ends it — Auditor (accept) or Supervisor (adjudication)
      — appends the ruling. Append only; never a separate file, never an overwrite. -->
 
 ## AC-<id>
@@ -10,7 +10,7 @@
 <!-- Short-circuit ACs (Master Agent's monitoring already concurs the work is
      deficient) skip Position/Response entirely and go straight to Ruling. -->
 
-### Position — exchange <N>
+### Position — exchange <N> (starting at 1)
 
 <!-- Auditor writes this: the AC id, the evidence its verdict already cites, and the
      exact reason the Master Agent's acceptance doesn't close the gap. Evidence-block
@@ -33,8 +33,9 @@
 
 ### Ruling
 
-<!-- PROVEN\|DEFECT\|UNRESOLVABLE, and who ruled: `negotiation` (Master Agent accepted)
-     or `Supervisor adjudication`. UNRESOLVABLE forces a human gate in both autonomy
+<!-- PROVEN\|DEFECT\|UNRESOLVABLE, and who ruled: `negotiation` (Master Agent accepted),
+     `Supervisor adjudication`, or `short-circuit` (orchestrator appended when Master Agent's
+     monitoring concurred deficiency). UNRESOLVABLE forces a human gate in both autonomy
      modes, take-care included. -->
 
 <!-- Repeat the ## AC-<id> section for every disputed AC that reaches this protocol. -->
