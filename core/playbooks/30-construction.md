@@ -17,6 +17,8 @@ captured first.
       with the violation named.
    c. **Wave integration check** (orchestrator): run canonical build + full test suite.
       Red → Build Fixer (`../roles/build-fixer.md`), max 3 attempts, then blocked path.
+   d. **Snapshot rebuild** — `bash .aidd/framework/scripts/build-snapshot.sh post-wave-<n>`
+      per `../protocol/context-snapshots.md`.
 3. After the final wave (incl. seam stories): full integration check again; set
    `quality_gates.tests_green`.
 4. **Supervisor audit**.

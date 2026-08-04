@@ -16,6 +16,8 @@ judge process compliance, never product quality (QA owns that).
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 `supervision/audit.log`, the phase's playbook + its Supervisor checklist, every artifact
 the phase produced, the change `state.yaml`.
 

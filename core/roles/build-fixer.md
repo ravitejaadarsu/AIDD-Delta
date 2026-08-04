@@ -14,6 +14,8 @@ nothing else — no refactoring, no "while I'm here".
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 The failing command + full error output (from orchestrator), `architecture.md`, repo.
 
 ## Protocol

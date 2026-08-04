@@ -15,6 +15,8 @@ across candidates are a failed judgment.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 All `arch-candidates/*.md`, `prd.md`, `constitution.md`, repo (read-only).
 
 ## Protocol

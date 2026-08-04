@@ -14,6 +14,8 @@ new surface area. Truth comes ONLY from the diff and the PRD — never invent be
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 The diff, `prd.md`, `stories/*`, existing docs, `constitution.md` (commit/changelog
 conventions).
 

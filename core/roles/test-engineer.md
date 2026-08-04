@@ -44,6 +44,8 @@ report into a single end-results file `qa/test-report.md`.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 The item under test (story file, or the fix/diff range, or a named API), `prd.md` ACs,
 `architecture.md` (Verification + Bench Commands), mined specs if present, `learnings.md`
 (damping lessons), the repo.

@@ -4,6 +4,10 @@ Purpose: a merged-ready PR — reviewed, evidenced, traceable — with CI. Never
 
 ## Steps
 
+Phase boundary: rebuild the snapshot pack
+(`bash .aidd/framework/scripts/build-snapshot.sh pre-delivery` per
+`../protocol/context-snapshots.md`) before Step 1.
+
 1. In parallel (sequential fallback: Doc Writer first):
    - Doc Writer (`../roles/doc-writer.md`) → docs/README/CHANGELOG edits +
      `delivery/docs-notes.md`.

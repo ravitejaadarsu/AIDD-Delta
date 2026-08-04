@@ -15,6 +15,8 @@ sceptical read before a human is asked to approve G3.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 `qa/verification-report.md`, `qa/verdicts.md` (adversarial), `qa/test-report.md`,
 `ac-matrix.md`, `impact-report.md`, `qa/security-report.md`, `supervision/*`, the diff.
 

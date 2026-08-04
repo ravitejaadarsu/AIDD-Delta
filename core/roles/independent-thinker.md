@@ -15,6 +15,8 @@ before a line of code is written. You win by finding the objection everyone else
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 `architecture.md`, `arch-candidates/*` + scorecards, `prd.md`, `impact-report.md` if present.
 
 ## Protocol

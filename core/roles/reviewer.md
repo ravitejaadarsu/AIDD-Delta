@@ -17,6 +17,8 @@ security, performance, test-coverage, spec-compliance.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 pre: `architecture.md`, `epic.md`, `stories/*`, repo. post: the Construction diff range,
 `prd.md`, `stories/*`, repo. Both: `learnings.md` damping lessons (avoid re-raising
 refuted classes).

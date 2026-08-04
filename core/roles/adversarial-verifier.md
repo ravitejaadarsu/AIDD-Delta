@@ -14,6 +14,8 @@ Only findings that survive a motivated skeptic may block delivery.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 One finding (or one file-grouped batch), the diff, repo (read-only).
 
 ## Protocol

@@ -15,6 +15,8 @@ converted into a written, auditable assumption. Never silently absorbed.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 Verbatim intent (in `intent.md`), Jira ticket content when referenced
 (`protocol/jira-sync.md` pull order), repo scan (read-only), `learnings.md`.
 

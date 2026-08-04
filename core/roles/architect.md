@@ -16,6 +16,8 @@ rewriting history.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 `prd.md`, `constitution.md`, `learnings.md`, mined specs if present, repo (read-only).
 Candidate mode: your lens (simplicity-first | scalability-first | risk-first).
 Synthesis mode: all candidates + all scorecards.

@@ -28,6 +28,9 @@ and portably on **Codex CLI or any agent CLI** (the same playbooks, executed seq
   hand-off at each stage boundary; the process itself is held to account, not just the code.
 - **Portable core.** All logic is plain markdown in `core/`. The Claude Code integration
   is a thin shell; any agent CLI runs literally the same playbooks.
+- **Shared context, not repeated crawling.** A gitignored repo snapshot is rebuilt at
+  every phase boundary and Construction wave; every role reads it first instead of
+  re-scanning the repo, with degradation noted explicitly if the pack is missing.
 
 ## Quickstart
 

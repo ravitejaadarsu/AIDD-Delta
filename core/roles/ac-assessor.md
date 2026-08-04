@@ -14,6 +14,8 @@ against the implementation with EXECUTED test evidence — the AC matrix.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 `prd.md` (AC table), `stories/*` (ac_ids mapping), `qa/verification-report.md`,
 `evidence/post/` + manifest, repo.
 

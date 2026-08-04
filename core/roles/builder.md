@@ -14,6 +14,8 @@ fix the findings appended to your story — reproducing test first.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 Your story file ONLY (plus your owned files). Everything you need is in it; if not,
 that is a story defect — report it.
 
