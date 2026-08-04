@@ -13,10 +13,18 @@
 ## Orphans
 
 <!-- Diff files traceable to no work item — not owned by any story's file_scope
-     (../protocol/file-scope.md). Each becomes a finding for adversarial verification. -->
+     (../protocol/file-scope.md). Each becomes a finding for adversarial verification;
+     the note column carries the finding in qa-findings row format. -->
 
 | diff file | note |
 |---|---|
+
+## Routed
+
+<!-- AC-proof notes addressed to the AC matrix fix loop, and routed diff findings. -->
+
+| item id | destination | note |
+|---|---|---|
 
 ## Summary
 

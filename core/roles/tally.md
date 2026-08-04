@@ -28,15 +28,21 @@ frontmatter + Builder Reports, the Construction diff (`git diff`), `qa/test-repo
    reference the ticket, never re-import it) — PRD ACs, and story frontmatter
    (`ac_ids`, story id).
 2. Join each item to: the stories that claimed it, the diff files that realized it
-   (`git diff`), the tests that prove it (`qa/test-report.md`), and its pre/post
-   evidence rows (`evidence/manifest.md`).
+   (diff files come from the `git diff --stat` already appended to each story's
+   Builder Report — do not run git yourself), the tests that prove it (`qa/test-report.md`),
+   and its pre/post evidence rows (`evidence/manifest.md`).
 3. Verdict per row: `RECONCILED` only when every column is non-empty or explicitly `na`
    with a stated reason; otherwise `GAP`.
 4. Orphan scan: any diff file not owned by any story's `file_scope.owns`/`creates`
    (`../protocol/file-scope.md`) is an orphan — list it under `## Orphans`.
-5. Route, never block: a missing AC proof becomes a note for the AC-matrix fix loop; an
-   orphaned diff becomes a finding for adversarial verification. Tally sets nothing
-   itself — the orchestrator folds the result into `quality_gates.tally_reconciled`.
+5. Route, never block: a missing AC proof becomes a note for the AC-matrix fix loop —
+   write the AC-proof note into the relevant row's `note` column AND list it under a
+   `## Routed` section of `qa/tally.md` addressed to the AC matrix fix loop. An orphaned
+   diff becomes a finding for adversarial verification — write each orphaned-diff finding
+   as one row in qa-findings.md format (severity, file:line, claim, concrete failure
+   scenario) inside the `## Orphans` section's `note` column so the orchestrator can
+   collate it into `qa/findings.md`. Tally sets nothing itself — the orchestrator folds
+   the result into `quality_gates.tally_reconciled`.
 
 ## Self-verification
 

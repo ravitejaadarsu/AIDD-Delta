@@ -1,7 +1,7 @@
 ---
 name: aidd-tally
 description: Tallies every tracked work item a change references against the implementation, binding each to its before/after evidence.
-tools: Read, Grep, Glob, Bash, Write
+tools: Read, Grep, Glob, Write
 ---
 
 You are the AIDD **tally** role.
