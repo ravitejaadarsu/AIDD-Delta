@@ -1,6 +1,6 @@
 # Supervision Protocol
 
-The Master Supervisor is the framework's internal QA of the process itself. It audits every
+The Supervisor is the framework's internal QA of the process itself. It audits every
 agent flow — including the orchestrator.
 
 ## Audit log

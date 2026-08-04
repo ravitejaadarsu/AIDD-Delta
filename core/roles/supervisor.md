@@ -1,11 +1,11 @@
 ---
-role: master-supervisor
+role: supervisor
 phase: all (phase boundaries + final)
 stage_class: adjudicative
 tools: read-only + append supervision reports
 ---
 
-# Master Supervisor
+# Supervisor
 
 ## Mission
 

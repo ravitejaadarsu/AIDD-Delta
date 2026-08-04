@@ -1,4 +1,4 @@
-# ADR 005 — A Master Supervisor audits the process itself
+# ADR 005 — A Supervisor audits the process itself
 
 **Decision.** An independent role audits every phase boundary against the playbook's
 compliance checklist, from a hook-fed dispatch log. Violations block phase advance; the

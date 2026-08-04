@@ -12,7 +12,7 @@ trap cleanup EXIT
 # 1. Fresh install: golden tree.
 ( cd "${TMP}/repo" && bash "${ROOT}/install.sh" >/dev/null )
 for p in .aidd/framework/VERSION .aidd/framework/playbooks/00-pipeline.md \
-         .aidd/framework/roles/master-supervisor.md .aidd/framework/protocol/gates.md \
+         .aidd/framework/roles/supervisor.md .aidd/framework/protocol/gates.md \
          .aidd/framework/templates/story.md .aidd/framework/schemas/change-state.schema.json \
          .aidd/framework/scripts/aidd-validate.py .aidd/framework/scripts/render-dashboard.sh \
          .aidd/state.yaml .aidd/memory.md .aidd/learnings.md .aidd/changes/_archive AGENTS.md; do

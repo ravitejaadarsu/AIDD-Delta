@@ -28,6 +28,6 @@ file_scope:
    to its own story file). Needing an outside file = STOP and report BLOCKED with the
    reason. Never grab the file. On Claude Code the `guard-scope` hook enforces this; on
    other runtimes it is protocol text checked by the spec-compliance reviewer and the
-   Master Supervisor.
+   Supervisor.
 4. **Build Fixer exemption.** Integration breakage crosses ownership lines; the Build Fixer
    may touch any file but must report every file touched and why.

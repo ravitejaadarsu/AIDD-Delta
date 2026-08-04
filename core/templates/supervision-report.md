@@ -1,6 +1,6 @@
 # Supervision Report — <phase> — <change-id>
 
-<!-- Master Supervisor, at the phase boundary. Audits process compliance, not product quality. -->
+<!-- Supervisor, at the phase boundary. Audits process compliance, not product quality. -->
 
 ## Checklist results
 

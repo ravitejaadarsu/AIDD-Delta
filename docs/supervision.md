@@ -1,9 +1,9 @@
 # Supervision
 
-The Master Supervisor is AIDD's answer to "who watches the watchers": a session-wide
+The Supervisor is AIDD's answer to "who watches the watchers": a session-wide
 auditor that checks the *process* at every phase boundary — including the orchestrator's
 own conduct. Canonical: `core/protocol/supervision.md`; role:
-`core/roles/master-supervisor.md`.
+`core/roles/supervisor.md`.
 
 - Every dispatch lands in `supervision/audit.log` (automatic on Claude Code via the Task
   hook; protocol duty elsewhere).

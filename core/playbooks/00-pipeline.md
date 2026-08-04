@@ -33,7 +33,7 @@ delivery → retro → done. Strict order per `../protocol/state-protocol.md`.
 3. Create working branch `aidd/<change-id>`.
 4. Run phases in order: `20-inception.md` → `30-construction.md` → `40-qa.md` →
    `50-delivery.md` → `60-retro.md`.
-5. At every phase boundary: dispatch the Master Supervisor (`../roles/master-supervisor.md`).
+5. At every phase boundary: dispatch the Supervisor (`../roles/supervisor.md`).
    A VIOLATIONS verdict blocks advance until remediated.
 
 ## Resume
