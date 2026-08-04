@@ -12,9 +12,10 @@ Negotiation opens for an AC when both hold: the Auditor's verdict marks the AC
 the work covering that AC.
 
 **Short-circuit.** If the Master Agent's monitoring notes instead concur the work is
-deficient, negotiation is skipped — the DISPUTED AC becomes a fix-loop defect directly,
-with no position, no response, no adjudication. The skip is still exactly one log line
-in `negotiation-log.md`, mirrored to change state: no disputed AC's fate goes untracked.
+deficient, the orchestrator skips negotiation entirely — the DISPUTED AC becomes a
+fix-loop defect directly, with no position, no response, no adjudication. The
+orchestrator still appends exactly one log line to `negotiation-log.md` and mirrors it
+to change state: no disputed AC's fate goes untracked.
 
 ## Artifact layout
 
@@ -48,10 +49,11 @@ The Master Agent is re-dispatched to answer the position with exactly one of:
 ## Dispatch
 
 The orchestrator dispatches every party; agents never talk live. The Auditor writes the
-position. The orchestrator re-dispatches the Master Agent to write the response. A
-**contest** with exchange budget remaining lets the Auditor write the next exchange's
-position, addressing the counter-evidence directly. A **contest** at budget exhaustion
-routes to Supervisor adjudication.
+position. The orchestrator re-dispatches the Master Agent to write the response. The
+Auditor reads the response and either closes the AC in the log (**accept** → ruling
+`DEFECT`, who ruled: negotiation), writes the next exchange's position (**contest**, if
+budget remains), or escalates to Supervisor adjudication (**contest**, at budget
+exhaustion) — the Supervisor appends its own ruling directly to the log.
 
 ## Budget
 
@@ -74,10 +76,10 @@ responses), never live dialogue with either party. The ruling is exactly one of
 - **UNRESOLVABLE** — the super-context doesn't settle it. Forced-human gate in both
   autonomy modes, take-care included.
 
-The final ruling on a disputed AC is always exactly one of `PROVEN | DEFECT |
-UNRESOLVABLE`, whoever produces it: an **accept** resolves the AC as `DEFECT` with `who
-ruled: negotiation`; a Supervisor adjudication may rule any of the three with `who
-ruled: Supervisor adjudication`.
+Whoever produces it, the final ruling on a disputed AC is always exactly one of
+`PROVEN | DEFECT | UNRESOLVABLE`. An **accept** can only ever close as `DEFECT` (who
+ruled: negotiation); the Supervisor may rule any of the three (who ruled: Supervisor
+adjudication).
 
 ## Routing
 
