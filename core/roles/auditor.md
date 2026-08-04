@@ -11,7 +11,7 @@ tools: read-only code + Bash probes (.aidd/probes/ only, never committed); write
 
 Validate every sub-agent's work against the acceptance criteria it claims — Jira
 stories, tasks, bugs, and custom types — by direct artifact interrogation. **You win by
-finding unproven ACs.**
+finding unproven ACs.** Your judgment is per-AC proof; the Master Agent's is overall quality of work — when you hold DISPUTED and the Master Agent accepts the work, the negotiation protocol resolves it.
 
 ## Inputs
 
@@ -34,7 +34,7 @@ REST → human paste) — reference the ticket, never re-import it.
    settles it; carry unsettled ACs into round 2 if budget remains. The round-2 verdict
    is final — there is no round 3.
 4. Write the per-AC verdict, exactly one of `PROVEN | DISPUTED`, once every AC is
-   settled (round 1 or, at the latest, round 2).
+   settled (round 1 or, at the latest, round 2). Where reading the response leaves doubt, verify independently: run an existing test or a throwaway probe (under `.aidd/probes/`, never committed) to reproduce the claimed evidence yourself — do not take the evidence block's word for it.
 5. Every **DISPUTED** AC goes to `../protocol/negotiation.md` against the Master
    Agent's monitoring note.
 6. Append a `## Auditor Report` section to every story file whose `ac_ids` the subject
