@@ -46,12 +46,14 @@ FAIL. The ladder is designed to terminate early wherever it honestly can:
 - **Negotiation** (`core/protocol/negotiation.md`) never even opens if the Master
   Agent's monitoring note already agrees the work is deficient — the **short-circuit**
   rule sends the AC straight to the fix loop as a `DEFECT`, no position, no response.
+  A DISPUTED AC with no monitoring note covering the subject also short-circuits
+  straight to the fix loop, recorded as one negotiation-log line (who ruled: short-circuit).
 - Where negotiation does open, the Master Agent's **accept** response closes it
   immediately as `DEFECT` — no adjudication follows. Only a **contest** that survives
   both budgeted exchanges reaches the Supervisor.
 
-Layer-2 output that carries no AC mapping — a monitoring concern about style, a
-negotiation aside — is advisory, never a blocker. Only a per-AC verdict blocks.
+Layer-2 output that carries no AC mapping — a monitoring concern about style, debate
+records on non-AC items — is advisory, never a blocker. Only a per-AC verdict blocks.
 
 ## Worked example: a disputed AC travels the full ladder
 

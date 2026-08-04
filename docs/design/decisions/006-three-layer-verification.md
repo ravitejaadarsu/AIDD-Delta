@@ -13,8 +13,8 @@ blocking economy is amended: an AC that exits the interrogation → negotiation 
 adjudication ladder as **DISPUTED** or ruled **DEFECT** blocks via the fix loop, same as
 an executed test FAIL. The ladder can terminate early — the Master Agent's **accept**
 skips adjudication and rules `DEFECT` directly; the short-circuit rule (the monitoring
-note already concurs the work is deficient) skips negotiation entirely. Layer-2 output
-with no AC mapping — a monitoring concern, a negotiation aside — is advisory; only a
+note already concurs the work is deficient) skips negotiation entirely; a DISPUTED AC with no monitoring note covering the subject also short-circuits straight to the fix loop. Layer-2 output
+with no AC mapping — a monitoring concern, debate records on non-AC items — is advisory; only a
 per-AC verdict blocks.
 **Why.** Precision over speed: an AC gap caught per wave, while the story's context is
 still live, is cheap to fix; the same gap found at final QA or in production is not. This
