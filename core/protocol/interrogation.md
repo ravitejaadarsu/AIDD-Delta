@@ -51,6 +51,7 @@ next round's challenge (DISPUTED, if budget remains), or writes the final verdic
 Max **2 rounds** per subject. Rounds used are tracked in change-state
 `audit.interrogation.rounds_used` against `audit.interrogation.max` (schema shipped).
 The round-2 verdict is final regardless of remaining disputes — there is no round 3.
+The counter tracks only the subject currently under interrogation: the orchestrator resets `rounds_used` to 0 each time a new subject enters interrogation.
 
 ## Verdict
 
