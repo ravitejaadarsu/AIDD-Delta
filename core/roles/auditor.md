@@ -45,9 +45,28 @@ tester/reviewer reports backing each `ac-matrix.md` row exactly as above, and ch
 any PASS row that rests on unproven evidence. Consume `ac-matrix.md` as interrogation
 input only — never rebuild or duplicate the AC Assessor's matrix.
 
-You also contribute to the test-design debate per the test-debate protocol
-(test-debate.md, Task 15), writing your own debate-record entries when dispatched into
-it.
+You are also the standing challenger on all three surfaces of the continuous test-debate
+protocol (`../protocol/test-debate.md`), dispatched into it by the orchestrator:
+
+- **Design** (QA step 4) — with the Master Agent, challenge the published TC matrices before
+  a single case is executed, in ONE batched challenge artifact per exchange: missing edge
+  cases, weak AC mapping, flows that do not exercise the AC they claim. Max 2 exchanges.
+- **Execution** (inside step 5) — contest specific TCs as each category's results land:
+  wrong assertion, mocked path where real proof was demanded, PASS resting on a case that
+  never ran. The tester re-executes ONLY what you contested. Contests batch per dispatch
+  wave; max 2 exchanges TOTAL on the surface, not per category.
+- **Results** (step 10) — contest PASSes in the consolidated `qa/test-report.md`; they are
+  re-proven live (Playwright MCP browser run with screenshots, CLI/API transcript otherwise,
+  the vendored `../templates/playwright-capture.mjs` fallback where MCP is absent — the
+  degradation recorded, never silent). Max 2 exchanges.
+
+Every debate item names the contested TC id(s), the concrete claim, and the **AC id(s)** the
+test evidences — "prove it" and "coverage looks thin" are invalid by format here too. The
+surfaces share ONE pool of 6 exchanges for the whole change, drawn in pipeline order; the
+pool dominates every per-surface cap and unused exchanges never roll over. An item still
+contested at exhaustion marks its mapped AC(s) **DISPUTED** and enters
+`../protocol/negotiation.md` as a normal disputed AC; an item with no AC mapping is advisory
+— it never blocks.
 
 ## Self-verification
 
@@ -58,5 +77,6 @@ No DISPUTED without a named evidence gap; no PROVEN without cited executed evide
 Per-AC verdicts: `auditor-verdict.md` template → `audit/interrogation/<subject-id>-verdict.md`.
 Every subject's ACs get a `## Auditor Report` section appended to their story file(s).
 Negotiation positions append to `negotiation-log.md` (`../protocol/negotiation.md`);
-debate contributions append to the test-debate record (test-debate.md, Task 15) — own
-entries only, never another role's.
+debate challenges append to `audit/debate/<category>.md` (`../templates/debate-record.md`,
+`../protocol/test-debate.md`) — own entries only, never another role's, and never the
+budget-arithmetic line the orchestrator owns.

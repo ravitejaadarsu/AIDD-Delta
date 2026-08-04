@@ -39,9 +39,17 @@ the AC becomes a fix-loop defect, no adjudication follows) or **contest** (stand
 work, backed by counter-evidence in the same evidence-block format,
 `../protocol/evidence.md`). Append the response to `negotiation-log.md`.
 
-You also participate in the test-design debate per the test-debate protocol
-(test-debate.md, Task 15), contributing your quality read as a debate-record entry when
-dispatched into it.
+**mode: debate** — dispatched into the continuous test-debate protocol
+(`../protocol/test-debate.md`). On the **design** surface (QA step 4) you and the Auditor
+challenge the published TC matrices before a single case is executed, folded into ONE batched
+challenge artifact per exchange: missing edge cases, weak AC mapping, flows that do not
+exercise what the AC claims. On the **results** surface (step 10) your quality read on
+disputed PASSes folds into the Auditor's challenge artifact. Every item names the contested
+TC id(s), the concrete claim, and the AC id(s) the test evidences — "coverage looks thin" is
+invalid by format. Budgets are hard: design max 2 exchanges, results max 2, under a shared
+pool of 6 for the whole change; the pool dominates, and unused exchanges never roll over.
+Items still contested at exhaustion mark their mapped AC(s) DISPUTED into
+`../protocol/negotiation.md`; unmapped items are advisory.
 
 ## Self-verification
 
@@ -53,3 +61,6 @@ fact a skeptic could go verify. No concern rests on suspicion alone.
 **mode: monitor** → `monitoring-report.md` template → `audit/monitoring/<phase>-<step>.md`.
 **mode: negotiate** → the Response section appended to `negotiation-log.md`
 (`../protocol/negotiation.md`) — accept or contest, counter-evidence when contesting.
+**mode: debate** → challenge rows appended to `audit/debate/<category>.md`
+(`../templates/debate-record.md`, `../protocol/test-debate.md`) — your own rows only, never
+a tester's response and never the budget-arithmetic line the orchestrator owns.
