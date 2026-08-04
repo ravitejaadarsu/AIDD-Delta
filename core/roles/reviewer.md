@@ -29,15 +29,18 @@ pre: `architecture.md`, `epic.md`, `stories/*`, repo. post: the Construction dif
 refuted classes).
 
 delta (exact inputs — read all four before judging any binding):
-1. The `pre-<phase>` (or latest available pre-phase) snapshot pack from
-   `.aidd/context/history/<UTC-stamp>-pre-<phase>/` — `snapshot.md` for the structure
-   map, `quality-baseline.md` for the pre-change sigmas.
+1. The **pre-implementation** snapshot pack: the latest history pack tagged
+   `pre-construction` (fall back to `pre-inception` if absent) — NEVER `pre-qa`, which is
+   rebuilt after implementation and would make every comparison vacuous. Read it from
+   `.aidd/context/history/<UTC-stamp>-pre-construction/` — `snapshot.md` for the
+   structure map, `quality-baseline.md` for the pre-change sigmas.
 2. The per-dimension `pre-review/<dimension>.md` set — what mode=pre actually found the
    plan to mean, not the plan document itself.
 3. The full Construction diff.
 4. The current `.aidd/context/quality-baseline.md` vs. the pre pack's copy from (1).
 
-**Degradation:** if no pre-phase history pack exists (snapshots adopted mid-change, or
+**Degradation:** if no pre-implementation history pack exists — neither `pre-construction`
+nor `pre-inception` (snapshots adopted mid-change, or
 the history dir is empty), report that explicitly at the top of `qa/findings-delta.md`
 and cover only what the remaining inputs support — structure-fit against the current
 `snapshot.md` — rather than silently skipping intent-fidelity or sigma-regression.

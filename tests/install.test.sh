@@ -53,4 +53,14 @@ grep -q 'AIDD:BEGIN' "${TMP}/repo2/AGENTS.md" || { echo "AIDD block not appended
 n=$(grep -c 'AIDD:BEGIN' "${TMP}/repo2/AGENTS.md")
 [ "${n}" -eq 1 ] || { echo "block duplicated on re-run (${n})"; fail=1; }
 
+# 4. .gitignore lacking a trailing newline: pattern appended on its own line, idempotently.
+mkdir -p "${TMP}/repo3"
+printf 'node_modules' > "${TMP}/repo3/.gitignore"   # no trailing newline
+( cd "${TMP}/repo3" && bash "${ROOT}/install.sh" >/dev/null )
+grep -qxF 'node_modules' "${TMP}/repo3/.gitignore" || { echo "last gitignore line corrupted by append"; fail=1; }
+grep -qxF '.aidd/context/' "${TMP}/repo3/.gitignore" || { echo ".aidd/context/ not on its own line"; fail=1; }
+( cd "${TMP}/repo3" && bash "${ROOT}/install.sh" >/dev/null )
+n=$(grep -cxF '.aidd/context/' "${TMP}/repo3/.gitignore")
+[ "${n}" -eq 1 ] || { echo "gitignore line duplicated on reinstall of newline-less file (${n})"; fail=1; }
+
 exit "${fail}"

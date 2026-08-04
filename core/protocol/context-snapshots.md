@@ -12,7 +12,9 @@ A repo-level context pack so every role reads instead of re-crawling.
 
 Rebuild at every phase boundary and after every Construction wave. Tag each rebuild:
 
-- `pre-<phase>` — before Inception, Construction, QA, Delivery, Retro.
+- `pre-<phase>` — before every phase; the playbooks wire the line explicitly for
+  Inception, Construction (`pre-construction`, the delta reviewer's baseline), QA, and
+  Delivery.
 - `post-wave-<n>` — after each Construction wave completes.
 
 ## Consumption rule
@@ -32,5 +34,6 @@ verification artifact.
 
 Every rebuild copies its three files to `history/<UTC-stamp>-<tag>/` under
 `.aidd/context/`, so prior packs stay inspectable. The delta reviewer (`mode=delta`)
-compares the `pre-<phase>` history pack against the current pack to surface what
-changed since the phase began.
+compares the **pre-implementation** pack — the latest one tagged `pre-construction`,
+falling back to `pre-inception`, never `pre-qa` — against the current pack, to surface
+what the implementation actually changed (`../roles/reviewer.md`).

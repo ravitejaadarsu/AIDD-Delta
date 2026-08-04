@@ -41,7 +41,15 @@ done
 printf '%s\n' "${AIDD_VERSION}" > "${TARGET}/.aidd/framework/VERSION"
 
 # 2. Keep the gitignored .aidd/context/ snapshot pack out of the target's git tree.
-grep -qxF '.aidd/context/' "${TARGET}/.gitignore" 2>/dev/null || echo '.aidd/context/' >> "${TARGET}/.gitignore"
+GITIGNORE="${TARGET}/.gitignore"
+if ! grep -qxF '.aidd/context/' "${GITIGNORE}" 2>/dev/null; then
+  # A .gitignore whose last line lacks a trailing newline would otherwise concatenate
+  # with our pattern (breaking it AND the grep -qxF guard, re-appending every install).
+  if [ -s "${GITIGNORE}" ] && [ -n "$(tail -c1 "${GITIGNORE}")" ]; then
+    printf '\n' >> "${GITIGNORE}"
+  fi
+  echo '.aidd/context/' >> "${GITIGNORE}"
+fi
 
 # 3. Seed user artifacts only when missing.
 mkdir -p "${TARGET}/.aidd/changes/_archive"

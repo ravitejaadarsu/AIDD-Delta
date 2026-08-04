@@ -14,6 +14,13 @@
 <file count per extension, descending>
 ```
 
+## Public API surface
+
+```
+<exported/public symbol declarations in tracked text files (best-effort, language-agnostic
+grep: export/def/func/public/pub/class/module.exports), first 60, or "(none detected)">
+```
+
 ## Entry points / manifests
 
 ```

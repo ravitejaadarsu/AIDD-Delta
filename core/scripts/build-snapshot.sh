@@ -20,7 +20,7 @@ ev() { # evidence block: command + trimmed output + exit code (evidence protocol
   echo '```'
 }
 
-# ── snapshot.md: repo tree + module map + entry points ──────────────────────
+# ── snapshot.md: repo tree + module map + public API surface + entry points ──
 {
   echo "# Repo snapshot — ${STAMP} (${TAG})"
   echo
@@ -34,6 +34,15 @@ ev() { # evidence block: command + trimmed output + exit code (evidence protocol
   git -C "${ROOT}" ls-files | awk -F. 'NF>1 {print $NF}' | sort | uniq -c | sort -rn | head -20
   echo '```'
   echo
+  echo "## Public API surface"
+  echo '```'
+  # Best-effort and language-agnostic: exported / public symbol declarations in tracked
+  # text files (-I skips binaries). Not a parse — a reading aid for structure-fit review.
+  api="$(git -C "${ROOT}" grep -InE '^[[:space:]]*(export |def |func |public |pub |class |module\.exports)' -- . 2>/dev/null \
+    | grep -vE '^[^:]*\.(md|markdown|txt):' | head -60)"
+  echo "${api:-(none detected)}"
+  echo '```'
+  echo
   echo "## Entry points / manifests"
   echo '```'
   git -C "${ROOT}" ls-files | grep -Ei '(^|/)((package|pyproject|cargo|go|pom)\.(json|toml|mod|xml)|makefile|justfile|main\.[a-z]+|index\.[a-z]+|setup\.(py|cfg))$' || echo "(none detected)"
@@ -41,6 +50,27 @@ ev() { # evidence block: command + trimmed output + exit code (evidence protocol
 } > "${CTX}/snapshot.md"
 
 # ── quality-baseline.md: measured sigmas, every number with its command ─────
+# Canonical coverage/lint commands are declared in architecture.md; this script never
+# guesses or runs project commands (ADR 002 zero-dep). The Coverage and Lint sections
+# below ALWAYS emit an explicit row, so a sigma this script cannot measure is visible
+# as `na` with its reason — degradation is explicit, never silent.
+ARCH=""
+for cand in "${ROOT}"/.aidd/changes/*/architecture.md "${ROOT}/architecture.md"; do
+  [ -f "${cand}" ] || continue
+  ARCH="${cand}"
+  break
+done
+ARCH_REL="${ARCH#"${ROOT}/"}"
+
+sigma_row() { # <sigma-name>: one explicit row, plus the pointer when architecture.md names it
+  echo "$1: na (no canonical command available to this script)"
+  if [ -n "${ARCH}" ] && grep -qiE "$1" "${ARCH}" 2>/dev/null; then
+    echo
+    echo "Canonical $1 command declared in \`${ARCH_REL}\` — the orchestrator appends its"
+    echo "evidence block (\`protocol/evidence.md\`) to this section per protocol."
+  fi
+}
+
 {
   echo "# Quality baseline — ${STAMP} (${TAG})"
   echo
@@ -53,9 +83,16 @@ ev() { # evidence block: command + trimmed output + exit code (evidence protocol
   echo "## TODO/FIXME markers"
   ev bash -c "git -C '${ROOT}' grep -nE 'TODO|FIXME' -- . 2>/dev/null | wc -l || true"
   echo
+  echo "## Coverage"
+  sigma_row coverage
+  echo
+  echo "## Lint"
+  sigma_row lint
+  echo
   echo "Project-specific sigmas (coverage %, lint, mutation) come from the canonical"
-  echo "commands in architecture.md when a change is active; absent that, rows above"
-  echo "are the baseline and missing sigmas are explicit \`na\` (degradation is explicit)."
+  echo "commands in architecture.md when a change is active; this script never runs them"
+  echo "(zero-dep), so the two sections above carry an explicit \`na\` row until the"
+  echo "orchestrator appends the measured evidence block — degradation is explicit."
 } > "${CTX}/quality-baseline.md"
 
 # ── delta.md: churn since previous snapshot ─────────────────────────────────

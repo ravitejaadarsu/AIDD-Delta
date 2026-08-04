@@ -34,6 +34,22 @@ $ <command>
 [exit <code>] <ISO-8601 timestamp>
 ```
 
+## Coverage
+
+coverage: na (no canonical command available to this script)
+
+<!-- ALWAYS present. The script never runs project commands, so it emits the explicit
+     `na` row plus — when architecture.md names a canonical coverage command — a pointer
+     saying the orchestrator appends the measured evidence block (`protocol/evidence.md`)
+     to this section. A sigma it cannot measure is visible, never silently absent. -->
+
+## Lint
+
+lint: na (no canonical command available to this script)
+
+<!-- Same contract as Coverage above. -->
+
 Project-specific sigmas (coverage %, lint, mutation) come from the canonical
-commands in architecture.md when a change is active; absent that, rows above
-are the baseline and missing sigmas are explicit `na` (degradation is explicit).
+commands in architecture.md when a change is active; this script never runs them
+(zero-dep), so the two sections above carry an explicit `na` row until the
+orchestrator appends the measured evidence block — degradation is explicit.

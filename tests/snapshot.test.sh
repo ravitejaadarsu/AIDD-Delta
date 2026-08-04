@@ -39,7 +39,16 @@ rm -rf "${NOGIT}"
 # 5. quality-baseline rows carry evidence commands (evidence protocol)
 grep -q '\$' "${TMP}/.aidd/context/quality-baseline.md"; check "baseline shows commands" $?
 
-# 6. Verify zero-match exit codes are not recorded as [exit 1] (fix for grep pipefail bug)
+# 6. snapshot.md carries the spec'd public-API-surface section
+grep -q '^## Public API surface$' "${TMP}/.aidd/context/snapshot.md"; check "API surface section present" $?
+
+# 7. Coverage + Lint sections always exist with an explicit na row (explicit degradation)
+grep -q '^## Coverage$' "${TMP}/.aidd/context/quality-baseline.md"; check "coverage section present" $?
+grep -q '^## Lint$' "${TMP}/.aidd/context/quality-baseline.md";     check "lint section present" $?
+grep -q '^coverage: na (' "${TMP}/.aidd/context/quality-baseline.md"; check "coverage na row explicit" $?
+grep -q '^lint: na ('     "${TMP}/.aidd/context/quality-baseline.md"; check "lint na row explicit" $?
+
+# 8. Verify zero-match exit codes are not recorded as [exit 1] (fix for grep pipefail bug)
 if ! grep -q '\[exit 1\]' "${TMP}/.aidd/context/quality-baseline.md"; then
   check "baseline exit codes clean" 0
 else

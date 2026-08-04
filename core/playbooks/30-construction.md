@@ -5,6 +5,13 @@ captured first.
 
 ## Steps
 
+Phase boundary: rebuild the snapshot pack
+(`bash .aidd/framework/scripts/build-snapshot.sh pre-construction` per
+`../protocol/context-snapshots.md`) before Step 1. This pack is the
+**pre-implementation** baseline the QA delta reviewer diffs against
+(`../roles/reviewer.md` mode=delta) — the only pack taken before any implementation
+exists.
+
 1. **Step 0 — pre evidence**: dispatch Evidence Capturer (`../roles/evidence-capturer.md`)
    with `stage: pre` over the PRD's affected-flows table + bench commands →
    `evidence/pre/` + manifest rows. Blocks wave 1 until complete.
