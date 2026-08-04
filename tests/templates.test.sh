@@ -25,7 +25,8 @@ for f in constitution.md memory.md learnings.md state.yaml change-state.yaml int
          security-report.md ac-matrix.md evidence-manifest.md playwright-capture.mjs \
          bench-capture.sh supervision-report.md dashboard.html traceability.mmd \
          pr-description.md ci-workflow.yml snapshot.md quality-baseline.md \
-         context-delta.md; do
+         context-delta.md interrogation-challenge.md interrogation-response.md \
+         auditor-verdict.md; do
   if [ ! -f "${T}/${f}" ]; then
     echo "missing template: ${T}/${f}"
     fail=1
