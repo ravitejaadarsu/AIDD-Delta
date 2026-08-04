@@ -26,6 +26,12 @@ and portably on **Codex CLI or any agent CLI** (the same playbooks, executed seq
   identical audit trail. State is schema-validated and every step is resumable.
 - **A supervisor over the supervisors.** An independent auditor inspects every agent
   hand-off at each stage boundary; the process itself is held to account, not just the code.
+- **Three-layer verification.** Workers build and test; a Layer-2 Master Agent + Auditor
+  + Tally interrogate per-AC proof and reconcile every tracked work item wave by wave;
+  the Supervisor adjudicates any dispute that survives negotiation. An acceptance
+  criterion that exits that ladder disputed or defective blocks delivery exactly like a
+  failing test — bounded by hard interrogation/negotiation budgets, never an infinite
+  argument.
 - **Portable core.** All logic is plain markdown in `core/`. The Claude Code integration
   is a thin shell; any agent CLI runs literally the same playbooks.
 - **Shared context, not repeated crawling.** A gitignored repo snapshot is rebuilt at
