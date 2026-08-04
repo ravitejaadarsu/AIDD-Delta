@@ -21,7 +21,8 @@ delivery → retro → done. Strict order per `../protocol/state-protocol.md`.
   (`.aidd/framework/scripts/render-dashboard.sh` when present).
 - Rebuilds the snapshot pack at every phase boundary
   (`bash .aidd/framework/scripts/build-snapshot.sh pre-<phase>` per
-  `../protocol/context-snapshots.md`).
+  `../protocol/context-snapshots.md`) + measured-sigma append per
+  `../protocol/context-snapshots.md`.
 - Never writes product code or product artifacts itself.
 
 ## Three verification layers

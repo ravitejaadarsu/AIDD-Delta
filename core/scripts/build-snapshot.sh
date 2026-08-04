@@ -66,8 +66,8 @@ sigma_row() { # <sigma-name>: one explicit row, plus the pointer when architectu
   echo "$1: na (no canonical command available to this script)"
   if [ -n "${ARCH}" ] && grep -qiE "$1" "${ARCH}" 2>/dev/null; then
     echo
-    echo "Canonical $1 command declared in \`${ARCH_REL}\` — the orchestrator appends its"
-    echo "evidence block (\`protocol/evidence.md\`) to this section per protocol."
+    echo "\`${ARCH_REL}\` mentions $1 — the orchestrator appends the measured evidence"
+    echo "block per context-snapshots.md, or records na."
   fi
 }
 

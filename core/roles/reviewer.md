@@ -69,7 +69,11 @@ suspicion before raising it.
   newly broken. Concrete scenario: **cite the baseline number vs. the current number**
   from the two `quality-baseline.md` files (pre pack vs. current), plus the `file:line`
   responsible where applicable. A regression claim without both numbers is invalid by
-  format, same as any other finding missing its concrete scenario.
+  format, same as any other finding missing its concrete scenario. Coverage/lint
+  regressions are raisable only when both packs carry measured rows (per
+  `../protocol/context-snapshots.md` § Measured sigmas); otherwise those two classes
+  are explicitly out of scope for this dispatch — note the degradation in the report
+  rather than raising against an `na` row.
 
 ## Self-verification
 

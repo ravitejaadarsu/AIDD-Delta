@@ -23,12 +23,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
   the Master Agent's own monitoring already concurs the work is deficient.
 - Repo-level context snapshots (ADR 007): a gitignored `.aidd/context/` pack
   (`snapshot.md`, `quality-baseline.md`) rebuilt at every phase boundary and Construction
-  wave; every role reads it first instead of re-crawling the repo. Pre-phase history
-  packs (`.aidd/context/history/<UTC-stamp>-pre-<phase>/`) feed the new delta review.
+  wave; every role reads it first instead of re-crawling the repo. The
+  pre-implementation history pack — latest `pre-construction`, falling back to
+  `pre-inception` — feeds the new delta review.
 - Reviewer `mode=delta` (ADR 008): a third mode on the existing parameterized Reviewer,
   dispatched once in QA step 1 alongside the `mode=post` dimension fan-out, binding
-  intent-fidelity, structure-fit, and sigma-regression against the pre-phase snapshot
-  pack → `qa/findings-delta.md`.
+  intent-fidelity, structure-fit, and sigma-regression against the pre-implementation
+  pack (latest `pre-construction`, falling back to `pre-inception`) →
+  `qa/findings-delta.md`.
 - Continuous test debate (ADR 009, `core/protocol/test-debate.md`): test designs and
   results are contested on three surfaces of the QA testing pass — design (before any
   case executes), execution (as each category's results land), and results (over the

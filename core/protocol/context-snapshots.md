@@ -17,6 +17,16 @@ Rebuild at every phase boundary and after every Construction wave. Tag each rebu
   Delivery.
 - `post-wave-<n>` — after each Construction wave completes.
 
+## Measured sigmas
+
+After each rebuild, when the active change's architecture.md declares canonical
+coverage or lint commands, the orchestrator runs them and appends their evidence
+blocks (per `../protocol/evidence.md`) to quality-baseline.md's Coverage/Lint
+sections, replacing the `na` rows. This is the one sanctioned edit to a generated
+pack file; without canonical commands the `na` rows stand (degradation is explicit).
+The delta reviewer's sigma-regression binding covers coverage/lint only when both
+packs carry these measured rows.
+
 ## Consumption rule
 
 Every role reads `snapshot.md` (and `quality-baseline.md` where relevant to its
