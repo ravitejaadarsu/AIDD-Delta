@@ -14,6 +14,8 @@ checklist, SBOM + license summary.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 The Construction diff, repo, lockfiles, `constitution.md` security rules.
 
 ## Protocol

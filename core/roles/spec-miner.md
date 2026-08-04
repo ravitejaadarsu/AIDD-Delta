@@ -14,6 +14,8 @@ mined spec, so future changes cannot regress unwritten behavior.
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 Capability name + entry-point paths (from orchestrator); the repo (read-only).
 
 ## Protocol

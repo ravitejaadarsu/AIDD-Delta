@@ -22,6 +22,9 @@ quality_gates:
   evidence_captured: pending
   supervision_compliant: pending
   critic_approved: pending
+  auditor_approved: pending
+  debate_complete: pending
+  tally_reconciled: pending
 stories: {}
 fix_loop:
   iteration: 0
@@ -29,6 +32,17 @@ fix_loop:
 backflow_used: false
 supervision: {}
 scores: {}
+audit:
+  interrogation:
+    rounds_used: 0
+    max: 2
+  negotiation:
+    exchanges_used: 0
+    max: 2
+    rulings: []          # one row per disputed AC closed: {ac_id, ruling, ruled_by}
+  debate:
+    exchanges_used: 0
+    max: 6
 blocked_reason: null
 history: []
 updated_at: null

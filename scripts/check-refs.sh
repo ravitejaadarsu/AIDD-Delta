@@ -18,7 +18,7 @@ def md_files():
         rel = os.path.relpath(dirpath, ROOT)
         dirnames[:] = [d for d in dirnames if d not in {".git", "node_modules", "tmp"}]
         for f in filenames:
-            if f.endswith(".md") and not any(x in os.path.join(dirpath, f) for x in ("tests/fixtures", "tests/scenarios")):
+            if f.endswith(".md") and not any(x in os.path.join(dirpath, f) for x in ("tests/fixtures", "tests/scenarios", "docs/superpowers", ".superpowers")):
                 yield os.path.join(dirpath, f)
 
 errors = []

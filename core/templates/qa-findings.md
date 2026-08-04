@@ -1,6 +1,8 @@
-# QA Findings — <dimension: correctness|security|performance|test-coverage|spec-compliance>
+# QA Findings — <dimension: correctness|security|performance|test-coverage|spec-compliance|delta>
 
-<!-- Reviewer mode=post, over the full Construction diff. -->
+<!-- Reviewer mode=post, over the full Construction diff. For dimension=delta this file
+     is `qa/findings-delta.md`, produced by Reviewer mode=delta (one dispatch covering
+     three bindings: intent-fidelity, structure-fit, sigma-regression). -->
 
 | # | Severity | file:line | Defect claim (one sentence) | Concrete failure scenario (inputs/state → wrong outcome) |
 |---|---|---|---|---|

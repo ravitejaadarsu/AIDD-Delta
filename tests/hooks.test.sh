@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Hook script unit tests with fixture stdin payloads.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 ROOT="$(pwd)"
 fail=0
 TMP="tests/tmp/hooks-$$"
@@ -15,6 +15,9 @@ cp tests/fixtures/states/global-valid.yaml "${TMP}/.aidd/state.yaml"
 cp tests/fixtures/states/change-invalid-bad-phase.yaml "${TMP}/.aidd/changes/2026-07-29-x/state.yaml"
 
 payload() { printf '{"tool_input": {"file_path": "%s"}}' "$1"; }
+
+# hooks.json: snapshot wrapper registered on Stop, alongside gate-check
+grep -q 'build-snapshot.sh' hooks/hooks.json || { echo "hooks.json missing build-snapshot.sh registration"; fail=1; }
 
 # validate-state: valid global state -> exit 0
 payload "${ROOT}/${TMP}/.aidd/state.yaml" | bash hooks/scripts/validate-state.sh >/dev/null 2>&1
@@ -34,7 +37,7 @@ payload "/x/src/app.py" | bash hooks/scripts/guard-scope.sh >/dev/null 2>&1
 
 # session-log: appends a dispatch line when a change is active
 (
-  cd "${TMP}"
+  cd "${TMP}" || exit 1
   python3 - <<'PY'
 with open('.aidd/state.yaml', encoding='utf-8') as fh:
     src = fh.read()
@@ -54,6 +57,46 @@ grep -q 'aidd-builder | build ST-001' "${TMP}/.aidd/changes/2026-07-29-x/supervi
   # fixture change_id differs from folder; gate-check only reads phase fields, so fine
   out="$(bash "${ROOT}/hooks/scripts/gate-check.sh")"
   echo "${out}" | grep -q 'awaiting a gate' || { echo "gate-check missed awaiting_gate"; exit 1; }
+) || fail=1
+
+# build-snapshot: silently no-ops outside an AIDD repo (no .aidd/ present)
+(
+  NOAIDD="$(mktemp -d)"
+  trap 'rm -rf "${NOAIDD}"' EXIT
+  cd "${NOAIDD}"
+  bash "${ROOT}/hooks/scripts/build-snapshot.sh" >/dev/null 2>&1
+  code=$?
+  [ "${code}" -eq 0 ] || { echo "build-snapshot exited ${code} outside an AIDD repo"; exit 1; }
+  [ -e "${NOAIDD}/.aidd" ] && { echo "build-snapshot created .aidd outside an AIDD repo"; exit 1; }
+  exit 0
+) || fail=1
+
+# build-snapshot: .aidd/ present but no vendored script -> silent no-op, nothing written
+(
+  NOVENDOR="$(mktemp -d)"
+  trap 'rm -rf "${NOVENDOR}"' EXIT
+  cd "${NOVENDOR}" || exit 1
+  git init -q .
+  mkdir -p .aidd
+  bash "${ROOT}/hooks/scripts/build-snapshot.sh" >/dev/null 2>&1
+  code=$?
+  [ "${code}" -eq 0 ] || { echo "build-snapshot exited ${code} with .aidd but no vendored script"; exit 1; }
+  [ -e "${NOVENDOR}/.aidd/context" ] && { echo "build-snapshot created .aidd/context without a vendored script"; exit 1; }
+  exit 0
+) || fail=1
+
+# build-snapshot: invokes the vendored script with tag session-stop when present
+(
+  SNAP="$(mktemp -d)"
+  trap 'rm -rf "${SNAP}"' EXIT
+  git -C "${SNAP}" init -q
+  mkdir -p "${SNAP}/.aidd/framework/scripts"
+  cp "${ROOT}/core/scripts/build-snapshot.sh" "${SNAP}/.aidd/framework/scripts/build-snapshot.sh"
+  git -C "${SNAP}" add -A
+  git -C "${SNAP}" -c user.email=t@t -c user.name=t commit -qm init
+  ( cd "${SNAP}" && bash "${ROOT}/hooks/scripts/build-snapshot.sh" >/dev/null 2>&1 )
+  grep -q 'session-stop' "${SNAP}/.aidd/context/snapshot.md" \
+    || { echo "build-snapshot did not tag the run session-stop"; exit 1; }
 ) || fail=1
 
 exit "${fail}"

@@ -26,6 +26,8 @@ the true reach), and CONFIRM after build that the actual impact matched the pred
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 `architecture.md`, `epic.md` (ownership sets), `prd.md`, mined specs, the repo (read-only).
 In QA mode: the actual diff, to compare predicted vs actual reach.
 

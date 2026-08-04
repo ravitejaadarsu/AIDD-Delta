@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Installer contract: golden tree, idempotency, user-data preservation, AGENTS.md patching.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 ROOT="$(pwd)"
 fail=0
 TMP="tests/tmp/install-$$"
@@ -12,7 +12,7 @@ trap cleanup EXIT
 # 1. Fresh install: golden tree.
 ( cd "${TMP}/repo" && bash "${ROOT}/install.sh" >/dev/null )
 for p in .aidd/framework/VERSION .aidd/framework/playbooks/00-pipeline.md \
-         .aidd/framework/roles/master-supervisor.md .aidd/framework/protocol/gates.md \
+         .aidd/framework/roles/supervisor.md .aidd/framework/protocol/gates.md \
          .aidd/framework/templates/story.md .aidd/framework/schemas/change-state.schema.json \
          .aidd/framework/scripts/aidd-validate.py .aidd/framework/scripts/render-dashboard.sh \
          .aidd/state.yaml .aidd/memory.md .aidd/learnings.md .aidd/changes/_archive AGENTS.md; do
@@ -24,6 +24,8 @@ for d in playbooks prompts roles protocol templates schemas scripts; do
     fail=1
   fi
 done
+grep -qxF '.aidd/context/' "${TMP}/repo/.gitignore" \
+  || { echo ".gitignore missing .aidd/context/ after fresh install"; fail=1; }
 
 # 2. Idempotency + user-data preservation.
 python3 - "${TMP}/repo/.aidd/state.yaml" <<'PY'
@@ -38,6 +40,8 @@ PY
 grep -q '^default_mode: take-care' "${TMP}/repo/.aidd/state.yaml" || { echo "state clobbered on reinstall"; fail=1; }
 n=$(grep -c 'AIDD:BEGIN' "${TMP}/repo/AGENTS.md")
 [ "${n}" -eq 1 ] || { echo "AGENTS block count wrong after reinstall (${n})"; fail=1; }
+n=$(grep -cxF '.aidd/context/' "${TMP}/repo/.gitignore")
+[ "${n}" -eq 1 ] || { echo "gitignore .aidd/context/ line duplicated on reinstall (${n})"; fail=1; }
 
 # 3. Append-not-clobber on a pre-existing AGENTS.md; no duplication on re-run.
 mkdir -p "${TMP}/repo2"
@@ -48,5 +52,15 @@ grep -q 'AIDD:BEGIN' "${TMP}/repo2/AGENTS.md" || { echo "AIDD block not appended
 ( cd "${TMP}/repo2" && bash "${ROOT}/install.sh" >/dev/null )
 n=$(grep -c 'AIDD:BEGIN' "${TMP}/repo2/AGENTS.md")
 [ "${n}" -eq 1 ] || { echo "block duplicated on re-run (${n})"; fail=1; }
+
+# 4. .gitignore lacking a trailing newline: pattern appended on its own line, idempotently.
+mkdir -p "${TMP}/repo3"
+printf 'node_modules' > "${TMP}/repo3/.gitignore"   # no trailing newline
+( cd "${TMP}/repo3" && bash "${ROOT}/install.sh" >/dev/null )
+grep -qxF 'node_modules' "${TMP}/repo3/.gitignore" || { echo "last gitignore line corrupted by append"; fail=1; }
+grep -qxF '.aidd/context/' "${TMP}/repo3/.gitignore" || { echo ".aidd/context/ not on its own line"; fail=1; }
+( cd "${TMP}/repo3" && bash "${ROOT}/install.sh" >/dev/null )
+n=$(grep -cxF '.aidd/context/' "${TMP}/repo3/.gitignore")
+[ "${n}" -eq 1 ] || { echo "gitignore line duplicated on reinstall of newline-less file (${n})"; fail=1; }
 
 exit "${fail}"

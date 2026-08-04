@@ -15,6 +15,8 @@ benchmark runs. Degradation is recorded, never silent (`protocol/evidence.md`).
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 `prd.md` affected-flows table, `architecture.md` Bench Commands & budgets,
 `templates/playwright-capture.mjs` + `templates/bench-capture.sh`, stage (pre|post).
 

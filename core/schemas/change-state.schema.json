@@ -50,7 +50,10 @@
         "acs_verified": { "enum": ["pending", "passed", "failed", "na"] },
         "evidence_captured": { "enum": ["pending", "passed", "failed", "na"] },
         "supervision_compliant": { "enum": ["pending", "passed", "failed", "na"] },
-        "critic_approved": { "enum": ["pending", "passed", "failed", "na"] }
+        "critic_approved": { "enum": ["pending", "passed", "failed", "na"] },
+        "auditor_approved": { "enum": ["pending", "passed", "failed", "na"] },
+        "debate_complete": { "enum": ["pending", "passed", "failed", "na"] },
+        "tally_reconciled": { "enum": ["pending", "passed", "failed", "na"] }
       }
     },
     "stories": {
@@ -89,6 +92,38 @@
           "score": { "type": "integer", "minimum": 0, "maximum": 100 }
         }
       }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "interrogation": { "type": "object", "additionalProperties": false,
+          "properties": { "rounds_used": {"type":"integer","minimum":0}, "max": {"type":"integer","minimum":1} },
+          "required": ["rounds_used","max"] },
+        "negotiation":   { "type": "object", "additionalProperties": false,
+          "properties": {
+            "exchanges_used": {"type":"integer","minimum":0},
+            "max": {"type":"integer","minimum":1},
+            "rulings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["ac_id", "ruling", "ruled_by"],
+                "additionalProperties": false,
+                "properties": {
+                  "ac_id": { "type": "string" },
+                  "ruling": { "enum": ["PROVEN", "DEFECT", "UNRESOLVABLE"] },
+                  "ruled_by": { "enum": ["negotiation", "Supervisor adjudication", "short-circuit", "short-circuit (no monitoring note)"] }
+                }
+              }
+            }
+          },
+          "required": ["exchanges_used","max"] },
+        "debate":        { "type": "object", "additionalProperties": false,
+          "properties": { "exchanges_used": {"type":"integer","minimum":0}, "max": {"type":"integer","minimum":1} },
+          "required": ["exchanges_used","max"] }
+      },
+      "required": ["interrogation","negotiation","debate"]
     },
     "blocked_reason": { "type": ["string", "null"] },
     "history": {

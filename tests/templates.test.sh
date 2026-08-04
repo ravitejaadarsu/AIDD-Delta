@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Template contract tests: YAML seed templates and the story template must be schema-valid.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 S=core/schemas
 T=core/templates
 fail=0
@@ -24,7 +24,10 @@ for f in constitution.md memory.md learnings.md state.yaml change-state.yaml int
          mined-spec.md pre-review-findings.md qa-findings.md verification-report.md \
          security-report.md ac-matrix.md evidence-manifest.md playwright-capture.mjs \
          bench-capture.sh supervision-report.md dashboard.html traceability.mmd \
-         pr-description.md ci-workflow.yml; do
+         pr-description.md ci-workflow.yml snapshot.md quality-baseline.md \
+         context-delta.md interrogation-challenge.md interrogation-response.md \
+         auditor-verdict.md negotiation-log.md monitoring-report.md tally.md \
+         debate-record.md; do
   if [ ! -f "${T}/${f}" ]; then
     echo "missing template: ${T}/${f}"
     fail=1

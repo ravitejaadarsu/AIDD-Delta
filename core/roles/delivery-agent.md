@@ -15,6 +15,8 @@ traceability graph, PR body carrying the full quality story, CI watched to green
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 All change artifacts, repo git state, `templates/pr-description.md`,
 `templates/ci-workflow.yml`, `templates/traceability.mmd`.
 

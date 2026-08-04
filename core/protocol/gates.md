@@ -23,20 +23,21 @@ At a gate the orchestrator always:
    - `take-care`: disposition is `approve` recorded as `approved_by: auto` — UNLESS an
      escalation flag is set (open BLOCKING question, disjointness CONCERNS, unresolved
      pre-review CRITICAL, open CONFIRMED finding, open test FAIL, AC matrix FAIL, critic
-     REJECT, unresolved supervision VIOLATION), in which case this gate behaves exactly like
+     REJECT, unresolved supervision VIOLATION, UNRESOLVABLE adjudication ruling (disputed
+     AC without a PROVEN/DEFECT resolution)), in which case this gate behaves exactly like
      `let-me-look`.
 3. Appends the gate entry to `gates` in change state and advances.
 
 ## The `g_test_report` sub-gate
 
-After the exhaustive test report is consolidated (QA step 9), the orchestrator seeks
+After the exhaustive test report is consolidated (QA step 14), the orchestrator seeks
 approval before annotating stories with the report. On approval it records `g_test_report`
 AND writes a `## Test Report` section into every affected story. In `take-care` this
 auto-approves unless an executed FAIL is still open.
 
 ## The critic verdict
 
-The Critic (QA step 11) returns APPROVE / APPROVE WITH CONDITIONS / REJECT, setting the
+The Critic (QA step 16) returns APPROVE / APPROVE WITH CONDITIONS / REJECT, setting the
 `critic_approved` quality gate: APPROVE→passed, CONDITIONS→passed (conditions recorded in
 the ledger + PR body), REJECT→failed (blocks G3; re-enter the fix loop or escalate).
 
@@ -50,6 +51,6 @@ share an identical entry structure.
 
 `tests_green, exhaustive_tests_passed, qa_findings_resolved, e2e_verified,
 mutation_floor_met, security_clean, perf_within_budget, acs_verified, evidence_captured,
-supervision_compliant, critic_approved` — all must be `passed` (or explicitly `na` with a
-recorded reason) before Delivery pushes anything. Autonomy modes modulate human approval,
-never quality.
+supervision_compliant, critic_approved, auditor_approved, debate_complete,
+tally_reconciled` — all must be `passed` (or explicitly `na` with a recorded reason)
+before Delivery pushes anything. Autonomy modes modulate human approval, never quality.

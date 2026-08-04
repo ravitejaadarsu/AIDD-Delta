@@ -14,6 +14,8 @@ starts smarter (`protocol/learning.md`).
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 The full change folder (findings, verdicts, fix-loop history, supervision reports,
 assumptions), existing `learnings.md`.
 

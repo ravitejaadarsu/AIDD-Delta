@@ -14,6 +14,8 @@ must be able to complete the story reading ONLY this file plus the files it owns
 
 ## Inputs
 
+- `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+
 Your story row, `epic.md`, `architecture.md`, `prd.md`, the owned files (read).
 
 ## Protocol

@@ -9,6 +9,6 @@ description: How to run the AIDD Delta pipeline in this repo. Use whenever the u
 2. You are the orchestrator: dispatch the roles in `.aidd/framework/roles/` as parallel
    subagents (the plugin registers each as `aidd-<role>`); you never write product code
    or product artifacts yourself.
-3. Phase boundaries: dispatch `aidd-master-supervisor`; VIOLATIONS block advance.
+3. Phase boundaries: dispatch `aidd-supervisor`; VIOLATIONS block advance.
 4. Honor gates per `.aidd/framework/protocol/gates.md` and the mode per
    `.aidd/framework/protocol/autonomy-modes.md`.

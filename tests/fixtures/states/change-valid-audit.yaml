@@ -1,0 +1,81 @@
+# Fixture: mid-construction plus seeded audit budgets block and Layer-2 gates.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth with session management"
+mode: take-care
+phase: construction
+phase_status: in_progress
+step: "ST-002 red tests written"
+jira:
+  ticket: PROJ-123
+  sync: false
+gates:
+  g1_prd:
+    status: approved
+    artifact: prd.md
+    artifact_sha256: "ab12cd34ab12cd34"
+    approved_by: auto
+    at: "2026-07-29T14:12:00Z"
+    notes: null
+  g2_plan:
+    status: approved
+    artifact: architecture.md
+    artifact_sha256: "cd34ef56cd34ef56"
+    approved_by: auto
+    at: "2026-07-29T15:02:00Z"
+    notes: null
+quality_gates:
+  tests_green: pending
+  exhaustive_tests_passed: pending
+  qa_findings_resolved: pending
+  e2e_verified: pending
+  mutation_floor_met: pending
+  security_clean: pending
+  perf_within_budget: pending
+  acs_verified: pending
+  evidence_captured: pending
+  supervision_compliant: pending
+  critic_approved: pending
+  auditor_approved: pending
+  debate_complete: pending
+  tally_reconciled: pending
+stories:
+  ST-001:
+    status: done
+    attempts: 1
+    wave: 1
+  ST-002:
+    status: in_progress
+    attempts: 1
+    wave: 1
+fix_loop:
+  iteration: 0
+  max: 3
+backflow_used: false
+supervision:
+  inception: compliant
+scores:
+  inception:
+    verdict: PASS
+    score: 97
+audit:
+  interrogation:
+    rounds_used: 0
+    max: 2
+  negotiation:
+    exchanges_used: 0
+    max: 2
+    rulings:
+      - ac_id: AC-3
+        ruling: DEFECT
+        ruled_by: short-circuit (no monitoring note)
+  debate:
+    exchanges_used: 0
+    max: 6
+blocked_reason: null
+history:
+  - at: "2026-07-29T13:40:00Z"
+    event: "inception complete"
+  - at: "2026-07-29T14:12:00Z"
+    event: "gate g1_prd approved by auto"
+updated_at: "2026-07-29T16:20:11Z"

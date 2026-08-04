@@ -3,3 +3,4 @@ node_modules/
 tests/tmp/
 *.pyc
 __pycache__/
+.aidd/context/

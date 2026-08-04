@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Plugin manifest integrity: JSON parses, versions in sync, wrappers reference real files.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 fail=0
 
 python3 - <<'PY' || fail=1
@@ -41,8 +41,8 @@ for f in cmds:
         errors.append(f"commands/{f}: missing description frontmatter")
 
 agents = sorted(f for f in os.listdir('agents') if f.endswith('.md'))
-if len(agents) != 22:
-    errors.append(f"expected 22 agents, found {len(agents)}")
+if len(agents) != 25:
+    errors.append(f"expected 25 agents, found {len(agents)}")
 for f in agents:
     role = f.replace('aidd-', '').replace('.md', '')
     if not os.path.isfile(f'core/roles/{role}.md'):

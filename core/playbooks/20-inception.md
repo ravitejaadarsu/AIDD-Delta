@@ -5,6 +5,10 @@ parallel-safe stories, reviewed against the live codebase BEFORE any code.
 
 ## Steps
 
+Phase boundary: rebuild the snapshot pack
+(`bash .aidd/framework/scripts/build-snapshot.sh pre-inception` per
+`../protocol/context-snapshots.md`) before Step 1.
+
 1. **Clarify** — dispatch Product Analyst (`../roles/product-analyst.md`), stage 1:
    `questions.md` section inside `intent.md`. Resolve per mode
    (`../protocol/autonomy-modes.md`). Zero open BLOCKING questions may remain.

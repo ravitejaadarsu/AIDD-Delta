@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Dashboard renderer: substitutes state into the template, no marker left behind.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 fail=0
 mkdir -p tests/tmp
 out="tests/tmp/dash-$$.html"

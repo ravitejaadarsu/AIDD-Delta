@@ -1,7 +1,11 @@
 # Phase: qa
 
-Code to proof: five-dimension post-implementation review plus security audit, adversarial
-verification (only CONFIRMED findings block), an **exhaustive test-engineer team** that
+Code to proof: six-dimension post-implementation review (correctness, security,
+performance, test-coverage, spec-compliance, plus a pre/post-bound `delta` review of
+intent-fidelity, structure-fit, and sigma-regression against the pre-implementation
+pack — latest `pre-construction`, falling back to `pre-inception`)
+plus security audit, adversarial verification (only CONFIRMED findings block), an
+**exhaustive test-engineer team** that
 designs and executes the full matrix of cases — happy path, negative, boundary,
 impossible/abuse, API-contract, concurrency, regression, performance — and writes the
 end-results file `qa/test-report.md`, a bounded fix loop fed by both confirmed findings and

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-AIDD_VERSION="0.2.0"
+AIDD_VERSION="0.3.0"
 # AIDD Delta universal installer.
 # Vendors the portable core into ./.aidd/framework/, patches AGENTS.md (managed block),
 # and seeds state — idempotently. Never touches your constitution, memory, learnings,
@@ -40,7 +40,18 @@ for d in playbooks prompts roles protocol templates schemas scripts; do
 done
 printf '%s\n' "${AIDD_VERSION}" > "${TARGET}/.aidd/framework/VERSION"
 
-# 2. Seed user artifacts only when missing.
+# 2. Keep the gitignored .aidd/context/ snapshot pack out of the target's git tree.
+GITIGNORE="${TARGET}/.gitignore"
+if ! grep -qxF '.aidd/context/' "${GITIGNORE}" 2>/dev/null; then
+  # A .gitignore whose last line lacks a trailing newline would otherwise concatenate
+  # with our pattern (breaking it AND the grep -qxF guard, re-appending every install).
+  if [ -s "${GITIGNORE}" ] && [ -n "$(tail -c1 "${GITIGNORE}")" ]; then
+    printf '\n' >> "${GITIGNORE}"
+  fi
+  echo '.aidd/context/' >> "${GITIGNORE}"
+fi
+
+# 3. Seed user artifacts only when missing.
 mkdir -p "${TARGET}/.aidd/changes/_archive"
 [ -f "${TARGET}/.aidd/state.yaml" ] || {
   sed "s/^aidd_version: .*/aidd_version: \"${AIDD_VERSION}\"/" \
@@ -49,7 +60,7 @@ mkdir -p "${TARGET}/.aidd/changes/_archive"
 [ -f "${TARGET}/.aidd/memory.md" ]    || cp "${SRC}/templates/memory.md"    "${TARGET}/.aidd/memory.md"
 [ -f "${TARGET}/.aidd/learnings.md" ] || cp "${SRC}/templates/learnings.md" "${TARGET}/.aidd/learnings.md"
 
-# 3. AGENTS.md managed block (append-not-clobber; replace between markers on re-run).
+# 4. AGENTS.md managed block (append-not-clobber; replace between markers on re-run).
 AGENTS="${TARGET}/AGENTS.md"
 BEGIN="<!-- AIDD:BEGIN"
 if [ ! -f "${AGENTS}" ]; then
@@ -72,7 +83,7 @@ else
   { printf '\n'; cat "${SRC}/AGENTS.md"; } >> "${AGENTS}"
 fi
 
-# 4. Validate seeded state.
+# 5. Validate seeded state.
 python3 "${TARGET}/.aidd/framework/scripts/aidd-validate.py" \
   "${TARGET}/.aidd/framework/schemas/state.schema.json" "${TARGET}/.aidd/state.yaml"
 
