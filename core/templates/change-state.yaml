@@ -3,6 +3,11 @@ schema: 1
 change_id: 2026-01-01-example-change
 intent: "REPLACE: verbatim user intent"
 mode: let-me-look
+rigor:                   # how much verification runs — see protocol/rigor-modes.md
+  mode: standard         # fast | standard | critical (classifier resolves at creation)
+  selected_by: classifier
+  reason: "REPLACE: the classifier row that matched"
+  escalations: []        # append-only, one-way: {from, to, trigger, at}
 phase: inception
 phase_status: not_started
 step: null

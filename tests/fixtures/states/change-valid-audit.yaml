@@ -3,6 +3,15 @@ schema: 1
 change_id: 2026-07-29-user-auth
 intent: "Add email/password auth with session management"
 mode: take-care
+rigor:
+  mode: critical
+  selected_by: escalation
+  reason: "diff touches src/auth/** (authn/authz trigger row)"
+  escalations:
+    - from: standard
+      to: critical
+      trigger: "CONFIRMED finding in src/auth/session.py (authn/authz path)"
+      at: "2026-07-29T15:40:00Z"
 phase: construction
 phase_status: in_progress
 step: "ST-002 red tests written"

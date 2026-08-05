@@ -45,6 +45,7 @@ expect_valid   "${S}/change-state.schema.json" "${F}/change-valid-audit.yaml"
 expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-bad-phase.yaml"
 expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-missing-mode.yaml"
 expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-audit-overbudget.yaml"
+expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-rigor-mode.yaml"
 expect_valid_fm   "${S}/story-frontmatter.schema.json" "${F}/story-valid.md"
 expect_invalid_fm "${S}/story-frontmatter.schema.json" "${F}/story-invalid.md"
 

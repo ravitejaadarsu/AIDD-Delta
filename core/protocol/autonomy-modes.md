@@ -3,6 +3,12 @@
 Same playbooks, same artifacts, same phase order, same quality gates. Exactly four
 mechanical differences.
 
+Autonomy decides **who approves**. How much verification runs is a separate, orthogonal
+axis — the rigor mode (`rigor-modes.md`). Never conflate them: a `take-care` change can be
+`critical` rigor, a `let-me-look` change can be `fast`, and neither setting is ever derived
+from the other. Nothing in this file reads `rigor.mode`; nothing in `rigor-modes.md` reads
+`mode`.
+
 ## `take-care` — "handle everything"
 
 1. Gates auto-approve (`approved_by: auto`) unless an escalation flag forces a human stop

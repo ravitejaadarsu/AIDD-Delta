@@ -33,8 +33,8 @@ for auto in ('agents', 'hooks/hooks.json'):
         errors.append(f"auto-discovered path missing on disk: {auto}")
 
 cmds = sorted(f for f in os.listdir('commands') if f.endswith('.md'))
-if len(cmds) != 17:
-    errors.append(f"expected 17 commands, found {len(cmds)}")
+if len(cmds) != 18:
+    errors.append(f"expected 18 commands, found {len(cmds)}")
 for f in cmds:
     text = open(f'commands/{f}', encoding='utf-8').read()
     if not text.startswith('---') or 'description:' not in text.split('---')[1]:

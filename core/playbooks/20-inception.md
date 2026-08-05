@@ -9,6 +9,11 @@ Phase boundary: rebuild the snapshot pack
 (`bash .aidd/framework/scripts/build-snapshot.sh pre-inception` per
 `../protocol/context-snapshots.md`) before Step 1.
 
+Every fan-out below takes its agent count, order, and cap from `../protocol/dispatch.md`
+(one lookup per step, recorded, never re-decided). `Rigor:` annotations name what each
+rigor mode does with the step (`../protocol/rigor-modes.md`); unannotated steps run
+identically in all three modes.
+
 1. **Clarify** — dispatch Product Analyst (`../roles/product-analyst.md`), stage 1:
    `questions.md` section inside `intent.md`. Resolve per mode
    (`../protocol/autonomy-modes.md`). Zero open BLOCKING questions may remain.
@@ -39,7 +44,12 @@ Phase boundary: rebuild the snapshot pack
     `mode: pre`, dimensions: feasibility, pattern-fit, coupling-risk, test-strategy →
     `pre-review/<dimension>.md`. CRITICAL findings resolved (artifact revised) or explicitly
     waived by the human; log resolutions.
-12. **Supervisor audit** → then **GATE G2** (`g2_plan`).
+    Rigor: fast — 2 dimensions (feasibility, pattern-fit); standard/critical — all 4.
+12. **Supervisor audit** → then **GATE G2** (`g2_plan`). Before the digest, re-run the rigor
+    classifier over the G2 surface (ownership sets ∪ `impact-report.md` reach ∪ story `risk`
+    markers) per `../protocol/rigor-modes.md`: it may only escalate, and an escalation here
+    back-fills nothing in Inception — it changes what Construction and QA will run.
+    Rigor: all modes — the classifier re-run and the Supervisor audit always happen.
 
 ## Exit checklist
 

@@ -25,6 +25,29 @@ delivery → retro → done. Strict order per `../protocol/state-protocol.md`.
   `../protocol/context-snapshots.md`.
 - Never writes product code or product artifacts itself.
 
+## Rigor mode
+
+How much verification the change earns is decided ONCE, mechanically, by the classifier in
+`../protocol/rigor-modes.md` — at change creation, before Inception. The resolved mode
+(`fast` | `standard` | `critical`, default `standard`) is recorded in change state under
+`rigor` (`mode`, `selected_by`, `reason`), echoed in the orchestrator's progress line, and
+carried into the G2/G3 gate digests and the PR body. Rigor is orthogonal to the autonomy
+mode: autonomy decides who approves, rigor decides how much runs. Escalation is one-way and
+automatic (`fast` → `standard` → `critical`) whenever mid-run evidence says the change is
+riskier than its mode; de-escalation does not exist. Every step a mode skips is recorded
+`na` with `reason: rigor:<mode>` — never silently absent. The floor in `rigor-modes.md`
+(TDD evidence, disjoint ownership, evidence blocks, the Supervisor audit, the Critic
+verdict, human approval at G3 in `let-me-look`) holds in every mode.
+
+## Dispatch is table-driven
+
+Agent count, ownership, parallel-vs-sequential, cap and order come from the decision table
+in `../protocol/dispatch.md` — one lookup per step, never a fresh judgment. The orchestrator
+records the resolved plan in `supervision/audit.log` and does not revisit it within the
+step; re-deciding mid-step is a supervision VIOLATION. Parallel dispatch requires provably
+pairwise-disjoint ownership sets (`../protocol/file-scope.md`); unproven ⇒ sequential in the
+row's documented order.
+
 ## Three verification layers
 
 - **Layer 1 — workers**: every role that produces the product (Builder, Reviewer, Test
@@ -47,7 +70,8 @@ delivery → retro → done. Strict order per `../protocol/state-protocol.md`.
 1. If `.aidd/state.yaml` reports `constitution: missing` → run `10-master.md` first.
 2. Create `changes/<YYYY-MM-DD>-<slug>/` from templates (`change-state.yaml`, `intent.md`);
    record the verbatim intent, mode (inherit `default_mode` unless the user chose), and
-   Jira ticket if referenced. Set `active_change`.
+   Jira ticket if referenced. Run the rigor classifier (`../protocol/rigor-modes.md`) over
+   the intent and record the resolved `rigor` block. Set `active_change`.
 3. Create working branch `aidd/<change-id>`.
 4. Run phases in order: `20-inception.md` → `30-construction.md` → `40-qa.md` →
    `50-delivery.md` → `60-retro.md`.

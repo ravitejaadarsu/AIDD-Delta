@@ -24,8 +24,9 @@ At a gate the orchestrator always:
      escalation flag is set (open BLOCKING question, disjointness CONCERNS, unresolved
      pre-review CRITICAL, open CONFIRMED finding, open test FAIL, AC matrix FAIL, critic
      REJECT, unresolved supervision VIOLATION, UNRESOLVABLE adjudication ruling (disputed
-     AC without a PROVEN/DEFECT resolution)), in which case this gate behaves exactly like
-     `let-me-look`.
+     AC without a PROVEN/DEFECT resolution), an automatic rigor escalation
+     (`rigor-modes.md`) since the change's risk assessment moved under the framework's own
+     feet), in which case this gate behaves exactly like `let-me-look`.
 3. Appends the gate entry to `gates` in change state and advances.
 
 ## The `g_test_report` sub-gate
@@ -54,3 +55,15 @@ mutation_floor_met, security_clean, perf_within_budget, acs_verified, evidence_c
 supervision_compliant, critic_approved, auditor_approved, debate_complete,
 tally_reconciled` — all must be `passed` (or explicitly `na` with a recorded reason)
 before Delivery pushes anything. Autonomy modes modulate human approval, never quality.
+
+## Rigor modes and `na`
+
+The active rigor mode (`rigor-modes.md`) decides how much verification runs, so a gate whose
+step that mode does not run is **not applicable**, not skipped: it records `na` with
+`reason: rigor:<mode>` (e.g. `mutation_floor_met: na`, `reason: rigor:fast`). A silently
+absent gate is a supervision VIOLATION; an `na` without its reason is the same violation.
+An automatic escalation voids every `na` earned under the outgone mode — those gates flip
+back to `pending` and must be earned in the new mode.
+
+Rigor never touches the floor: `tests_green`, `acs_verified`, `supervision_compliant` and
+`critic_approved` are earned in every mode, `na` never available to them.
