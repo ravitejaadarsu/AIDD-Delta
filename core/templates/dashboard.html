@@ -17,6 +17,7 @@ table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:6px 10px
 </style></head><body>
 <h1>AIDD Delta</h1><div class="dim" id="meta"></div>
 <h2>Phases</h2><div class="phases" id="phases"></div>
+<h2>Recent progress</h2><div class="card"><table id="prog"></table></div>
 <h2>Gates</h2><div class="card"><table id="gates"><tr><th>Gate</th><th>Status</th><th>Approved by</th><th>At</th></tr></table></div>
 <h2>Quality gates</h2><div class="card"><table id="qg"></table></div>
 <h2>Stories</h2><div class="card"><table id="stories"><tr><th>Story</th><th>Wave</th><th>Status</th><th>Attempts</th></tr></table></div>
@@ -34,6 +35,12 @@ document.getElementById("meta").textContent =
 const idx = PHASES.indexOf(c.phase);
 document.getElementById("phases").innerHTML = PHASES.map((p,i)=>
   `<div class="phase ${i<idx?"done":i===idx?"active":""}">${p}</div>`).join("");
+const pr = document.getElementById("prog");
+const PROG = DATA.progress || [];
+if (!PROG.length) pr.insertAdjacentHTML("beforeend",
+  `<tr><td class="dim">no progress lines recorded yet — see protocol/progress.md</td></tr>`);
+PROG.forEach(p=>pr.insertAdjacentHTML("beforeend",
+  `<tr><td class="dim">${p.at}</td><td class="${p.shape==="plain"?"dim":p.state==="blocked"?"bad":""}">${p.line}</td></tr>`));
 const gt = document.getElementById("gates");
 Object.entries(c.gates||{}).forEach(([k,v])=>gt.insertAdjacentHTML("beforeend",
   `<tr><td>${k}</td><td class="${cls(v.status)}">${v.status}</td><td>${v.approved_by??"—"}</td><td class="dim">${v.at??"—"}</td></tr>`));
