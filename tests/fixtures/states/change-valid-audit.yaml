@@ -100,6 +100,18 @@ audit:
   debate:
     exchanges_used: 0
     max: 6
+escapes:
+  - id: E-001
+    at: "2026-09-14T09:20:00Z"
+    defect_class: race
+    verdict: layer-blind
+    blind_layers:
+      - L1-tests
+      - L2-debate
+    regression_test: "tests/test_store.py::test_concurrent_append_keeps_all_rows"
+    amendment: "core/roles/test-engineer.md: add a concurrent-writer row to state-concurrency-idempotency"
+    report: "escapes/E-001-store-append-race.md"
+    repeat_of: null
 blocked_reason: null
 history:
   - at: "2026-07-29T13:40:00Z"

@@ -63,6 +63,21 @@ modes; runaway (a dispatch ≥ 5× its class median) aborts that dispatch and re
 retrying silently. Cost never overrides the floor, and **an `na` justified by cost is
 forbidden**: cost pressure produces a STOP, never a quieter run. Gate: `within_cost_budget`.
 
+## Escape analysis (post-merge)
+
+Every layer above verifies forward. `../protocol/escape-analysis.md` is the backward pass: a
+defect found after merge is attributed to the change that produced it, and the Escape Analyst
+(`../roles/escape-analyst.md`) fills a mandatory nine-row per-layer verdict table —
+which layer should have caught it, whether it did, why the artifact was blind, and one minimal
+`preventable_by` change to a named file. Two outputs are mandatory: a permanent regression test
+(authored TDD in the fix change, RED then GREEN) and one amendment **proposal** — recorded in
+the report and in `learnings.md`, and **never applied by an agent**. **The orchestrator's
+recording duties**: append the `escapes` row to the merged change's state, append the row to
+`.aidd/escapes/register.md`, recompute the escape rate and per-layer blindness (numerator and
+denominator always printed; `not measured` when the window has no analyzed escape), and
+dispatch the Retro Learner as a retro addendum (`60-retro.md`). Escape analysis re-opens no
+phase and re-runs no gate; a repeat escape escalates to a human instead of re-proposing.
+
 ## Three verification layers
 
 - **Layer 1 — workers**: every role that produces the product (Builder, Reviewer, Test

@@ -1,0 +1,20 @@
+# Fixture: INVALID — escapes[].blind_layers carries a token outside the closed enum.
+# The layer vocabulary is shared with bench/harness.md's visible_to tokens; an invented layer
+# ("L4-vibes") would make the blindness metric uncountable, so the schema must reject it.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth with session management"
+mode: take-care
+phase: done
+phase_status: complete
+escapes:
+  - id: E-002
+    at: "2026-09-20T11:05:00Z"
+    defect_class: race
+    verdict: layer-blind
+    blind_layers:
+      - L4-vibes
+    regression_test: null
+    amendment: null
+    report: "escapes/E-002-example.md"
+    repeat_of: null

@@ -57,6 +57,7 @@ audit:
   debate:
     exchanges_used: 0
     max: 6
+escapes: []              # post-merge defects analyzed per layer — protocol/escape-analysis.md
 blocked_reason: null
 history: []
 updated_at: null

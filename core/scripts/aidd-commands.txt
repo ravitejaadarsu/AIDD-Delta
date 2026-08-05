@@ -10,6 +10,7 @@
 /aidd:dashboard|.aidd/framework/scripts/render-dashboard.sh|Regenerate and show the AIDD dashboard
 /aidd:deliver|.aidd/framework/playbooks/50-delivery.md|Run the AIDD Delivery phase
 /aidd:document|.aidd/framework/playbooks/05-document.md|Run the AIDD Document phase (brownfield spec mining)
+/aidd:escape|.aidd/framework/protocol/escape-analysis.md|Analyze a defect that escaped to production — which layer went blind, and what changes
 /aidd:go|.aidd/framework/playbooks/00-pipeline.md|Run the full AIDD pipeline for an intent (or Jira key)
 /aidd:impact|.aidd/framework/roles/impact-analyst.md|Run AIDD impact analysis — blast radius through multiple lenses
 /aidd:inception|.aidd/framework/playbooks/20-inception.md|Run the AIDD Inception phase for an intent
