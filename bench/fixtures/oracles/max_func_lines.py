@@ -17,6 +17,9 @@ import sys
 
 
 def main(argv):
+    if len(argv) == 2 and argv[1] in ("-h", "--help"):
+        print(f"usage: {os.path.basename(argv[0])} <file.py> <limit>")
+        return 0
     if len(argv) != 3:
         print(f"usage: {os.path.basename(argv[0])} <file.py> <limit>", file=sys.stderr)
         return 2

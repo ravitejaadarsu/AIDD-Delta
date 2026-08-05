@@ -18,6 +18,7 @@ actually performed on their own machine, and a cell nobody measured reads `not m
 | `bench/defects/` | The injected-defect catalogue, `D-NNN-<slug>.md` |
 | `bench/fixtures/` | Seed files a task's `setup` copies into its work dir |
 | `bench/scripts/` | `bench-run.sh`, `bench-grade.sh`, `bench-inject.sh`, `bench-report.sh` |
+| `bench/scripts/` (helpers) | `bench-common.sh`, `bench_meta.py`, `bench_metrics.py`, `bench-patch.py` |
 | `bench/results/` | Run outputs. `TEMPLATE.md` is the report shape |
 | `bench/harness.md` | The method: schemas, metrics, reps, anti-cheating rules |
 
