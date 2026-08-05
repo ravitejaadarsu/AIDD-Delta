@@ -35,7 +35,11 @@ carried into the G2/G3 gate digests and the PR body. Rigor is orthogonal to the 
 mode: autonomy decides who approves, rigor decides how much runs. Escalation is one-way and
 automatic (`fast` → `standard` → `critical`) whenever mid-run evidence says the change is
 riskier than its mode; de-escalation does not exist. Every step a mode skips is recorded
-`na` with `reason: rigor:<mode>` — never silently absent. The floor in `rigor-modes.md`
+`na` with `reason: rigor:<mode>` — never silently absent — in the object form
+`{status: na, reason: rigor:<mode>}` that `../protocol/gates.md` §The `na` encoding defines
+and the schema enforces. Wherever a `Rigor:` annotation below writes the shorthand
+`<gate>: na`, `reason: rigor:<mode>`, that object form is what it means. The floor in
+`rigor-modes.md`
 (TDD evidence, disjoint ownership, evidence blocks, the Supervisor audit, the Critic
 verdict, human approval at G3 in `let-me-look`) holds in every mode.
 

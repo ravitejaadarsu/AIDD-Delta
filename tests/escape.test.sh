@@ -104,6 +104,19 @@ need "${E}" 'numerator and the denominator|numerator and denominator' \
 need "${E}" 'not measured'                "the not-measured (never 0%) rule"
 need "${E}" 'counter-metric'              "the counter-metric framing"
 need "${E}" 'register\.md'                "the escape register"
+# The register is referenced by six files, so it needs a template like every other artifact.
+G=core/templates/escape-register.md
+exists "${G}"
+need "${E}" 'templates/escape-register\.md' "the register's template"
+need "${G}" '^## Metrics'                 "the recomputed metrics section"
+need "${G}" 'escape_rate|Escape rate'     "the escape-rate metric"
+need "${G}" 'not measured'                "the not-measured (never 0%) rule in the template"
+need "${G}" 'numerator and the denominator|numerator and denominator" *|numerator' \
+                                          "the print-both-terms rule in the template"
+for layer in 'L1-review' 'L1-tests' 'L2-auditor' 'L2-tally' 'L2-debate' 'L3-supervisor' \
+             'critic' 'e2e-mutation' 'evidence-capture'; do
+  need "${G}" "${layer}" "the '${layer}' blindness row in the register template"
+done
 need "${E}" 'bench/harness\.md'           "the shared defect-class vocabulary in bench/"
 
 # ── repeats escalate rather than re-propose

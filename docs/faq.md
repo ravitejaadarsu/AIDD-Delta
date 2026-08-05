@@ -9,7 +9,7 @@ hook-enforced invariants become orchestrator duties that the Supervisor audits r
 mechanisms that block. Cell-by-cell detail: [capability-matrix.md](capability-matrix.md).
 
 **Does take-care mode lower the quality bar?** No. Autonomy modes change who approves
-gates, never the fourteen quality gates — those block delivery identically in both modes.
+gates, never the sixteen quality gates — those block delivery identically in both modes.
 
 **What if my project has no UI?** Evidence capture degrades to CLI/API transcripts,
 recorded explicitly in the manifest. No mutation tool for your stack? `mutation_floor_met`

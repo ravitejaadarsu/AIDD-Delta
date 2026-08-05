@@ -181,9 +181,10 @@ escapes:
 
 ## 7. The register and the two metrics
 
-`.aidd/escapes/register.md` is the repo-level, append-only index: one row per escape (id,
-date, change id, defect class, verdict, blind layers, regression test, amendment,
-disposition, `repeat_of`), plus a `## Metrics` section recomputed on every append.
+`.aidd/escapes/register.md` is the repo-level, append-only index, created from
+`../templates/escape-register.md`: one row per escape (id, date, change id, defect class,
+verdict, blind layers, regression test, amendment, disposition, `repeat_of`), plus a
+`## Metrics` section recomputed on every append.
 
 **Escape rate** — how often a delivered change turns out to have carried a defect:
 
@@ -234,6 +235,18 @@ and a production defect that the same layer misses in the field are counted in o
 8. Dispatch the Retro Learner as a **retro addendum** (`../playbooks/60-retro.md`) so the
    escape's lessons land in the same `learnings.md` as every other lesson — one learning loop,
    extended, not a second one.
+
+Each of those eight steps emits one progress line in the ordinary format (`progress.md` §1).
+Because an escape run sits outside the phase machine there is no change-state `phase` to
+print, so `<phase>` carries the literal `escape` and `<total>` is the eight steps above:
+
+```text
+[escape 3/8] E-001 attributed to 2026-07-29-user-auth · escapes/E-001-store-append-race.md · gates: 0/0 · rigor: - · next: repeat check
+```
+
+`gates: 0/0` because escape analysis opens no gate, and `rigor: -` because the escape run
+itself has no rigor mode — the mode belongs to the **fix** change the regression test lands
+in (§4a), which is at least the escaped change's.
 
 ## 9. What escape analysis must never become
 

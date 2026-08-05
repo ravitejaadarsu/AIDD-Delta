@@ -50,11 +50,23 @@ share an identical entry structure.
 
 ## Quality gates (mode-independent)
 
+Sixteen, and `core/schemas/change-state.schema.json` is the authoritative set — this list
+and that schema must agree:
+
 `tests_green, exhaustive_tests_passed, qa_findings_resolved, e2e_verified,
 mutation_floor_met, security_clean, perf_within_budget, acs_verified, evidence_captured,
 supervision_compliant, critic_approved, auditor_approved, debate_complete,
-tally_reconciled` — all must be `passed` (or explicitly `na` with a recorded reason)
-before Delivery pushes anything. Autonomy modes modulate human approval, never quality.
+tally_reconciled, within_cost_budget, evidence_reproduced` — all must be `passed` (or
+explicitly `na` with a recorded reason) before Delivery pushes anything. Autonomy modes
+modulate human approval, never quality.
+
+The last two are mode-independent on identical terms to the other fourteen, and each is
+defined in the protocol that owns it rather than here:
+
+| gate | defined in | records `na` when |
+|---|---|---|
+| `within_cost_budget` | `cost-governance.md` §9 | no dispatch ran at all, with `reason: cost:no-dispatches` — the one `na` reason in the whole framework that is not `rigor:<mode>` |
+| `evidence_reproduced` | `determinism.md` §6 | `fast` mode, with `reason: rigor:fast` |
 
 ## The `na` encoding (canonical)
 

@@ -50,6 +50,63 @@ grep -qF 'the artifact path' "${P}"      || { echo "FAIL: gate ask must name the
 # ── the dashboard is the detail surface
 need 'Recent progress' "the dashboard as the detail surface"
 
+# ── every worked example must obey the denominator rule it states. A canonical example
+# that contradicts its own rule is how `[construction 4/9]` survived: nothing checked it.
+python3 - <<'PY' || fail=1
+import re
+import sys
+
+PLAYBOOK = {
+    'document': 'core/playbooks/05-document.md',
+    'master': 'core/playbooks/10-master.md',
+    'inception': 'core/playbooks/20-inception.md',
+    'construction': 'core/playbooks/30-construction.md',
+    'qa': 'core/playbooks/40-qa.md',
+    'delivery': 'core/playbooks/50-delivery.md',
+    'retro': 'core/playbooks/60-retro.md',
+}
+# Escape analysis runs outside the phase machine, so its denominator is its own flow
+# section rather than a playbook — count only the steps under that heading.
+ESCAPE_SRC = 'core/protocol/escape-analysis.md'
+ESCAPE_HEADING = '## 8. Flow'
+STEP_RE = re.compile(r'^[0-9]+\. ', re.M)
+LINE_RE = re.compile(r'\[([a-z]+) ([0-9]+)/([0-9]+)\]')
+SOURCES = ('core/protocol/progress.md', 'core/protocol/determinism.md', ESCAPE_SRC)
+
+counts, errors = {}, []
+for phase, path in PLAYBOOK.items():
+    with open(path, encoding='utf-8') as fh:
+        counts[phase] = len(STEP_RE.findall(fh.read()))
+
+with open(ESCAPE_SRC, encoding='utf-8') as fh:
+    escape_text = fh.read()
+if ESCAPE_HEADING not in escape_text:
+    errors.append(f'{ESCAPE_SRC}: no {ESCAPE_HEADING!r} section to take a denominator from')
+    counts['escape'] = 0
+else:
+    flow = escape_text.split(ESCAPE_HEADING, 1)[1].split('\n## ', 1)[0]
+    counts['escape'] = len(STEP_RE.findall(flow))
+PLAYBOOK['escape'] = f'{ESCAPE_SRC} {ESCAPE_HEADING}'
+
+for src in SOURCES:
+    with open(src, encoding='utf-8') as fh:
+        text = fh.read()
+    for phase, step, total in LINE_RE.findall(text):
+        if phase not in counts:
+            errors.append(f'{src}: progress example names unknown phase {phase!r}')
+            continue
+        if int(total) != counts[phase]:
+            errors.append(f'{src}: example [{phase} {step}/{total}] contradicts the '
+                          f'denominator rule — {PLAYBOOK[phase]} numbers {counts[phase]} steps')
+        if not 1 <= int(step) <= counts[phase]:
+            errors.append(f'{src}: example [{phase} {step}/{total}] step is outside '
+                          f'1..{counts[phase]}')
+
+if errors:
+    print('\n'.join(f'FAIL: {e}' for e in errors))
+    sys.exit(1)
+PY
+
 # ── renderer emits the Recent progress section from change history
 TMP="tests/tmp/progress-$$"
 mkdir -p "${TMP}"
@@ -61,7 +118,8 @@ import sys
 tmp = sys.argv[1]
 with open('tests/fixtures/states/change-valid-mid-construction.yaml', encoding='utf-8') as fh:
     src = fh.read()
-line = ('[construction 4/9] ST-002 red tests written · '
+# The denominator is the phase's real step count: 30-construction.md numbers 4 steps.
+line = ('[construction 2/4] ST-002 red tests written · '
         'changes/2026-07-29-user-auth/stories/ST-002.md · gates: 2/4 · rigor: - · '
         'next: ST-002 implementation')
 entry = f'  - at: "2026-07-29T16:20:00Z"\n    event: "{line}"\n'

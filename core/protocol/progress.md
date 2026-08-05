@@ -16,8 +16,8 @@ human-scannable:
 
 | Field | Meaning | When unavailable |
 |---|---|---|
-| `<phase>` | the change-state `phase` value, verbatim | never — a step outside a phase is not a step |
-| `<step>/<total>` | the playbook's step number and that phase's step count | never — the playbook numbers its steps |
+| `<phase>` | the change-state `phase` value, verbatim — or the literal `escape` for a run that sits outside the phase machine (`escape-analysis.md` §8) | never — a step outside a phase is not a step |
+| `<step>/<total>` | the playbook's step number and that phase's step count — the numbered steps the playbook actually carries, so Construction's denominator is 4 and QA's is 17 | never — the playbook numbers its steps |
 | `<what happened>` | the state transition, past tense, ≤10 words | never |
 | `<evidence pointer>` | repo-relative path to the artifact or evidence block just written | `-` |
 | `gates: <k>/<n>` | approved gates over gates defined for the change | `gates: 0/0` |
@@ -35,10 +35,11 @@ Rules:
   re-read, a no-op validation: silent. The line is a state-transition record, not a
   heartbeat.
 
-Example:
+Example — `30-construction.md` numbers **4** steps, and writing a story's red tests happens
+inside step 2 (the per-wave loop), so the line reads `2/4`:
 
 ```text
-[construction 4/9] ST-002 red tests written · changes/2026-07-29-user-auth/stories/ST-002.md · gates: 2/4 · rigor: standard · next: ST-002 implementation
+[construction 2/4] ST-002 red tests written · changes/2026-07-29-user-auth/stories/ST-002.md · gates: 2/4 · rigor: standard · next: ST-002 implementation
 ```
 
 ## 2. Blocked and failed lines

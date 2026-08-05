@@ -120,13 +120,54 @@ need core/playbooks/50-delivery.md 'aidd-cost\.sh'               "the PR body's 
 need core/playbooks/50-delivery.md 'Reversibility'               "the delivery reversibility note"
 
 # ── the ledger template's documented columns
-for col in 'at' 'phase' 'step' 'role' 'unit' 'tokens_in' 'tokens_out' 'minutes' \
+for col in 'at' 'phase' 'class' 'role' 'unit' 'tokens_in' 'tokens_out' 'minutes' \
            'cum_tokens' 'cum_minutes' 'source'; do
   need "${L}" "\| ${col} \|" "the ledger '${col}' column"
 done
 need "${L}" '^## Remaining planned dispatches' "the remaining-dispatch section the projection reads"
 need "${L}" '^## Stops'                        "the stops section"
 need "${L}" 'not measured'                     "the not-measured convention"
+
+# ── the ledger keys on the dispatch-class id, and those ids are actually unique.
+# Step cells are not: `QA 1` names two rows and `QA 3, 5, 9` is compound, so a median
+# grouped on step text would merge unrelated dispatches and split related ones.
+D=core/protocol/dispatch.md
+need "${D}" '^\| Step \| Class \|'  "the Class column in the dispatch decision table"
+need "${L}" 'dispatch-class id'     "the ledger keying on the class id"
+need "${C}" 'dispatch-class id'     "the protocol keying the ledger on the class id"
+python3 - <<'PY' || fail=1
+import re
+import sys
+
+with open('core/protocol/dispatch.md', encoding='utf-8') as fh:
+    lines = fh.read().splitlines()
+
+header = next((i for i, ln in enumerate(lines)
+               if ln.startswith('| Step | Class |')), None)
+if header is None:
+    print('FAIL: core/protocol/dispatch.md has no `| Step | Class |` decision table')
+    sys.exit(1)
+
+ids, dupes = [], []
+for line in lines[header + 2:]:
+    if not line.startswith('|'):
+        break
+    cell = [c.strip() for c in line.strip().strip('|').split('|')][1]
+    if not re.fullmatch(r'`[a-z0-9][a-z0-9-]*`', cell):
+        print(f'FAIL: dispatch class id {cell!r} is not a short backticked lowercase slug')
+        sys.exit(1)
+    slug = cell.strip('`')
+    if slug in ids:
+        dupes.append(slug)
+    ids.append(slug)
+
+if dupes:
+    print(f'FAIL: dispatch class ids must be unique — repeated: {sorted(set(dupes))}')
+    sys.exit(1)
+if len(ids) < 20:
+    print(f'FAIL: only {len(ids)} class ids; the decision table covers all four phases')
+    sys.exit(1)
+PY
 
 # ── the script: --help exits 0, and a synthetic ledger yields a summary with a projection
 if ! bash "${SH}" --help >/dev/null 2>&1; then
@@ -156,19 +197,19 @@ trap cleanup EXIT
   echo
   echo '## Dispatches'
   echo
-  echo '| at | phase | step | role | unit | tokens_in | tokens_out | minutes | cum_tokens | cum_minutes | source |'
+  echo '| at | phase | class | role | unit | tokens_in | tokens_out | minutes | cum_tokens | cum_minutes | source |'
   echo '|---|---|---|---|---|---|---|---|---|---|---|'
-  echo '| 2026-08-06T10:00:00Z | qa | QA 5 | test-engineer | api-contract | 30000 | 6000 | 2.0 | 36000 | 2.0 | measured |'
-  echo '| 2026-08-06T10:02:00Z | qa | QA 5 | test-engineer | boundary-edge | 28000 | 5000 | 1.5 | 69000 | 3.5 | measured |'
-  echo '| 2026-08-06T10:04:00Z | qa | QA 5 | test-engineer | functional-happy-path | 40000 | 8000 | 2.5 | 117000 | 6.0 | measured |'
-  echo '| 2026-08-06T10:07:00Z | qa | QA 7 | e2e-verifier | - | not measured | not measured | 4.0 | 117000 | 10.0 | not measured |'
+  echo '| 2026-08-06T10:00:00Z | qa | qa5-test | test-engineer | api-contract | 30000 | 6000 | 2.0 | 36000 | 2.0 | measured |'
+  echo '| 2026-08-06T10:02:00Z | qa | qa5-test | test-engineer | boundary-edge | 28000 | 5000 | 1.5 | 69000 | 3.5 | measured |'
+  echo '| 2026-08-06T10:04:00Z | qa | qa5-test | test-engineer | functional-happy-path | 40000 | 8000 | 2.5 | 117000 | 6.0 | measured |'
+  echo '| 2026-08-06T10:07:00Z | qa | qa7-e2e | e2e-verifier | - | not measured | not measured | 4.0 | 117000 | 10.0 | not measured |'
   echo
   echo '## Remaining planned dispatches'
   echo
   echo '| class | count |'
   echo '|---|---|'
-  echo '| QA 5 | 2 |'
-  echo '| QA 16 | 1 |'
+  echo '| qa5-test | 2 |'
+  echo '| qa16-critic | 1 |'
   echo
   echo '## Stops'
   echo
@@ -191,14 +232,14 @@ say() { # extended-regex, what the summary must report
 say 'rows: 4 \(measured 3, not measured 1\)' "the measured/not-measured row split"
 say 'spent: 117000 tokens'                   "the spend recomputed from the ledger"
 say 'budget: 150000 tokens'                  "the budget read from the ledger"
-say 'QA 5: median 36000 tokens'              "the per-class median (measured rows only)"
+say 'qa5-test: median 36000 tokens'          "the per-class median (measured rows only)"
 say 'projection: >= 189000 tokens'           "the projection over the remaining plan"
 say 'LOWER BOUND'                            "the lower-bound marker for an unknown class"
 say 'status: (soft|hard)'                    "the threshold status"
 say 'UNRESOLVED: 1 stop'                     "the unresolved pending stop"
 
 # A measured-only ledger with every class known must print an exact projection, not a bound.
-grep -v 'not measured' "${TMP}/ledger.md" | grep -v '^| QA 16' > "${TMP}/exact.md"
+grep -v 'not measured' "${TMP}/ledger.md" | grep -v '^| qa16-critic' > "${TMP}/exact.md"
 out2="$(bash "${SH}" --ledger "${TMP}/exact.md" 2>&1)"
 if printf '%s\n' "${out2}" | grep -q 'LOWER BOUND'; then
   echo "FAIL: ${SH} reported a lower bound with every remaining class measured"

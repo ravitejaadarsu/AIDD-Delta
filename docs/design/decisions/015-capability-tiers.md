@@ -7,7 +7,7 @@ portability. Tier 1 is Claude Code (parallel Task-tool dispatch, five enforcemen
 `/aidd:*` command surface); Tier 2 is Codex CLI (native `AGENTS.md` routing, single execution
 thread, no hooks); Tier 3 is any other agent CLI or a plain LLM session (prompts pasted from
 `.aidd/framework/prompts/`). The contract states what is identical on every tier — phase
-sequence, gate semantics, the fourteen quality gates, evidence discipline, the
+sequence, gate semantics, the sixteen quality gates, evidence discipline, the
 artifacts-only channel, the state machine, three-layer verification and its budgets, explicit
 degradation — and what is Claude-Code-only: wall-clock parallelism, and mechanical hook
 *prevention* of protocol violations where other tiers have protocol duty plus the

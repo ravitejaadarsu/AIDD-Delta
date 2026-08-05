@@ -243,5 +243,6 @@ rigor:
 `mode` and `selected_by` are required within the block; the block itself is optional, so a
 change created before this protocol shipped still validates and is read as `standard` /
 `classifier`. The resolved mode is echoed in the orchestrator's progress line so the cost
-of the run is visible while it runs, and it appears in the G2/G3 gate digests and the PR
-body next to the autonomy mode.
+of the run is visible while it runs, in the G2/G3 gate digests, on the dashboard's
+**Rigor & cost** card (`../templates/dashboard.html`), and on the `Rigor / autonomy` line of
+the PR body (`../templates/pr-description.md`) next to the autonomy mode.

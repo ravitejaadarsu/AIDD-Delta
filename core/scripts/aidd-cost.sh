@@ -15,8 +15,10 @@ threshold status. Computes only — never writes state or the ledger.
 Options:
   --ledger <path>     cost/ledger.md to read (default: the active change's ledger)
   --json <dir>        directory of per-dispatch usage JSON files, merged with the ledger
-                      (each file: {at, phase, step, role, unit, tokens_in, tokens_out,
-                      minutes}; a missing or null token field records "not measured")
+                      (each file: {at, phase, class, role, unit, tokens_in, tokens_out,
+                      minutes}; `class` is the dispatch-class id from the protocol/dispatch.md
+                      decision table, and a missing or null token field records
+                      "not measured")
   --state <path>      change state.yaml to read cost.budget_tokens / cost.budget_minutes from
   --budget-tokens <n> override the token ceiling
   --budget-minutes <n> override the wall-clock ceiling
@@ -137,8 +139,10 @@ if ledger_path and os.path.isfile(ledger_path):
     for cells in table_rows(secs.get("dispatches", [])):
         if len(cells) < 11 or cells[0].startswith("<"):
             continue
+        # Column 3 is the dispatch-class id (protocol/dispatch.md `Class`), which is what
+        # every median groups on — Step text is neither unique nor atomic.
         dispatches.append({
-            "at": cells[0], "phase": cells[1], "step": cells[2], "role": cells[3],
+            "at": cells[0], "phase": cells[1], "class": cells[2], "role": cells[3],
             "unit": cells[4], "tokens_in": num(cells[5]), "tokens_out": num(cells[6]),
             "minutes": num(cells[7], 0), "source": cells[10].lower(),
         })
@@ -160,7 +164,8 @@ if json_dir:
         ti, to = rec.get("tokens_in"), rec.get("tokens_out")
         dispatches.append({
             "at": str(rec.get("at", "")), "phase": str(rec.get("phase", "")),
-            "step": str(rec.get("step", "")), "role": str(rec.get("role", "")),
+            "class": str(rec.get("class") or rec.get("step") or ""),
+            "role": str(rec.get("role", "")),
             "unit": str(rec.get("unit", "")), "tokens_in": ti, "tokens_out": to,
             "minutes": rec.get("minutes") or 0,
             "source": "measured" if (ti is not None and to is not None) else NOT_MEASURED,
@@ -205,9 +210,9 @@ for r in dispatches:
 
 class_tokens, class_minutes = {}, {}
 for r in meas:
-    class_tokens.setdefault(r["step"], []).append(r["tokens_in"] + r["tokens_out"])
+    class_tokens.setdefault(r["class"], []).append(r["tokens_in"] + r["tokens_out"])
 for r in dispatches:
-    class_minutes.setdefault(r["step"], []).append(r["minutes"] or 0)
+    class_minutes.setdefault(r["class"], []).append(r["minutes"] or 0)
 medians = {c: median(v) for c, v in class_tokens.items()}
 
 budget_tokens = num(arg_bt) or num(budget.get("budget_tokens", ""))
@@ -299,12 +304,12 @@ if budget_minutes:
 runaways = []
 for r in meas:
     total = r["tokens_in"] + r["tokens_out"]
-    med = medians.get(r["step"])
-    rows = len(class_tokens.get(r["step"], []))
+    med = medians.get(r["class"])
+    rows = len(class_tokens.get(r["class"], []))
     if med and rows >= 3 and total >= 5 * med:
-        runaways.append(f"{r['step']}/{r['unit']}: {total} tokens >= 5x class median {med}")
+        runaways.append(f"{r['class']}/{r['unit']}: {total} tokens >= 5x class median {med}")
     elif budget_tokens and rows < 3 and total >= 0.25 * budget_tokens:
-        runaways.append(f"{r['step']}/{r['unit']}: {total} tokens >= 25% of budget "
+        runaways.append(f"{r['class']}/{r['unit']}: {total} tokens >= 25% of budget "
                         f"(class has {rows} measured rows, no usable median)")
 
 print("")

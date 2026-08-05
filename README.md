@@ -14,7 +14,7 @@ afternoon discovering, in review, that a green test proved nothing.
 | **Authorship** | single author; no external contributors yet |
 | **External validation** | **none yet.** No third-party team has run this end to end and reported back. If you do, [we publish it](docs/case-studies/README.md) — including negative results |
 | **CI** | green on `main` ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) — self-tests plus pinned ShellCheck and markdownlint, with a linter-drift check so local and CI lint byte-identically |
-| **Self-tests** | `bash tests/run.sh` — zero-dependency bash + python3 stdlib; 13 suites at the time of writing. The runner prints `suites=N failures=N`; CI fails on any non-zero |
+| **Self-tests** | `bash tests/run.sh` — zero-dependency bash + python3 stdlib; 17 suites at the time of writing. The runner prints `suites=N failures=N`; CI fails on any non-zero |
 | **Benchmarks** | **no published benchmark results yet.** The harness ships in [`bench/`](bench/harness.md) with its task set, defect corpus, and comparison arms — run it yourself and report what you get |
 | **Runtime tiers** | Tier 1 Claude Code · Tier 2 Codex CLI · Tier 3 any other agent CLI or plain LLM ([capability matrix](docs/capability-matrix.md)) |
 

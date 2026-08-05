@@ -16,7 +16,9 @@ Every fan-out below takes its agent count, ownership rule, order, and cap from
 `../protocol/dispatch.md`: the orchestrator resolves the plan ONCE per step, records it in
 `supervision/audit.log`, and does not revisit it within the step — re-deciding mid-step is a
 supervision VIOLATION. `Rigor:` annotations name what each rigor mode does with the step
-(`../protocol/rigor-modes.md`).
+(`../protocol/rigor-modes.md`); where one writes the shorthand `<gate>: na`,
+`reason: rigor:<mode>`, it means the object form `{status: na, reason: rigor:<mode>}` that
+`../protocol/gates.md` §The `na` encoding defines and the schema enforces.
 
 1. **Step 0 — pre evidence**: dispatch Evidence Capturer (`../roles/evidence-capturer.md`)
    with `stage: pre` over the PRD's affected-flows table + bench commands →

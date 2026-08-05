@@ -42,8 +42,9 @@ re-runs what the new mode requires, records the escalation, and tells you at the
 Rigor reduces breadth, never honesty. In every mode: TDD evidence (a failing test before
 green), disjoint file ownership, evidence blocks with real exit codes, the Supervisor's
 process audit at every phase boundary, the Critic verdict, and your approval at G3 in
-`let-me-look`. A step a mode skips is recorded `na` with the mode as the reason — visible in
-the dashboard and the PR body, never silently missing.
+`let-me-look`. A step a mode skips is recorded `na` **with the mode as the reason** — the
+dashboard's quality-gate table prints that reason next to the status, and the PR body's
+`Rigor / autonomy` line names the mode that earned it. Never silently missing.
 
 ## Choosing it yourself
 

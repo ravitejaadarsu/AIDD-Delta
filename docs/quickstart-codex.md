@@ -3,7 +3,7 @@
 The same pipeline, no plugin required. Everything the agent needs is plain markdown.
 
 Your runtime sets your **tier**, and tier changes **parallelism and enforcement automation,
-not correctness**: the playbooks, gate semantics, the fourteen quality gates, evidence rules,
+not correctness**: the playbooks, gate semantics, the sixteen quality gates, evidence rules,
 and the artifact set are identical to a Claude Code run. Cell-by-cell:
 [capability-matrix.md](capability-matrix.md).
 

@@ -75,9 +75,11 @@ skips the TDD evidence, the evidence blocks, the Supervisor, the Critic, the AC 
 your approval at G3 in `let-me-look`.
 
 And the one move that would hide a degraded run is banned outright: **an `na` justified by
-cost is forbidden.** A quality gate may record `na` only with `reason: rigor:<mode>`. A gate
-whose `na` reason names cost, budget, tokens, time, or spend is a supervision violation and
-the gate reverts to `pending`. Cost pressure produces a STOP, never a quieter run.
+cost is forbidden.** A quality gate may record `na` only with `reason: rigor:<mode>` — with
+one named carve-out, `within_cost_budget` itself recording `reason: cost:no-dispatches` when
+no dispatch ran at all. Any other gate whose `na` reason names cost, budget, tokens, time, or
+spend is a supervision violation and the gate reverts to `pending`. Cost pressure produces a
+STOP, never a quieter run.
 
 ## The gate
 
@@ -88,5 +90,6 @@ Supervisor itemizes as a violation.
 
 ## Where you see it
 
-The progress line (soft crossings only), the G2/G3 gate digests, the PR body's cost summary,
-the dashboard, and `/aidd:cost` on demand.
+The progress line (soft crossings only), the G2/G3 gate digests, the PR body's `## Cost`
+section, the dashboard's **Rigor & cost** section (`docs/dashboard.md`), and `/aidd:cost` on
+demand.

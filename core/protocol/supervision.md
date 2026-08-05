@@ -25,8 +25,13 @@ log and artifacts against the phase checklist in the corresponding playbook. Che
   confined to ownership sets; integration green evidence present; a Master Agent monitoring
   note present for every wave (`audit/monitoring/*`); Auditor interrogation verdicts
   complete for every wave (each claimed AC exactly `PROVEN` or `DISPUTED`); audit budgets
-  respected — interrogation ≤ 2 rounds per subject, negotiation ≤ 2 exchanges per disputed
-  AC, counters in change-state `audit` matching the artifacts on disk.
+  respected — **the maxima are read from change state, never assumed**: interrogation rounds
+  per subject ≤ `audit.interrogation.max` and negotiation exchanges per disputed AC ≤
+  `audit.negotiation.max`, with those values themselves checked against the row
+  `rigor-modes.md` §Seeded audit budgets gives the change's current `rigor.mode`
+  (`standard` 1 / 1 / 2, `critical` 2 / 2 / 6). A budget seeded above the mode's row is
+  itself a VIOLATION — it buys rounds the mode did not pay for. Counters in change-state
+  `audit` must match the artifacts on disk.
 - QA: every CRITICAL/HIGH finding has a verdict; fix loop within budget; E2E clean-state
   evidence; **determinism repeats present for the modes that require them**
   (`determinism.md`: `standard`/`critical` — the gating suite twice and every

@@ -93,7 +93,7 @@ exactly one row to `cost/ledger.md` (`../templates/cost-ledger.md`) and folds th
 |---|---|
 | `at` | ISO-8601 UTC seconds, when the dispatch returned |
 | `phase` | change-state `phase`, verbatim |
-| `step` | the **dispatch-class token** — the `Step` cell of the `dispatch.md` row that produced this dispatch (`QA 5`, `Construction 2a`, `Inception 11`) |
+| `class` | the **dispatch-class id** — the `Class` cell of the `dispatch.md` decision-table row that produced this dispatch (`qa5-test`, `con2a-builder`, `inc11-prereview`). Never the `Step` text: step cells are not unique (`QA 1` names two rows) and not atomic (`QA 3, 5, 9`), so grouping cost on them would merge unrelated dispatches |
 | `role` | the role file dispatched, without `.md` |
 | `unit` | the unit key from the row's deterministic order (`boundary-edge`, `ST-004`, `subject-3`) |
 | `tokens_in` | measured input tokens, or `not measured` |
@@ -124,10 +124,10 @@ Rules that make the ledger worth reading:
 ```text
 projection_tokens = spent_tokens + Σ over remaining classes c of ( count(c) × median_tokens(c) )
 
-remaining classes = the dispatch classes of every step the resolved dispatch plans
-                    (dispatch.md) still owe at the CURRENT rigor mode, with count(c) =
+remaining classes = the dispatch-class ids (dispatch.md `Class` column) the resolved
+                    dispatch plans still owe at the CURRENT rigor mode, with count(c) =
                     how many units of class c remain
-median_tokens(c)  = median of (tokens_in + tokens_out) over ledger rows with step == c
+median_tokens(c)  = median of (tokens_in + tokens_out) over ledger rows with class == c
                     and source == measured
                     tie rule: an even number of rows ⇒ the mean of the two middle values,
                     floored to an integer — so two runs project identically
@@ -235,9 +235,12 @@ invisible — recording a step as not-applicable because it was expensive — is
 outright**:
 
 > **An `na` justified by cost is forbidden.** `na` has exactly one legitimate reason
-> vocabulary, `reason: rigor:<mode>` (`gates.md` §Rigor modes and `na`). Cost pressure
-> produces a STOP (§5), never a silent reduction. A quality gate recording `na` with a reason
-> naming cost, budget, tokens, time, or spend is a supervision VIOLATION, and the gate
+> vocabulary, `reason: rigor:<mode>` (`gates.md` §Rigor modes and `na`), plus **one named
+> carve-out**: `within_cost_budget` itself may record `reason: cost:no-dispatches` (§9), and
+> nothing else may ever use it. That carve-out records that **no dispatch ran at all**, which
+> is the opposite of a step skipped to save money — there was no spend to judge. Cost pressure
+> produces a STOP (§5), never a silent reduction. Any other quality gate recording `na` with a
+> reason naming cost, budget, tokens, time, or spend is a supervision VIOLATION, and the gate
 > reverts to `pending`.
 
 The Supervisor's phase-boundary checklist (`supervision.md`) checks, mechanically:
@@ -248,7 +251,8 @@ The Supervisor's phase-boundary checklist (`supervision.md`) checks, mechanicall
 2. `cost.spent_tokens` equals the last row's `cum_tokens`; `cost.spent_minutes` equals the
    last row's `cum_minutes`; `cost.by_phase` sums to both. (Recompute with `aidd-cost.sh`.)
 3. No `quality_gates` value is `na` with a reason naming cost, budget, tokens, time, or
-   spend.
+   spend — the sole exception being `within_cost_budget: {status: na, reason:
+   cost:no-dispatches}` (§9), which is checkable in one step: an empty ledger.
 4. Every `cost.stops` row has a terminal `disposition`; no row is still `pending` at a phase
    boundary past the one that recorded it.
 5. No `source: not measured` row carries a numeric `0` in `tokens_in` or `tokens_out`, and no
@@ -261,8 +265,9 @@ The Supervisor's phase-boundary checklist (`supervision.md`) checks, mechanicall
 Mode-independent, same shape as every other quality gate
 (`pending` | `passed` | `failed` | `na`), set by the orchestrator, and part of the
 `quality_gates` object in `core/schemas/change-state.schema.json` — which is the
-authoritative set (`gates.md` §Quality gates enumerates the v0.3.0 gates; this one is defined
-here and carries the identical must-be-`passed`-or-`na` rule before Delivery pushes).
+authoritative set (`gates.md` §Quality gates enumerates all sixteen and points here for this
+one's definition; it carries the identical must-be-`passed`-or-`na` rule before Delivery
+pushes).
 
 | value | when |
 |---|---|
@@ -280,6 +285,12 @@ missing ledger, which is a VIOLATION.
 - **Progress line** — soft crossings only, inside `<what happened>` (§5).
 - **Gate digests** — G2 and G3 carry one line: spent / budget / projection, and any `stops`
   row (`gates.md` §Uniform mechanism step 1).
-- **PR body** — the ledger summary and the reversibility note, per `../playbooks/50-delivery.md`.
-- **Dashboard** — `cost` renders with the other state objects after every state write.
+- **PR body** — the `## Cost` and `## Reversibility` sections of
+  `../templates/pr-description.md`, filled from the ledger summary per
+  `../playbooks/50-delivery.md` step 3.
+- **Dashboard** — the **Rigor & cost** section of `../templates/dashboard.html`, rebuilt on
+  every state write: the rigor mode, spend against both ceilings, the projection, and the
+  `stops` count with its unresolved tally. An absent `cost` block reads `not recorded` and an
+  unmeasured projection reads `not measured` — the dashboard never shows a `0` nobody
+  measured.
 - **`/aidd:cost`** — on demand, any time, read-only.

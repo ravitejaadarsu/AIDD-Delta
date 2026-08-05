@@ -135,8 +135,8 @@ The moment repeats disagree, the test is **quarantined**. Mechanically:
 
 Same shape as every other quality gate (`pending` | `passed` | `failed` | `na`), in the
 `quality_gates` object of `core/schemas/change-state.schema.json` — the authoritative set
-(`gates.md` §Quality gates enumerates the v0.3.0 gates; this one is defined here under the
-identical must-be-`passed`-or-`na` rule before Delivery pushes).
+(`gates.md` §Quality gates enumerates all sixteen and points here for this one's definition;
+it carries the identical must-be-`passed`-or-`na` rule before Delivery pushes).
 
 | value | when |
 |---|---|
@@ -160,7 +160,39 @@ writes `qa/determinism-report.md`.
 In `fast` there is no E2E Verifier dispatch, nothing is repeated, and the gate records `na`
 with its reason. No other role may set `evidence_reproduced`.
 
-## 8. What this protocol is not
+## 8. State
+
+Recorded in change state under `determinism` (closed object, optional at top level so a
+change created before this protocol shipped still validates and reads as un-reproduced):
+
+```yaml
+determinism:
+  repeats_required: 2      # runs required PER reproduced claim in the current mode
+  repeats_done: 0          # the LOWEST run count recorded across those claims
+  report: null             # qa/determinism-report.md, null until it exists
+  quarantined: []          # {test, ac_ids, suspected_source, disposition, accepted_reason}
+```
+
+The **orchestrator** writes all four and nobody else (`state-protocol.md` rule 1), reading
+them off the E2E Verifier's `qa/determinism-report.md`. The counts are **per claim class**
+(§1), not cumulative:
+
+| field | semantics |
+|---|---|
+| `repeats_required` | how many runs **each** reproduced claim class must have in the current rigor mode — `0` in `fast`, `2` in `standard` and `critical` (§2). Seeded when the mode resolves. It is deliberately a per-claim count and never a total, because how many class-3 claims exist is not known until the fix loop closes. |
+| `repeats_done` | the **lowest** run count recorded over the claim classes the mode requires — a minimum, not a sum. That is what makes `repeats_done >= repeats_required` the entire arithmetic of the gate: one under-repeated claim cannot be masked by another that ran twice. `0` while any required claim is unrun. |
+| `report` | repo-relative path to `qa/determinism-report.md`; `null` until the E2E Verifier writes it. `evidence_reproduced: passed` alongside a `null` report is a supervision VIOLATION — the gate would be resting on a document that does not exist. |
+| `quarantined` | one row per test whose repeats disagreed (§5), append-only within the change. `disposition` moves `pending` → `fixed` or `accepted`, never back, and `accepted` never restores the test to the evidence set. |
+
+A rigor escalation out of `fast` re-seeds `repeats_required` to `2` and resets `repeats_done`
+to `0`: the `na` earned under the outgone mode is void and the repeats run in the new mode
+(`rigor-modes.md` §Escalation).
+
+A quarantine is a state transition, so it emits exactly one progress line like any other step
+(`progress.md` §1) — `[qa 7/17] 2 tests quarantined · qa/determinism-report.md · gates: 2/4 ·
+rigor: standard · next: post evidence` — never a narration of the comparison that produced it.
+
+## 9. What this protocol is not
 
 - **Not a retry mechanism.** §3. A green that only appears sometimes is not a green.
 - **Not a flake-suppression tool.** Quarantine removes a test from the *evidence* set, never

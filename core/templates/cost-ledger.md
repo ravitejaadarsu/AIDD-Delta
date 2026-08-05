@@ -17,12 +17,14 @@
 
 ## Dispatches
 
-<!-- `step` is the dispatch-class token: the `Step` cell of the ../protocol/dispatch.md row
-     that produced this dispatch (e.g. `QA 5`, `Construction 2a`). Medians in the projection
-     group on this column, so it must match the table byte-for-byte.
+<!-- `class` is the dispatch-class id: the `Class` cell of the ../protocol/dispatch.md
+     decision-table row that produced this dispatch (e.g. `qa5-test`, `con2a-builder`).
+     Medians in the projection group on this column, so it must match the table
+     byte-for-byte — and it is the class id, never the `Step` text, because Step cells are
+     neither unique (`QA 1` names two rows) nor atomic (`QA 3, 5, 9`).
      `source` is `measured` or `not measured`. cum_tokens counts measured rows only. -->
 
-| at | phase | step | role | unit | tokens_in | tokens_out | minutes | cum_tokens | cum_minutes | source |
+| at | phase | class | role | unit | tokens_in | tokens_out | minutes | cum_tokens | cum_minutes | source |
 |---|---|---|---|---|---|---|---|---|---|---|
 
 ## Remaining planned dispatches

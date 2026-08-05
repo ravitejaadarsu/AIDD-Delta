@@ -26,40 +26,48 @@ Once per step, in this order:
 
 Unit counts read `fast / standard / critical`. A unit is one dispatch of one role.
 
-| Step | Unit of work | Units (fast / std / crit) | Dispatch | Cap | Deterministic order |
-|---|---|---|---|---|---|
-| Inception 4 | architecture candidate (lens) | 3 / 3 / 3 | parallel (artifact-disjoint) | 3 | lens asc: `risk-first`, `scalability-first`, `simplicity-first` |
-| Inception 5 | judge scorecard | 3 / 3 / 3 | parallel (artifact-disjoint) | 3 | scorecard index asc |
-| Inception 6 | architecture synthesis | 1 / 1 / 1 | sequential | 1 | — |
-| Inception 7 | independent thinker | 1 / 1 / 1 | sequential (after synthesis) | 1 | — |
-| Inception 8 | epic scoper | 1 / 1 / 1 | sequential | 1 | — |
-| Inception 9 | story author | one per story | parallel (artifact-disjoint: one story file each) | 6 | story-id asc |
-| Inception 10 | impact analyst | 1 / 1 / 1 | sequential | 1 | — |
-| Inception 11 | pre-review dimension | 2 / 4 / 4 | parallel (artifact-disjoint) | 4 | dimension asc: `coupling-risk`, `feasibility`, `pattern-fit`, `test-strategy` (fast set: `feasibility`, `pattern-fit`) |
-| Construction 1 | evidence capturer (`stage: pre`) | 0 / 1 / 1 | sequential, blocks wave 1 | 1 | — |
-| Construction 2a | builder (wave story) | every story in the wave | parallel ONLY if the wave's ownership sets are pairwise disjoint | 4 | story-id asc |
-| Construction 2c | Master Agent `mode: monitor` (per wave) | 0 / 1 / 1 | sequential, after the wave's builders return | 1 | wave asc |
-| Construction 2d | Auditor interrogation subject (Builder Report) | 0 / one per report | parallel (artifact-disjoint per subject-id) | 4 | subject-id asc; rounds WITHIN a subject strictly sequential |
-| Construction 2e | integration check / build fixer | 1 / 1 / 1 | sequential, alone | 1 | — (crosses ownership lines by exemption — never parallel with a builder) |
-| QA 1 | post-review dimension (incl. `mode: delta`) | 2 / 6 / 6 | parallel (artifact-disjoint) | 6 | dimension asc: `correctness`, `delta`, `performance`, `security`, `spec-compliance`, `test-coverage` (fast set: `correctness`, `spec-compliance`) |
-| QA 1 | security auditor | 0 / 1 / 1 | parallel with the dimension fan-out (own artifact) | 1 | — |
-| QA 3 | adversarial verifier (per CRITICAL/HIGH finding) | only if a CRITICAL exists / all / all | parallel; file-grouped if >12 findings | 6 | finding number asc |
-| QA 3, 5, 9 | Master Agent `mode: monitor` (per batch) | 0 / 3 / 3 | sequential, one per closed batch | 1 | batch order: review, test, verification |
-| QA 4, 5, 10 | debate exchange | 0 / ≤2 (design only) / ≤6 | strictly sequential — an exchange is one challenge plus its response | 1 | surface pipeline order (design → execution → results); within a batched challenge, category asc |
-| QA 5 | test engineer (per category) | 2 / 5 / 8 | parallel (artifact-disjoint) | 6 | category asc: `api-contract`, `boundary-edge`, `functional-happy-path`, `impossible-abuse`, `negative-error-handling`, `performance-smoke`, `regression-compat`, `state-concurrency-idempotency` |
-| QA 6 | fix-loop builder (per defect group) | one per owning story | parallel ONLY if the owning stories' ownership sets are pairwise disjoint | 4 | story-id asc |
-| QA 7 | E2E verifier | 0 / 1 / 1 | sequential, alone — clean state means nothing else runs | 1 | — |
-| QA 8 | evidence capturer (`stage: post`) | 0 / 1 / 1 | sequential | 1 | — |
-| QA 9 | AC assessor | 1 / 1 / 1 | sequential | 1 | — |
-| QA 11 | tally | 0 / 1 / 1 | sequential | 1 | — |
-| QA 12 | Auditor final audit subject | 0 / one per subject | parallel (artifact-disjoint per subject-id) | 4 | subject-id asc |
-| QA 13 | negotiation (per disputed AC) | 0 / ≤1 / ≤2 exchanges | strictly sequential, one AC at a time (the counter resets per AC) | 1 | ac-id asc |
-| QA 16 | critic | 1 / 1 / 1 | sequential | 1 | — (never skipped) |
-| Delivery 1 | doc writer + delivery-agent prep | 2 / 2 / 2 | parallel ONLY if the doc set and the commit set are disjoint | 2 | documented fallback: Doc Writer, then Delivery Agent |
-| Delivery 2–4 | delivery agent | 1 / 1 / 1 | sequential | 1 | — |
-| Delivery 6 | Supervisor final session report | 1 / 1 / 1 | sequential | 1 | — |
-| Retro 1 | retro learner | 1 / 1 / 1 | sequential | 1 | — |
-| Every phase boundary | Supervisor phase audit | 1 / 1 / 1 | sequential | 1 | — (never skipped in any mode) |
+**`Class` is the row's stable identifier**, and it is what everything downstream keys on: the
+`class` column of `cost/ledger.md` (`../templates/cost-ledger.md`), the per-class medians and
+projection in `aidd-cost.sh` (`cost-governance.md` §4), and the `class=` field of the
+recorded dispatch plan. It exists because the `Step` cell cannot do that job — `QA 1` names
+two different rows, and `QA 3, 5, 9` and `QA 4, 5, 10` are compound, so grouping cost on the
+step text would merge unrelated dispatches and split related ones. Class ids are unique
+within this table, and an id is never reused for a different unit of work.
+
+| Step | Class | Unit of work | Units (fast / std / crit) | Dispatch | Cap | Deterministic order |
+|---|---|---|---|---|---|---|
+| Inception 4 | `inc4-arch` | architecture candidate (lens) | 3 / 3 / 3 | parallel (artifact-disjoint) | 3 | lens asc: `risk-first`, `scalability-first`, `simplicity-first` |
+| Inception 5 | `inc5-judge` | judge scorecard | 3 / 3 / 3 | parallel (artifact-disjoint) | 3 | scorecard index asc |
+| Inception 6 | `inc6-synth` | architecture synthesis | 1 / 1 / 1 | sequential | 1 | — |
+| Inception 7 | `inc7-thinker` | independent thinker | 1 / 1 / 1 | sequential (after synthesis) | 1 | — |
+| Inception 8 | `inc8-scoper` | epic scoper | 1 / 1 / 1 | sequential | 1 | — |
+| Inception 9 | `inc9-story` | story author | one per story | parallel (artifact-disjoint: one story file each) | 6 | story-id asc |
+| Inception 10 | `inc10-impact` | impact analyst | 1 / 1 / 1 | sequential | 1 | — |
+| Inception 11 | `inc11-prereview` | pre-review dimension | 2 / 4 / 4 | parallel (artifact-disjoint) | 4 | dimension asc: `coupling-risk`, `feasibility`, `pattern-fit`, `test-strategy` (fast set: `feasibility`, `pattern-fit`) |
+| Construction 1 | `con1-evidence-pre` | evidence capturer (`stage: pre`) | 0 / 1 / 1 | sequential, blocks wave 1 | 1 | — |
+| Construction 2a | `con2a-builder` | builder (wave story) | every story in the wave | parallel ONLY if the wave's ownership sets are pairwise disjoint | 4 | story-id asc |
+| Construction 2c | `con2c-monitor` | Master Agent `mode: monitor` (per wave) | 0 / 1 / 1 | sequential, after the wave's builders return | 1 | wave asc |
+| Construction 2d | `con2d-interrogation` | Auditor interrogation subject (Builder Report) | 0 / one per report | parallel (artifact-disjoint per subject-id) | 4 | subject-id asc; rounds WITHIN a subject strictly sequential |
+| Construction 2e | `con2e-integration` | integration check / build fixer | 1 / 1 / 1 | sequential, alone | 1 | — (crosses ownership lines by exemption — never parallel with a builder) |
+| QA 1 | `qa1-dim` | post-review dimension (incl. `mode: delta`) | 2 / 6 / 6 | parallel (artifact-disjoint) | 6 | dimension asc: `correctness`, `delta`, `performance`, `security`, `spec-compliance`, `test-coverage` (fast set: `correctness`, `spec-compliance`) |
+| QA 1 | `qa1-sec` | security auditor | 0 / 1 / 1 | parallel with the dimension fan-out (own artifact) | 1 | — |
+| QA 3 | `qa3-adversarial` | adversarial verifier (per CRITICAL/HIGH finding) | only if a CRITICAL exists / all / all | parallel; file-grouped if >12 findings | 6 | finding number asc |
+| QA 3, 5, 9 | `qa-monitor` | Master Agent `mode: monitor` (per batch) | 0 / 3 / 3 | sequential, one per closed batch | 1 | batch order: review, test, verification |
+| QA 4, 5, 10 | `qa-debate` | debate exchange | 0 / ≤2 (design only) / ≤6 | strictly sequential — an exchange is one challenge plus its response | 1 | surface pipeline order (design → execution → results); within a batched challenge, category asc |
+| QA 5 | `qa5-test` | test engineer (per category) | 2 / 5 / 8 | parallel (artifact-disjoint) | 6 | category asc: `api-contract`, `boundary-edge`, `functional-happy-path`, `impossible-abuse`, `negative-error-handling`, `performance-smoke`, `regression-compat`, `state-concurrency-idempotency` |
+| QA 6 | `qa6-fixloop` | fix-loop builder (per defect group) | one per owning story | parallel ONLY if the owning stories' ownership sets are pairwise disjoint | 4 | story-id asc |
+| QA 7 | `qa7-e2e` | E2E verifier | 0 / 1 / 1 | sequential, alone — clean state means nothing else runs | 1 | — |
+| QA 8 | `qa8-evidence-post` | evidence capturer (`stage: post`) | 0 / 1 / 1 | sequential | 1 | — |
+| QA 9 | `qa9-ac` | AC assessor | 1 / 1 / 1 | sequential | 1 | — |
+| QA 11 | `qa11-tally` | tally | 0 / 1 / 1 | sequential | 1 | — |
+| QA 12 | `qa12-audit` | Auditor final audit subject | 0 / one per subject | parallel (artifact-disjoint per subject-id) | 4 | subject-id asc |
+| QA 13 | `qa13-negotiation` | negotiation (per disputed AC) | 0 / ≤1 / ≤2 exchanges | strictly sequential, one AC at a time (the counter resets per AC) | 1 | ac-id asc |
+| QA 16 | `qa16-critic` | critic | 1 / 1 / 1 | sequential | 1 | — (never skipped) |
+| Delivery 1 | `del1-docs-prep` | doc writer + delivery-agent prep | 2 / 2 / 2 | parallel ONLY if the doc set and the commit set are disjoint | 2 | documented fallback: Doc Writer, then Delivery Agent |
+| Delivery 2–4 | `del2-delivery` | delivery agent | 1 / 1 / 1 | sequential | 1 | — |
+| Delivery 6 | `del6-supervisor` | Supervisor final session report | 1 / 1 / 1 | sequential | 1 | — |
+| Retro 1 | `retro1-learner` | retro learner | 1 / 1 / 1 | sequential | 1 | — |
+| Every phase boundary | `phase-supervisor` | Supervisor phase audit | 1 / 1 / 1 | sequential | 1 | — (never skipped in any mode) |
 
 ## Ownership rule (mechanical)
 
@@ -114,10 +122,11 @@ dispatches that do not match the recorded plan. A step whose scope genuinely cha
 starts a NEW step with a new token and its own single plan.
 
 Recorded as one line in `supervision/audit.log` (`supervision.md` format, role
-`orchestrator`, status `dispatched`):
+`orchestrator`, status `dispatched`). `class=` carries the row's class id, which is what
+lets the Supervisor match the plan against the ledger rows it produced:
 
 ```text
-2026-08-06T10:14:02Z | construction | orchestrator | wave-2 | dispatched | dispatch-plan units=3 agents=3 mode=parallel cap=4 order=ST-004,ST-005,ST-006
+2026-08-06T10:14:02Z | construction | orchestrator | wave-2 | dispatched | dispatch-plan class=con2a-builder units=3 agents=3 mode=parallel cap=4 order=ST-004,ST-005,ST-006
 ```
 
 ## Worked examples
