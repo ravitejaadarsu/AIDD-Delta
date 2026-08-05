@@ -21,11 +21,13 @@ jobs:
       - name: Assert no linter version drift
         run: |
           want="$(grep -m1 '^MDLINT_VERSION=' tests/run.sh | cut -d'"' -f2)"
-          got="$(markdownlint-cli2 --version 2>/dev/null | head -1 | tr -d 'v')"
+          # `--version` prints "markdownlint-cli2 v0.18.1 (markdownlint v0.38.0)" —
+          # take the FIRST semver on the line, which is the cli2 version.
+          got="$(markdownlint-cli2 --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
           echo "tests/run.sh pins ${want}; installed ${got}"
-          case "${got}" in
-            "${want}"*) ;;
-            *) echo "::error::markdownlint drift: pinned ${want}, installed ${got}"; exit 1 ;;
-          esac
+          if [ "${got}" != "${want}" ]; then
+            echo "::error::markdownlint drift: pinned ${want}, installed ${got:-none}"
+            exit 1
+          fi
       - name: Self-tests
         run: bash tests/run.sh
