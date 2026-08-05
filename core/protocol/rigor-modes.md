@@ -29,11 +29,20 @@ excessive for a button label. Cost proportional to risk — with a floor that ne
 | Evidence capture | build/suite transcript only | pre + post + manifest | pre + post + manifest |
 | Critic + Supervisor | ALWAYS | ALWAYS | ALWAYS |
 
-Budgets are seeded into change state the moment the mode resolves: `standard` seeds
-`audit.interrogation.max: 1`, `audit.negotiation.max: 1`, `audit.debate.max: 2`;
-`critical` seeds `2`, `2`, `6` (the shipped v0.3.0 values). `fast` seeds nothing — Layer 2
-never runs, the template values stand unused, and every Layer-2 quality gate records `na`
-with its reason.
+### Seeded audit budgets
+
+Budgets are seeded into change state the moment the mode resolves. This table is the
+authority — `core/templates/change-state.yaml` seeds the row for its own `rigor.mode`, and
+`tests/rigor.test.sh` reads both and fails if they disagree:
+
+| rigor mode | `audit.interrogation.max` | `audit.negotiation.max` | `audit.debate.max` |
+|---|---|---|---|
+| `fast` | — | — | — |
+| `standard` | 1 | 1 | 2 |
+| `critical` | 2 | 2 | 6 |
+
+`fast` seeds nothing — Layer 2 never runs, whatever the template carries stands unused, and
+every Layer-2 quality gate records `na` with its reason (`gates.md` §The `na` encoding).
 
 ## Mode detail
 
@@ -199,7 +208,9 @@ Rigor mode reduces **breadth**, never **honesty**. In `fast` exactly as in `crit
 - human approval at G3 in `let-me-look`, and every forced-human escalation flag in
   `take-care` (`gates.md`);
 - the gate ledger with artifact hashes and staleness (`gates.md`);
-- honest `na`: a step a mode skips is recorded `na` with `reason: rigor:<mode>` — never
+- honest `na`: a step a mode skips is recorded in the object form
+  `{status: na, reason: rigor:<mode>}` — the canonical encoding is `gates.md`
+  §The `na` encoding, and the schema accepts nothing else that carries a reason. Never
   silently absent, never reported as passed.
 
 A mode that would require dropping any floor item is not a mode; it is a bug. The

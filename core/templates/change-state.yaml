@@ -52,17 +52,17 @@ fix_loop:
 backflow_used: false
 supervision: {}
 scores: {}
-audit:
+audit:                   # seeded from rigor.mode — see protocol/rigor-modes.md §Seeded audit budgets
   interrogation:
     rounds_used: 0
-    max: 2
+    max: 1               # standard: 1 round per subject (critical: 2)
   negotiation:
     exchanges_used: 0
-    max: 2
+    max: 1               # standard: 1 exchange per disputed AC (critical: 2)
     rulings: []          # one row per disputed AC closed: {ac_id, ruling, ruled_by}
   debate:
     exchanges_used: 0
-    max: 6
+    max: 2               # standard: design surface only (critical: pool of 6)
 escapes: []              # post-merge defects analyzed per layer — protocol/escape-analysis.md
 blocked_reason: null
 history: []

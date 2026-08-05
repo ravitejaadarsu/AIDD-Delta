@@ -84,7 +84,7 @@ need core/protocol/supervision.md 'determinism repeats present' \
 # ── the gate
 need "${D}" '^## 6\. The .evidence_reproduced. quality gate' "the determinism gate section"
 S=core/schemas/change-state.schema.json
-need "${S}" '"evidence_reproduced": \{ "enum": \["pending", "passed", "failed", "na"\] \}' \
+need "${S}" '"evidence_reproduced": \{ "oneOf": \[' \
                                           "the evidence_reproduced gate in the schema"
 need "${S}" '"determinism": \{'           "the determinism object in the schema"
 need "${S}" '"shared-fixture"'            "the suspected-source enum in the schema"

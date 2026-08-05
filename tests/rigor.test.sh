@@ -108,5 +108,70 @@ if ! python3 core/scripts/aidd-validate.py "${S}" core/templates/change-state.ya
 fi
 need core/templates/change-state.yaml '^ *mode: standard'      "the seeded standard rigor mode"
 need core/templates/change-state.yaml '^ *selected_by: classifier' "the seeded classifier selector"
+need "${R}" '^### Seeded audit budgets'  "the per-mode seeded-audit-budget table"
+
+# The seed template must carry the audit maxima its OWN rigor.mode entitles it to. Both
+# sides are parsed — the protocol's table and the template's YAML — so changing the default
+# mode moves the expectation with it instead of breaking this test.
+python3 - <<'PY' || fail=1
+import sys
+
+ns = {'__name__': 'aidd_validate'}
+with open('core/scripts/aidd-validate.py', encoding='utf-8') as fh:
+    exec(fh.read(), ns)  # the repo's own parser — no third-party YAML (ADR 002)
+
+with open('core/templates/change-state.yaml', encoding='utf-8') as fh:
+    tpl = ns['parse_yaml'](fh.read()) or {}
+with open('core/protocol/rigor-modes.md', encoding='utf-8') as fh:
+    proto = fh.read().splitlines()
+
+COLS = ['audit.interrogation.max', 'audit.negotiation.max', 'audit.debate.max']
+errors = []
+
+
+def cells(line):
+    return [c.strip().strip('`') for c in line.strip().strip('|').split('|')]
+
+
+header = next((i for i, ln in enumerate(proto)
+               if ln.lstrip().startswith('|') and all(c in ln for c in COLS)), None)
+if header is None:
+    errors.append('core/protocol/rigor-modes.md: no table heads all three audit.*.max columns')
+    print('\n'.join(errors))
+    sys.exit(1)
+
+names = cells(proto[header])
+order = [names.index(c) for c in COLS]
+table = {}
+for line in proto[header + 2:]:
+    if not line.lstrip().startswith('|'):
+        break
+    row = cells(line)
+    table[row[0]] = [row[i] for i in order]
+
+mode = (tpl.get('rigor') or {}).get('mode')
+audit = tpl.get('audit') or {}
+seeded = [(audit.get(block) or {}).get('max')
+          for block in ('interrogation', 'negotiation', 'debate')]
+
+if mode not in table:
+    errors.append(f'template rigor.mode {mode!r} has no row in the protocol table '
+                  f'(rows: {sorted(table)})')
+else:
+    row = table[mode]
+    if all(v in ('—', '-', '') for v in row):
+        pass  # `fast` seeds nothing; whatever the template carries stands unused
+    else:
+        expected = [int(v) for v in row]
+        if seeded != expected:
+            errors.append(
+                f'core/templates/change-state.yaml seeds audit maxima {seeded} but its own '
+                f'rigor.mode is {mode!r}, which protocol/rigor-modes.md seeds {expected} '
+                f'(interrogation, negotiation, debate)')
+
+if errors:
+    print('\n'.join(f'FAIL: {e}' for e in errors))
+    sys.exit(1)
+PY
 
 exit "${fail}"

@@ -3,7 +3,7 @@
 
 Validates YAML (strict AIDD subset) or JSON documents against a JSON Schema
 subset (draft-07 keywords: type, enum, pattern, required, properties,
-additionalProperties, items, minimum, maximum).
+additionalProperties, items, minimum, maximum, oneOf).
 
 The AIDD YAML subset is deliberately small so this parser stays tiny and every
 runtime (Claude Code, Codex CLI, CI) can validate state without installing
@@ -176,6 +176,24 @@ def validate(instance, schema, path, errors):
         if not any(TYPE_CHECKS[t](instance) for t in types):
             errors.append(f'{path}: expected type {types}, got {type(instance).__name__}')
             return
+    if 'oneOf' in schema:
+        matched, branch_errors = [], []
+        for index, branch in enumerate(schema['oneOf']):
+            sub = []
+            validate(instance, branch, path, sub)
+            if sub:
+                # Sub-errors already carry the path; keep only the explanation.
+                trimmed = [e[len(path) + 2:] if e.startswith(f'{path}: ') else e for e in sub]
+                branch_errors.append(f'form {index + 1}: ' + '; '.join(trimmed))
+            else:
+                matched.append(index)
+        if not matched:
+            errors.append(f'{path}: matches none of the {len(schema["oneOf"])} allowed forms '
+                          f'({" | ".join(branch_errors)})')
+        elif len(matched) > 1:
+            forms = ', '.join(str(i + 1) for i in matched)
+            errors.append(f'{path}: matches {len(matched)} allowed forms ({forms}), '
+                          'expected exactly one')
     if 'enum' in schema and instance not in schema['enum']:
         errors.append(f'{path}: value {instance!r} not in enum {schema["enum"]}')
     if 'pattern' in schema and isinstance(instance, str):

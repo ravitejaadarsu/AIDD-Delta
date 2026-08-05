@@ -98,10 +98,17 @@ need core/protocol/supervision.md 'cost\.by_phase'  "the Supervisor's ledger/sta
 need "${C}" 'within_cost_budget'          "the cost quality gate"
 need "${C}" 'cost:no-dispatches'          "the single legitimate na reason for the cost gate"
 S=core/schemas/change-state.schema.json
-need "${S}" '"within_cost_budget": \{ "enum": \["pending", "passed", "failed", "na"\] \}' \
+need "${S}" '"within_cost_budget": \{ "oneOf": \[' \
                                           "the within_cost_budget gate in the schema"
 need "${S}" '"cost": \{'                  "the cost object in the schema"
 need "${S}" '"aborted-dispatch"'          "the runaway disposition in the schema enum"
+# Ledger minutes carry one decimal (§3), so the minute fields must not be integer-typed.
+need "${S}" '"budget_minutes": \{ "type": "number", "minimum": 0 \}' \
+                                          "a decimal-capable cost.budget_minutes"
+need "${S}" '"spent_minutes": \{ "type": "number", "minimum": 0 \}' \
+                                          "a decimal-capable cost.spent_minutes"
+need "${S}" '"minutes": \{ "type": "number", "minimum": 0 \}' \
+                                          "decimal-capable cost.by_phase minutes"
 need core/templates/change-state.yaml '^  within_cost_budget: pending' \
                                           "the seeded within_cost_budget gate"
 need core/templates/change-state.yaml '^cost:' "the seeded cost block"
