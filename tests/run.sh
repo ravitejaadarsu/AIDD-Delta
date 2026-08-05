@@ -5,6 +5,10 @@
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
+# Pinned lint toolchain. CI installs these exact versions; local runs fall back to
+# `npx -y markdownlint-cli2@${MDLINT_VERSION}` so both lint byte-identically.
+MDLINT_VERSION="0.18.1"
+
 failures=0
 suites=0
 
@@ -36,17 +40,38 @@ if command -v shellcheck >/dev/null 2>&1; then
   if [ "${#sh_targets[@]}" -gt 0 ] && ! shellcheck -S warning "${sh_targets[@]}"; then
     failures=$((failures + 1))
   fi
+elif [ "${AIDD_STRICT_LINT:-0}" = "1" ]; then
+  echo "── FAIL shellcheck unavailable and AIDD_STRICT_LINT=1 (CI must lint)"
+  failures=$((failures + 1))
 else
-  echo "── shellcheck not installed; skipping (CI runs it)"
+  echo "── shellcheck not installed; skipping"
 fi
 
-if command -v markdownlint-cli2 >/dev/null 2>&1; then
-  echo "── markdownlint"
-  if ! markdownlint-cli2 "**/*.md" "#node_modules"; then
+MD_GLOBS=("**/*.md" "#node_modules" "#.superpowers" "#.aidd")
+
+mdlint() { # pinned so local and CI lint identically — never unpin (see .markdownlint.jsonc)
+  if command -v markdownlint-cli2 >/dev/null 2>&1; then
+    markdownlint-cli2 "${MD_GLOBS[@]}"
+  elif command -v npx >/dev/null 2>&1; then
+    npx -y "markdownlint-cli2@${MDLINT_VERSION}" "${MD_GLOBS[@]}"
+  else
+    return 127
+  fi
+}
+
+echo "── markdownlint (pinned ${MDLINT_VERSION})"
+mdlint; md_status=$?
+if [ "${md_status}" -eq 0 ]; then
+  :
+elif [ "${md_status}" -eq 127 ]; then
+  if [ "${AIDD_STRICT_LINT:-0}" = "1" ]; then
+    echo "   FAIL markdownlint unavailable and AIDD_STRICT_LINT=1 (CI must lint)"
     failures=$((failures + 1))
+  else
+    echo "   markdownlint unavailable (no markdownlint-cli2, no npx); skipping"
   fi
 else
-  echo "── markdownlint-cli2 not installed; skipping (CI runs it)"
+  failures=$((failures + 1))
 fi
 
 echo "suites=${suites} failures=${failures}"

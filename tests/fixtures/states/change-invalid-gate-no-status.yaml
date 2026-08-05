@@ -1,0 +1,15 @@
+# Fixture (INVALID): the object form of a quality gate carries a reason but no `status`.
+# A gate that explains itself without saying what it is would be an unreadable gate, so
+# `status` is required in the object form (core/protocol/gates.md).
+schema: 1
+change_id: 2026-08-06-gate-no-status
+intent: "Reject an object-form gate that omits status"
+mode: take-care
+phase: qa
+phase_status: in_progress
+quality_gates:
+  mutation_floor_met:
+    reason: "rigor:fast"
+blocked_reason: null
+history: []
+updated_at: "2026-08-06T11:20:00Z"

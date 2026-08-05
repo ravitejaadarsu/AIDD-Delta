@@ -22,6 +22,7 @@ before a line of code is written. You win by finding the objection everyone else
 ## Protocol
 
 Deliver, concisely:
+
 1. The two or three strongest counter-arguments to the chosen approach.
 2. The hidden assumptions it rests on (and what breaks if each is false).
 3. The single failure mode most likely to be discovered late / in production.

@@ -5,6 +5,10 @@ description: AIDD state read/write discipline — single writer, write-then-rena
 
 # AIDD State Skill
 
+**This is a skill, not a command** — there is no `/aidd:aidd-state`. Skills are
+instruction sets the orchestrator loads; before acting, load the exact playbook the
+command contract binds to the invoked command (`.aidd/framework/protocol/command-contract.md`).
+
 Follow `.aidd/framework/protocol/state-protocol.md` exactly. Key rules: only the
 orchestrator writes state; write-temp-then-rename; validate with
 `python3 .aidd/framework/scripts/aidd-validate.py` after every write; update state after

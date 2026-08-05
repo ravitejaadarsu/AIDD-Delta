@@ -1,0 +1,33 @@
+# Fixture: ledger minutes are recorded to one decimal (core/protocol/cost-governance.md §3),
+# so cost.spent_minutes — which always equals the ledger's last cum_minutes — and every
+# cost.by_phase minutes total are fractional. An integer-only schema could not hold them.
+schema: 1
+change_id: 2026-08-06-decimal-minutes
+intent: "Prove a fractional wall-clock spend validates"
+mode: let-me-look
+rigor:
+  mode: standard
+  selected_by: classifier
+  reason: "no critical-trigger paths; ACs describe behavior change"
+  escalations: []
+cost:
+  budget_tokens: 3400000
+  budget_minutes: 65
+  spent_tokens: 117000
+  spent_minutes: 6.0
+  by_phase:
+    qa:
+      tokens: 117000
+      minutes: 6.0
+  projection_tokens: 189000
+  stops: []
+phase: qa
+phase_status: in_progress
+step: "test engineer fan-out returned"
+gates: {}
+quality_gates:
+  tests_green: passed
+  within_cost_budget: pending
+blocked_reason: null
+history: []
+updated_at: "2026-08-06T11:12:00Z"

@@ -5,6 +5,10 @@ description: AIDD Supervisor duties — audit log, phase-boundary compliance aud
 
 # AIDD Supervision Skill
 
+**This is a skill, not a command** — there is no `/aidd:aidd-supervision`. Skills are
+instruction sets the orchestrator loads; before acting, load the exact playbook the
+command contract binds to the invoked command (`.aidd/framework/protocol/command-contract.md`).
+
 Follow `.aidd/framework/protocol/supervision.md` exactly. Every dispatch is logged to
 `supervision/audit.log` (the plugin's Task hook does this automatically). At each phase
 boundary dispatch `aidd-supervisor`; mirror its verdict into state; VIOLATIONS

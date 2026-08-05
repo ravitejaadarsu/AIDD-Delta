@@ -3,6 +3,33 @@ schema: 1
 change_id: 2026-07-29-user-auth
 intent: "Add email/password auth with session management"
 mode: take-care
+rigor:
+  mode: critical
+  selected_by: escalation
+  reason: "diff touches src/auth/** (authn/authz trigger row)"
+  escalations:
+    - from: standard
+      to: critical
+      trigger: "CONFIRMED finding in src/auth/session.py (authn/authz path)"
+      at: "2026-07-29T15:40:00Z"
+cost:
+  budget_tokens: 5600000
+  budget_minutes: 105
+  spent_tokens: 1240000
+  spent_minutes: 38
+  by_phase:
+    inception:
+      tokens: 620000
+      minutes: 19
+    construction:
+      tokens: 620000
+      minutes: 19
+  projection_tokens: 4980000
+  stops:
+    - at: "2026-07-29T16:02:00Z"
+      phase: construction
+      reason: "runaway: Construction 2a/ST-002 at 6.1x class median 41000"
+      disposition: aborted-dispatch
 phase: construction
 phase_status: in_progress
 step: "ST-002 red tests written"
@@ -39,6 +66,19 @@ quality_gates:
   auditor_approved: pending
   debate_complete: pending
   tally_reconciled: pending
+  within_cost_budget: pending
+  evidence_reproduced: pending
+determinism:
+  repeats_required: 2
+  repeats_done: 2
+  report: "qa/determinism-report.md"
+  quarantined:
+    - test: "tests/test_session.py::test_expiry_boundary"
+      ac_ids:
+        - AC-5
+      suspected_source: clock
+      disposition: pending
+      accepted_reason: null
 stories:
   ST-001:
     status: done
@@ -72,6 +112,18 @@ audit:
   debate:
     exchanges_used: 0
     max: 6
+escapes:
+  - id: E-001
+    at: "2026-09-14T09:20:00Z"
+    defect_class: race
+    verdict: layer-blind
+    blind_layers:
+      - L1-tests
+      - L2-debate
+    regression_test: "tests/test_store.py::test_concurrent_append_keeps_all_rows"
+    amendment: "core/roles/test-engineer.md: add a concurrent-writer row to state-concurrency-idempotency"
+    report: "escapes/E-001-store-append-race.md"
+    repeat_of: null
 blocked_reason: null
 history:
   - at: "2026-07-29T13:40:00Z"

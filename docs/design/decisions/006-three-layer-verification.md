@@ -4,6 +4,7 @@
 Reviewer, Test Engineer, Verifier, Evidence Capturer, AC Assessor, Security Auditor,
 Adversarial Verifier) and the process auditor (Layer 3: Supervisor, renamed from Master
 Supervisor in v0.3.0 — see the amendment on ADR 005). Layer 2 is a dedicated Master Agent
+
 + Auditor + Tally, communicating only through artifacts: the Master Agent monitors work
 quality after every construction wave and QA step batch; the Auditor interrogates
 per-AC proof (`core/protocol/interrogation.md`) after every construction wave and once as

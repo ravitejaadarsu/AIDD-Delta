@@ -1,0 +1,17 @@
+# Fixture (INVALID): the object form of a quality gate is closed — `status` plus an
+# optional `reason`, nothing else. An unknown key (here `waived_by`) would let a run
+# smuggle a disposition past the gate ledger, so the schema rejects it.
+schema: 1
+change_id: 2026-08-06-gate-extra-key
+intent: "Reject an object-form gate carrying an unknown property"
+mode: take-care
+phase: qa
+phase_status: in_progress
+quality_gates:
+  security_clean:
+    status: na
+    reason: "rigor:fast"
+    waived_by: human
+blocked_reason: null
+history: []
+updated_at: "2026-08-06T11:24:00Z"

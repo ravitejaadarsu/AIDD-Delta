@@ -4,6 +4,13 @@
 
 <!-- Verbatim intent + change-id + Jira link if any. -->
 
+**Rigor / autonomy:** `<fast|standard|critical>` (chosen by `<classifier|user|escalation>`,
+`<N>` escalation(s)) · `<take-care|let-me-look>`
+
+<!-- The rigor mode and who chose it, from change-state `rigor` (../protocol/rigor-modes.md);
+     the autonomy mode from `mode` (../protocol/autonomy-modes.md). The two are orthogonal —
+     print both, never derive one from the other. -->
+
 ## What changed
 
 <!-- Story-grouped summary. -->
@@ -23,6 +30,23 @@
 ## Evidence
 
 <!-- Pre/post capture gallery links (evidence/manifest.md) + bench deltas. -->
+
+## Cost
+
+<!-- The `bash .aidd/framework/scripts/aidd-cost.sh` roll-up
+     (../protocol/cost-governance.md §10, ../playbooks/50-delivery.md step 3). A column the
+     runtime could not measure reads `not measured` — never `0`. A projection with any
+     unknown class is printed as a lower bound and labelled one. -->
+
+**Spend:** `<tokens>` / `<budget_tokens>` tokens · `<minutes>` / `<budget_minutes>` min ·
+projection `<tokens | ≥ tokens (N classes unknown)>` · `within_cost_budget:`
+`<passed|failed|na>` · stops: `<none | disposition per row>`
+
+## Reversibility
+
+<!-- Exactly one line: the revert commit (`git revert <sha>`), the migration down-path (the
+     exact command), or the feature flag (its name and the value that disables it).
+     "Not reversible" is an allowed answer only with its reason; a blank line is not. -->
 
 ## Supervision
 

@@ -1,0 +1,29 @@
+# Fixture: same as change-valid-fresh.yaml but rigor.mode is not one of fast|standard|critical.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth with session management"
+mode: let-me-look
+rigor:
+  mode: paranoid
+  selected_by: classifier
+  reason: "invalid: 'paranoid' is not a rigor mode"
+  escalations: []
+phase: inception
+phase_status: not_started
+step: null
+jira:
+  ticket: null
+  sync: false
+gates: {}
+quality_gates:
+  tests_green: pending
+stories: {}
+fix_loop:
+  iteration: 0
+  max: 3
+backflow_used: false
+supervision: {}
+scores: {}
+blocked_reason: null
+history: []
+updated_at: "2026-07-29T13:00:00Z"

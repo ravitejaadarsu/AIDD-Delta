@@ -19,6 +19,41 @@ payload() { printf '{"tool_input": {"file_path": "%s"}}' "$1"; }
 # hooks.json: snapshot wrapper registered on Stop, alongside gate-check
 grep -q 'build-snapshot.sh' hooks/hooks.json || { echo "hooks.json missing build-snapshot.sh registration"; fail=1; }
 
+# hooks.json: guard-command registered as a PreToolUse guard on the command/skill surface
+python3 - <<'PY' || fail=1
+import json, sys
+hooks = json.load(open('hooks/hooks.json', encoding='utf-8'))
+errors = []
+entries = [e for e in hooks['hooks'].get('PreToolUse', [])
+           if any('guard-command.sh' in h['command'] for h in e['hooks'])]
+if not entries:
+    errors.append('hooks.json: guard-command.sh not registered on PreToolUse')
+for e in entries:
+    matcher = e.get('matcher', '')
+    for tool in ('Skill', 'SlashCommand', 'Task'):
+        if tool not in matcher:
+            errors.append(f'guard-command matcher {matcher!r} does not cover {tool}')
+if errors:
+    print('\n'.join(errors))
+    sys.exit(1)
+PY
+
+# guard-command: allows an aidd skill with a note; denies an unknown /aidd: command
+(
+  cd "${TMP}" || exit 1
+  mkdir -p .aidd/framework/scripts
+  cp "${ROOT}/core/scripts/aidd-commands.txt" .aidd/framework/scripts/
+  note="$(printf '{"tool_name":"Skill","tool_input":{"skill":"aidd-supervision"}}' \
+    | bash "${ROOT}/hooks/scripts/guard-command.sh" 2>&1)"
+  [ $? -eq 0 ] || { echo "guard-command denied a legitimate skill"; exit 1; }
+  echo "${note}" | grep -qi 'not a command' \
+    || { echo "guard-command omitted the skills-are-not-commands note"; exit 1; }
+  printf '{"tool_name":"SlashCommand","tool_input":{"command":"/aidd:aidd-qa"}}' \
+    | bash "${ROOT}/hooks/scripts/guard-command.sh" >/dev/null 2>&1
+  [ $? -eq 2 ] || { echo "guard-command allowed an unknown /aidd: command"; exit 1; }
+  exit 0
+) || fail=1
+
 # validate-state: valid global state -> exit 0
 payload "${ROOT}/${TMP}/.aidd/state.yaml" | bash hooks/scripts/validate-state.sh >/dev/null 2>&1
 [ $? -eq 0 ] || { echo "validate-state rejected a valid state"; fail=1; }

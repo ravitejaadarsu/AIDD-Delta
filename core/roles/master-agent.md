@@ -18,6 +18,7 @@ process was followed or that the right role was dispatched at the right time.
 ## Inputs
 
 - `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+- the change's `rigor.mode` — it sets your round/exchange budget per `../protocol/rigor-modes.md`.
 
 The batch's sub-agent reports (Builder Reports in construction; `qa/*` reports in QA),
 `audit/interrogation/*` where the Auditor has already run over the same subjects.

@@ -6,35 +6,35 @@
 
 ## Test files
 
-```
+```text
 $ <command>
 <count of test/spec files>
 [exit <code>] <ISO-8601 timestamp>
-```
+```text
 
 ## Repo size (tracked files)
 
-```
+```text
 $ <command>
 <tracked file count>
 [exit <code>] <ISO-8601 timestamp>
-```
+```text
 
 ## Largest files (complexity hotspots proxy)
 
-```
+```text
 $ <command>
 <top 10 files by line count>
 [exit <code>] <ISO-8601 timestamp>
-```
+```text
 
 ## TODO/FIXME markers
 
-```
+```text
 $ <command>
 <count of TODO/FIXME occurrences>
 [exit <code>] <ISO-8601 timestamp>
-```
+```text
 
 ## Coverage
 

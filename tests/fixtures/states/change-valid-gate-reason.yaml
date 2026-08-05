@@ -1,0 +1,56 @@
+# Fixture: a `fast` change at QA close. Every gate the mode does not run records the
+# object form `{status: na, reason: rigor:fast}` — the encoding core/protocol/gates.md
+# mandates. Gates with nothing to explain keep the scalar form; both must validate.
+schema: 1
+change_id: 2026-08-06-readme-typo
+intent: "Fix the broken link in the README quickstart table"
+mode: take-care
+rigor:
+  mode: fast
+  selected_by: classifier
+  reason: "every path on the classified surface matches the fast allow-list (**/*.md)"
+  escalations: []
+phase: qa
+phase_status: in_progress
+step: "critic verdict recorded"
+gates: {}
+quality_gates:
+  tests_green: passed
+  exhaustive_tests_passed: passed
+  qa_findings_resolved: passed
+  e2e_verified:
+    status: na
+    reason: "rigor:fast"
+  mutation_floor_met:
+    status: na
+    reason: "rigor:fast"
+  security_clean:
+    status: na
+    reason: "rigor:fast"
+  perf_within_budget:
+    status: na
+    reason: "rigor:fast"
+  acs_verified: passed
+  evidence_captured:
+    status: na
+    reason: "rigor:fast"
+  supervision_compliant: passed
+  critic_approved: passed
+  auditor_approved:
+    status: na
+    reason: "rigor:fast"
+  debate_complete:
+    status: na
+    reason: "rigor:fast"
+  tally_reconciled:
+    status: na
+    reason: "rigor:fast"
+  within_cost_budget:
+    status: na
+    reason: "cost:no-dispatches"
+  evidence_reproduced:
+    status: na
+    reason: "rigor:fast"
+blocked_reason: null
+history: []
+updated_at: "2026-08-06T11:04:00Z"

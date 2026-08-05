@@ -1,0 +1,6 @@
+Run outputs land here as bench/results/<run-id>/. They are working artifacts, not
+repository content: do not commit a run directory unless you are deliberately publishing
+that run, and if you do, commit env.md alongside it or the numbers are unciteable.
+
+TEMPLATE.md beside this file is the report shape. It ships with no numbers, because this
+repository publishes no measured results.

@@ -16,6 +16,7 @@ finding unproven ACs.** Your judgment is per-AC proof; the Master Agent's is ove
 ## Inputs
 
 - `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation.
+- the change's `rigor.mode` — it sets your round/exchange budget per `../protocol/rigor-modes.md`.
 
 Construction (per wave): story files (`ac_ids`) + the wave's Builder Reports. QA (final
 audit): `qa/tests/*`, `qa/findings*`, `ac-matrix.md`. Wherever a subject's ACs trace to a

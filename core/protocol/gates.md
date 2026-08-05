@@ -24,8 +24,9 @@ At a gate the orchestrator always:
      escalation flag is set (open BLOCKING question, disjointness CONCERNS, unresolved
      pre-review CRITICAL, open CONFIRMED finding, open test FAIL, AC matrix FAIL, critic
      REJECT, unresolved supervision VIOLATION, UNRESOLVABLE adjudication ruling (disputed
-     AC without a PROVEN/DEFECT resolution)), in which case this gate behaves exactly like
-     `let-me-look`.
+     AC without a PROVEN/DEFECT resolution), an automatic rigor escalation
+     (`rigor-modes.md`) since the change's risk assessment moved under the framework's own
+     feet), in which case this gate behaves exactly like `let-me-look`.
 3. Appends the gate entry to `gates` in change state and advances.
 
 ## The `g_test_report` sub-gate
@@ -49,8 +50,53 @@ share an identical entry structure.
 
 ## Quality gates (mode-independent)
 
+Sixteen, and `core/schemas/change-state.schema.json` is the authoritative set — this list
+and that schema must agree:
+
 `tests_green, exhaustive_tests_passed, qa_findings_resolved, e2e_verified,
 mutation_floor_met, security_clean, perf_within_budget, acs_verified, evidence_captured,
 supervision_compliant, critic_approved, auditor_approved, debate_complete,
-tally_reconciled` — all must be `passed` (or explicitly `na` with a recorded reason)
-before Delivery pushes anything. Autonomy modes modulate human approval, never quality.
+tally_reconciled, within_cost_budget, evidence_reproduced` — all must be `passed` (or
+explicitly `na` with a recorded reason) before Delivery pushes anything. Autonomy modes
+modulate human approval, never quality.
+
+The last two are mode-independent on identical terms to the other fourteen, and each is
+defined in the protocol that owns it rather than here:
+
+| gate | defined in | records `na` when |
+|---|---|---|
+| `within_cost_budget` | `cost-governance.md` §9 | no dispatch ran at all, with `reason: cost:no-dispatches` — the one `na` reason in the whole framework that is not `rigor:<mode>` |
+| `evidence_reproduced` | `determinism.md` §6 | `fast` mode, with `reason: rigor:fast` |
+
+## The `na` encoding (canonical)
+
+A quality-gate value takes **one of two forms**, and this section is the single place that
+defines them. `core/schemas/change-state.schema.json` enforces exactly this.
+
+```yaml
+quality_gates:
+  tests_green: passed              # scalar form — a gate with no reason to record
+  mutation_floor_met:              # object form — a gate that must explain itself
+    status: na
+    reason: "rigor:fast"
+```
+
+- **Scalar form** — the bare status (`pending` | `passed` | `failed` | `na`). Valid for any
+  gate that has nothing to explain.
+- **Object form** — `{status, reason}`, closed: `status` is required and takes the same four
+  values, `reason` is a string, and no other key is accepted. **A gate skipped by rigor mode
+  is written in the object form**, `{status: na, reason: rigor:<mode>}`. There is no third
+  encoding: a sibling `reason` key next to a scalar status is rejected by the schema, which
+  is what stops the reason from drifting away from the gate it belongs to.
+
+## Rigor modes and `na`
+
+The active rigor mode (`rigor-modes.md`) decides how much verification runs, so a gate whose
+step that mode does not run is **not applicable**, not skipped: it records the object form
+above (e.g. `mutation_floor_met: {status: na, reason: rigor:fast}`). A silently absent gate
+is a supervision VIOLATION; an `na` written in the scalar form, with its reason nowhere, is
+the same violation. An automatic escalation voids every `na` earned under the outgone mode —
+those gates flip back to `pending` and must be earned in the new mode.
+
+Rigor never touches the floor: `tests_green`, `acs_verified`, `supervision_compliant` and
+`critic_approved` are earned in every mode, `na` never available to them.
