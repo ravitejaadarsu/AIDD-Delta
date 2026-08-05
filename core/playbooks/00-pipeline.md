@@ -48,6 +48,21 @@ step; re-deciding mid-step is a supervision VIOLATION. Parallel dispatch require
 pairwise-disjoint ownership sets (`../protocol/file-scope.md`); unproven ⇒ sequential in the
 row's documented order.
 
+## Cost governance
+
+Rigor decides how much verification the change intends to buy; `../protocol/cost-governance.md`
+governs what it actually spends. Two ceilings (`cost.budget_tokens`, `cost.budget_minutes`)
+are seeded from the rigor mode at change creation and re-derived once at G2 from the resolved
+epic. **The orchestrator's recording duty: after every dispatch returns, before the next one
+starts, append one row to `cost/ledger.md`** (`../templates/cost-ledger.md`) and fold it into
+`cost.spent_*` and `cost.by_phase` — a runtime that exposes no usage records `not measured`,
+never a zero. The projection is arithmetic (remaining planned dispatches × the running median
+of that dispatch class), recomputed after every append. Soft (70%) reports inside the progress
+line's `<what happened>` field; hard (100%) STOPs and asks — forced-human in both autonomy
+modes; runaway (a dispatch ≥ 5× its class median) aborts that dispatch and records it, never
+retrying silently. Cost never overrides the floor, and **an `na` justified by cost is
+forbidden**: cost pressure produces a STOP, never a quieter run. Gate: `within_cost_budget`.
+
 ## Three verification layers
 
 - **Layer 1 — workers**: every role that produces the product (Builder, Reviewer, Test
@@ -88,3 +103,5 @@ row's documented order.
 - Evidence over assertion (`../protocol/evidence.md`).
 - Bounded loops; exhaustion → blocked, never infinite retries.
 - Quality gates are mode-independent (`../protocol/gates.md`).
+- Every dispatch is metered (`../protocol/cost-governance.md`); a budget stop pauses work for
+  a human decision and never reduces verification.

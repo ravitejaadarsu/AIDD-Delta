@@ -6,6 +6,7 @@
 # fails on a phantom row or a missing one. Skills are NOT commands: see protocol/command-contract.md.
 /aidd:approve|.aidd/framework/protocol/gates.md|Approve the currently pending AIDD gate
 /aidd:construct|.aidd/framework/playbooks/30-construction.md|Run the AIDD Construction phase
+/aidd:cost|.aidd/framework/protocol/cost-governance.md|Report AIDD cost — ledger summary, projection, and threshold status
 /aidd:dashboard|.aidd/framework/scripts/render-dashboard.sh|Regenerate and show the AIDD dashboard
 /aidd:deliver|.aidd/framework/playbooks/50-delivery.md|Run the AIDD Delivery phase
 /aidd:document|.aidd/framework/playbooks/05-document.md|Run the AIDD Document phase (brownfield spec mining)

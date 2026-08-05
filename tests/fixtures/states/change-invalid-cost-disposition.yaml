@@ -1,0 +1,21 @@
+# Fixture: INVALID — cost.stops[].disposition is outside the closed enum. A stop whose
+# disposition is invented (here: "kept-going") is exactly the anti-gaming case
+# protocol/cost-governance.md forbids, so the schema must reject it.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth with session management"
+mode: take-care
+cost:
+  budget_tokens: 3400000
+  budget_minutes: 65
+  spent_tokens: 3500000
+  spent_minutes: 70
+  by_phase: {}
+  projection_tokens: 3500000
+  stops:
+    - at: "2026-07-29T16:02:00Z"
+      phase: qa
+      reason: "hard: spent_tokens over budget_tokens"
+      disposition: kept-going
+phase: qa
+phase_status: in_progress

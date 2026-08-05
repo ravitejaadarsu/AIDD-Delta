@@ -19,12 +19,23 @@ Phase boundary: rebuild the snapshot pack
    canonical commands) — commit if new.
 3. Assemble PR body from `templates/pr-description.md`: verdict table, findings funnel,
    assumptions, AC matrix summary, evidence links, supervision summary, traceability.
+   - **Cost summary** — the `cost/ledger.md` roll-up from
+     `bash .aidd/framework/scripts/aidd-cost.sh` (`../protocol/cost-governance.md`): spend
+     against both ceilings, per-phase totals, the projection (marked a lower bound when a
+     class was never measured), `within_cost_budget`, and every `cost.stops` row with its
+     disposition. A row the runtime could not measure reads `not measured`, never `0`.
+   - **Reversibility** — one line stating how to undo this change: the revert commit
+     (`git revert <sha>`), the migration down-path (the exact command), or the feature flag
+     (its name and the value that disables it). "Not reversible" is an allowed answer only
+     with the reason; a blank line is not.
 4. Push branch; open PR (`gh pr create`); watch CI (poll, bounded 30 min).
    CI red → Build Fixer (max 2 attempts, re-push, re-watch) → exhausted = human
    escalation with logs.
 5. Optional Jira write-back per `../protocol/jira-sync.md` (config + per-run approval).
 6. **Supervisor final session report** → `supervision/final-report.md`.
-7. Write `delivery/delivery-report.md`: per-phase verdicts/scores + funnel + links.
+7. Write `delivery/delivery-report.md`: per-phase verdicts/scores + funnel + links, the cost
+   summary, and the reversibility line from step 3 — the delivery report is where "how do we
+   undo this" is recorded for whoever needs it at 3am, not only in the PR body.
    Mark phase complete; global `changes.<id>` stays `in_progress` until retro.
 
 ## Scoring (orchestrator, rule-driven)
@@ -44,4 +55,6 @@ Rollup: final verdict = worst phase; final score = 0.15·inception + 0.30·const
 
 - [ ] PR open, CI green, body embeds verdict/funnel/AC/evidence/supervision
 - [ ] docs + changelog updated; samples verified
+- [ ] PR body + delivery report carry the cost summary (`within_cost_budget`, no `pending`
+      stop) and the one-line reversibility note
 - [ ] delivery report written

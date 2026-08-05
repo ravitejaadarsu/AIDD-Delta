@@ -8,6 +8,14 @@ rigor:                   # how much verification runs — see protocol/rigor-mod
   selected_by: classifier
   reason: "REPLACE: the classifier row that matched"
   escalations: []        # append-only, one-way: {from, to, trigger, at}
+cost:                    # actual spend against the mode's ceilings — see protocol/cost-governance.md
+  budget_tokens: 3400000 # standard default (derived, not measured); tunable in constitution.md
+  budget_minutes: 65
+  spent_tokens: 0        # derived from cost/ledger.md — never asserted
+  spent_minutes: 0
+  by_phase: {}           # phase -> {tokens, minutes}; sums to spent_*
+  projection_tokens: null
+  stops: []              # append-only: {at, phase, reason, disposition}
 phase: inception
 phase_status: not_started
 step: null
@@ -30,6 +38,7 @@ quality_gates:
   auditor_approved: pending
   debate_complete: pending
   tally_reconciled: pending
+  within_cost_budget: pending
 stories: {}
 fix_loop:
   iteration: 0

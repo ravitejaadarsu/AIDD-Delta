@@ -36,7 +36,27 @@ log and artifacts against the phase checklist in the corresponding playbook. Che
   tally complete (`qa/tally.md`) with zero unwaived `GAP` rows and no unrouted orphans;
   negotiation log terminal — every disputed AC closed by short-circuit, accept, or
   Supervisor ruling, no dangling `DISPUTED`.
-- Delivery: PR body embeds verdict table, funnel, AC matrix, evidence links; CI watched.
+- Delivery: PR body embeds verdict table, funnel, AC matrix, evidence links, the cost summary
+  and the one-line reversibility note; CI watched.
+
+## Cost checks (every phase boundary)
+
+Mode-independent, from `cost-governance.md`. Recompute with
+`bash .aidd/framework/scripts/aidd-cost.sh` rather than trusting the state numbers:
+
+- `cost/ledger.md` present, with one row per `returned`/`rejected` line in
+  `supervision/audit.log` (matched on phase + role + unit) — no missing row, no phantom row.
+- `cost.spent_tokens` equals the ledger's last `cum_tokens`; `cost.spent_minutes` equals its
+  last `cum_minutes`; `cost.by_phase` sums to both.
+- **No `na` justified by cost.** A `quality_gates` value of `na` whose reason names cost,
+  budget, tokens, time, or spend is a VIOLATION; the only legitimate `na` reason vocabulary is
+  `reason: rigor:<mode>` (plus `reason: cost:no-dispatches` for `within_cost_budget` itself).
+- Every `cost.stops` row has a terminal `disposition`; none is still `pending` past the phase
+  boundary that recorded it.
+- No `source: not measured` row carries a numeric `0` in a token column, and no median was
+  computed over one.
+- No `cost.budget_*` ceiling changed without either a formula re-derivation history event or a
+  `cost.stops` row with `disposition: raised`.
 
 ## Verdicts
 

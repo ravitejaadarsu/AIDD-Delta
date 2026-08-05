@@ -33,6 +33,43 @@
         }
       }
     },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "budget_tokens": { "type": "integer", "minimum": 0 },
+        "budget_minutes": { "type": "integer", "minimum": 0 },
+        "spent_tokens": { "type": "integer", "minimum": 0 },
+        "spent_minutes": { "type": "integer", "minimum": 0 },
+        "by_phase": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["tokens", "minutes"],
+            "additionalProperties": false,
+            "properties": {
+              "tokens": { "type": "integer", "minimum": 0 },
+              "minutes": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "projection_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "stops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["at", "phase", "reason", "disposition"],
+            "additionalProperties": false,
+            "properties": {
+              "at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+              "phase": { "enum": ["document", "master", "inception", "construction", "qa", "delivery", "retro"] },
+              "reason": { "type": "string" },
+              "disposition": { "enum": ["raised", "reduced-breadth", "narrowed-scope", "aborted", "aborted-dispatch", "pending"] }
+            }
+          }
+        }
+      }
+    },
     "phase": { "enum": ["document", "master", "inception", "construction", "qa", "delivery", "retro", "done"] },
     "phase_status": { "enum": ["not_started", "in_progress", "awaiting_gate", "blocked", "complete"] },
     "step": { "type": ["string", "null"] },
@@ -77,7 +114,8 @@
         "critic_approved": { "enum": ["pending", "passed", "failed", "na"] },
         "auditor_approved": { "enum": ["pending", "passed", "failed", "na"] },
         "debate_complete": { "enum": ["pending", "passed", "failed", "na"] },
-        "tally_reconciled": { "enum": ["pending", "passed", "failed", "na"] }
+        "tally_reconciled": { "enum": ["pending", "passed", "failed", "na"] },
+        "within_cost_budget": { "enum": ["pending", "passed", "failed", "na"] }
       }
     },
     "stories": {
