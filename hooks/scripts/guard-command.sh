@@ -79,9 +79,18 @@ for name in names:
             "NOTE:" + name + " is a SKILL, not a command (no /aidd:" + name + " exists). "
             "Load the playbook the manifest binds to the command before reasoning (" + CONTRACT + ").")
     elif name not in cmds:
-        near = closest(name)
-        tail = ("Closest supported command: /aidd:" + near + " (" + cmds[near] + ")."
-                if near else "No close match in the manifest.")
+        # The observed failure mode: a skill name used as a command (/aidd:supervision
+        # for the aidd-supervision skill). Say that, instead of a misleading near-match.
+        skill_confusion = next(
+            (s for s in SKILLS if s == "aidd-" + name or s.endswith("-" + name)), "")
+        if skill_confusion:
+            tail = ("`" + skill_confusion + "` is a SKILL, not a command — there is no "
+                    "/aidd:" + name + ". Load the skill by name, or run the phase command "
+                    "the manifest binds to this work.")
+        else:
+            near = closest(name)
+            tail = ("Closest supported command: /aidd:" + near + " (" + cmds[near] + ")."
+                    if near else "No close match in the manifest.")
         lines.append(
             "DENY:/aidd:" + name + " is not an AIDD command. " + tail +
             " Only rows in scripts/aidd-commands.txt are commands — name the closest one and stop, "
