@@ -39,6 +39,12 @@ quality_gates:
   debate_complete: pending
   tally_reconciled: pending
   within_cost_budget: pending
+  evidence_reproduced: pending
+determinism:             # reproduce the green before trusting it — protocol/determinism.md
+  repeats_required: 2    # standard: the gating suite twice (fast: 0, gate records na)
+  repeats_done: 0
+  report: null
+  quarantined: []        # {test, ac_ids, suspected_source, disposition, accepted_reason}
 stories: {}
 fix_loop:
   iteration: 0

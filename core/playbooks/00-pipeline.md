@@ -48,7 +48,14 @@ step; re-deciding mid-step is a supervision VIOLATION. Parallel dispatch require
 pairwise-disjoint ownership sets (`../protocol/file-scope.md`); unproven ⇒ sequential in the
 row's documented order.
 
-## Cost governance
+## Cost, escapes, determinism
+
+Three protocols govern what the pipeline spends, what it learns from a miss, and whether its
+green claims are reproducible. Each names an orchestrator recording duty, and none of them may
+reduce verification: `../protocol/cost-governance.md`, `../protocol/escape-analysis.md`,
+`../protocol/determinism.md`.
+
+### Cost governance
 
 Rigor decides how much verification the change intends to buy; `../protocol/cost-governance.md`
 governs what it actually spends. Two ceilings (`cost.budget_tokens`, `cost.budget_minutes`)
@@ -63,7 +70,22 @@ modes; runaway (a dispatch ≥ 5× its class median) aborts that dispatch and re
 retrying silently. Cost never overrides the floor, and **an `na` justified by cost is
 forbidden**: cost pressure produces a STOP, never a quieter run. Gate: `within_cost_budget`.
 
-## Escape analysis (post-merge)
+### Determinism proof
+
+A green claim that gates delivery is not trusted until reproduced
+(`../protocol/determinism.md`). Three claim classes need it: the full-suite green the
+`tests_green` gate rests on, the clean-state E2E green, and any test whose FAIL closed a
+fix-loop iteration. Repeats by mode: `fast` none (`evidence_reproduced: na`,
+`reason: rigor:fast`); `standard` the suite twice; `critical` the suite twice plus the
+canonical set twice. The E2E Verifier performs them inside its existing QA step 7 dispatch —
+runtime, not extra agents. Runs agree only on identical exit code AND an identical
+test-id → outcome map; **a repeat is a measurement, never a retry**, so FAIL-then-PASS is a
+disagreement and re-running until green is a supervision VIOLATION. A disagreement quarantines
+the test: it may not serve as evidence for any AC or gate, its ACs revert to unproven into the
+existing fix loop, and **the orchestrator's recording duty** is
+`qa/determinism-report.md` plus the `determinism` state block. Gate: `evidence_reproduced`.
+
+### Escape analysis (post-merge)
 
 Every layer above verifies forward. `../protocol/escape-analysis.md` is the backward pass: a
 defect found after merge is attributed to the change that produced it, and the Escape Analyst
@@ -120,3 +142,5 @@ phase and re-runs no gate; a repeat escape escalates to a human instead of re-pr
 - Quality gates are mode-independent (`../protocol/gates.md`).
 - Every dispatch is metered (`../protocol/cost-governance.md`); a budget stop pauses work for
   a human decision and never reduces verification.
+- A gating green is reproduced before it is trusted (`../protocol/determinism.md`); a repeat is
+  a measurement, never a retry.

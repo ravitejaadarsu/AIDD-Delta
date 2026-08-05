@@ -67,6 +67,18 @@ quality_gates:
   debate_complete: pending
   tally_reconciled: pending
   within_cost_budget: pending
+  evidence_reproduced: pending
+determinism:
+  repeats_required: 2
+  repeats_done: 2
+  report: "qa/determinism-report.md"
+  quarantined:
+    - test: "tests/test_session.py::test_expiry_boundary"
+      ac_ids:
+        - AC-5
+      suspected_source: clock
+      disposition: pending
+      accepted_reason: null
 stories:
   ST-001:
     status: done

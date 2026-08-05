@@ -43,10 +43,25 @@ need "${Q}" 'protocol/interrogation\.md'                    "the interrogation p
 need "${Q}" 'protocol/negotiation\.md'                      "the negotiation protocol"
 need "${Q}" 'roles/supervisor\.md'                          "the Supervisor audit + adjudication"
 need "${Q}" 'audit\.negotiation\.rulings'                   "the negotiation rulings state mirror"
+need "${Q}" 'protocol/determinism\.md'                      "the determinism repeats at the E2E step"
+need "${Q}" 'protocol/cost-governance\.md'                  "the per-dispatch cost recording duty"
+
+# Delivery: the cost summary and the reversibility note are part of the shipped story.
+DL=core/playbooks/50-delivery.md
+need "${DL}" 'aidd-cost\.sh'    "the cost-ledger summary in the PR body"
+need "${DL}" 'Reversibility'    "the one-line reversibility note"
+
+# Retro: the escape channel must be reachable from the playbook that runs the learning loop.
+RT=core/playbooks/60-retro.md
+need "${RT}" 'protocol/escape-analysis\.md' "the escape channel"
+need "${RT}" 'roles/escape-analyst\.md'     "the Escape Analyst role"
+need "${RT}" 'retro addendum'               "the retro addendum for a post-merge escape"
 
 # The Supervisor must be able to detect a missing dispatch: its checklists name the artifacts.
 S=core/protocol/supervision.md
 need "${S}" 'audit/monitoring/\*'       "per-wave monitoring notes (Construction checklist)"
 need "${S}" 'audit/monitoring/qa-\*'    "per-batch monitoring notes (QA checklist)"
+need "${S}" 'cost/ledger\.md'           "the cost ledger (cost checklist)"
+need "${S}" 'quarantined'               "quarantined tests not counted as evidence (QA checklist)"
 
 exit "${fail}"

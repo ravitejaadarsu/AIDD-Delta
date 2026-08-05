@@ -48,6 +48,7 @@ expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-audit-overbu
 expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-rigor-mode.yaml"
 expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-cost-disposition.yaml"
 expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-escape-layer.yaml"
+expect_invalid "${S}/change-state.schema.json" "${F}/change-invalid-determinism-source.yaml"
 expect_valid_fm   "${S}/story-frontmatter.schema.json" "${F}/story-valid.md"
 expect_invalid_fm "${S}/story-frontmatter.schema.json" "${F}/story-invalid.md"
 

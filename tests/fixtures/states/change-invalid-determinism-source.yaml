@@ -1,0 +1,17 @@
+# Fixture: INVALID — determinism.quarantined[].suspected_source is outside the closed enum.
+# "flaky-infra" is exactly the non-answer protocol/determinism.md §4 rejects: the source must
+# be one the six discriminating checks can confirm, so the schema must reject it.
+schema: 1
+change_id: 2026-07-29-user-auth
+intent: "Add email/password auth with session management"
+mode: take-care
+phase: qa
+phase_status: in_progress
+determinism:
+  repeats_required: 2
+  repeats_done: 2
+  report: "qa/determinism-report.md"
+  quarantined:
+    - test: "tests/test_session.py::test_expiry_boundary"
+      suspected_source: flaky-infra
+      disposition: pending

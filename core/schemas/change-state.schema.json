@@ -115,7 +115,32 @@
         "auditor_approved": { "enum": ["pending", "passed", "failed", "na"] },
         "debate_complete": { "enum": ["pending", "passed", "failed", "na"] },
         "tally_reconciled": { "enum": ["pending", "passed", "failed", "na"] },
-        "within_cost_budget": { "enum": ["pending", "passed", "failed", "na"] }
+        "within_cost_budget": { "enum": ["pending", "passed", "failed", "na"] },
+        "evidence_reproduced": { "enum": ["pending", "passed", "failed", "na"] }
+      }
+    },
+    "determinism": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repeats_required": { "type": "integer", "minimum": 0 },
+        "repeats_done": { "type": "integer", "minimum": 0 },
+        "report": { "type": ["string", "null"] },
+        "quarantined": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["test", "suspected_source", "disposition"],
+            "additionalProperties": false,
+            "properties": {
+              "test": { "type": "string" },
+              "ac_ids": { "type": "array", "items": { "type": "string" } },
+              "suspected_source": { "enum": ["seed", "clock", "network", "shared-fixture", "test-order", "concurrency", "unknown"] },
+              "disposition": { "enum": ["pending", "fixed", "accepted"] },
+              "accepted_reason": { "type": ["string", "null"] }
+            }
+          }
+        }
       }
     },
     "stories": {
