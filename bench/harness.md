@@ -296,6 +296,36 @@ A defect run is a normal rep with one extra step between `setup` and the driver:
 3. `bench-report.sh` reports caught/escaped **by layer**, so a defect the baseline arm
    catches with a plain test run is not credited to Layer 2.
 
+### Defect grader contract
+
+A defect's `grader` is a `bash -euo pipefail` script run with CWD = the rep directory, so it
+can read:
+
+| Path | Contents |
+| --- | --- |
+| `./work/` | The working copy the arm changed |
+| `./work/.aidd/changes/` | The AIDD arm's own artifact tree, when the arm is AIDD |
+| `./driver.log` | Everything the driver wrote to stdout and stderr |
+| `./setup.log` `./pretest.log` `./oracle.log` | The harness's own phase logs |
+
+Exit codes: **0 = caught**, **1 = escaped**, **≥2 = grader error** (never silently a catch).
+A grader that exits 0 prints, as its last line, the layer token that actually fired:
+
+```text
+CAUGHT-BY: L2-tally
+```
+
+`bench-report.sh` reads that token into `defect_caught_by`, which is how caught-versus-missed
+is sliced **by layer**. Two rules keep the slicing honest:
+
+1. **A catch requires a report, not a symptom.** A defect that merely makes the task's oracle
+   fail is an *escape* accompanied by a failed task. Detection means an artifact or transcript
+   in which the arm said what was wrong.
+2. **Credit goes to the layer that fired, not the layer that was supposed to.** If the
+   baseline arm catches a `mocked-proof` defect from its own test run, the report records
+   `L1-tests` for that arm. `visible_to` is the hypothesis; `defect_caught_by` is the
+   measurement, and they are allowed to disagree — that disagreement is a result.
+
 `injection_mode: command` defects are applied and reverted mechanically by
 `bench-inject.sh` (git-based; it refuses to run on a dirty tree, and `--revert` restores
 via `git checkout`/`git clean` of the paths it touched). `injection_mode: instruction`

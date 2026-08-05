@@ -55,6 +55,37 @@ a clean work dir, with `BENCH_USAGE_FILE` pointing at the path where it should w
 token usage. Read `bench/harness.md` before publishing anything: **≥3 reps**, a **baseline
 arm**, medians with ranges, and the anti-cheating rules are not optional.
 
+## The defect catalogue at a glance
+
+`visible_to` is the **hypothesis** about which layer should surface the fault;
+`defect_caught_by` in the metrics is the **measurement**, and they are allowed to disagree.
+
+| Defect | Class | Mode | Hypothesised layer |
+| --- | --- | --- | --- |
+| D-001 | logic-inversion | command | L1-tests (control) |
+| D-002 | off-by-one | command | L1-tests |
+| D-003 | contract-break | command | L1-tests |
+| D-004 | silent-catch | command | L1-review |
+| D-005 | secret-leak | command | L1-review (control) |
+| D-006 | perf-regression | command | L1-review |
+| D-007 | race | instruction | L2-debate |
+| D-008 | mocked-proof | command | L2-auditor |
+| D-009 | missing-ac-coverage | command | L2-tally |
+| D-010 | orphan-diff | command | L2-tally |
+| D-011 | auth-bypass | instruction | L2-auditor |
+| D-012 | tenant-leak | instruction | L2-auditor |
+| D-013 | migration-data-loss | instruction | L2-auditor |
+| D-014 | missing-ac-coverage | command | L2-debate |
+| D-015 | process-skip | instruction | L3-supervisor |
+
+D-001 and D-005 are deliberate **positive controls** that Layer 1 should catch outright. A
+catalogue in which every fault needs Layer 2 would be a catalogue built to flatter Layer 2.
+
+D-008, D-009, and D-010 are the three faults that justify Layer 2, and each one states its
+argument checkably rather than rhetorically: the mocked test stays green with the function
+under test completely broken (demonstrated, see the defect file), the disabled test's absence
+has no line number, and the unrequested file has no defect in it at all.
+
 ## Running a defect
 
 ```bash
