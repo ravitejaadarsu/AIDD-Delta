@@ -29,6 +29,7 @@ pre: `architecture.md`, `epic.md`, `stories/*`, repo. post: the Construction dif
 refuted classes).
 
 delta (exact inputs — read all four before judging any binding):
+
 1. The **pre-implementation** snapshot pack: the latest history pack tagged
    `pre-construction` (fall back to `pre-inception` if absent) — NEVER `pre-qa`, which is
    rebuilt after implementation and would make every comparison vacuous. Read it from
@@ -56,6 +57,7 @@ concrete scenario is invalid by format.** You may run tests/probes read-only to 
 suspicion before raising it.
 
 **delta bindings:**
+
 - **intent-fidelity** — the diff honors what the plan *meant* (per the `pre-review/<dimension>.md`
   findings), not merely what makes tests pass. Concrete scenario: cite the pre-review
   claim the implementation diverges from and the diff hunk (`file:line`) that diverges,

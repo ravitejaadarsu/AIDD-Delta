@@ -136,7 +136,7 @@ context, never blockers.
 
 Artifact layout under `.aidd/changes/<id>/audit/`:
 
-```
+```text
 audit/
   interrogation/
     <story-id>-round1-challenge.md   Auditor: disputed ACs, evidence gaps, exact proof demanded
@@ -193,6 +193,7 @@ surfaces draw from the pool in pipeline order: design first, then execution, the
    attached as evidence), CLI/API transcripts otherwise. Runtimes without Playwright MCP
    fall back to the existing `core/templates/playwright-capture.mjs` script (explicit
    degradation, never silent). Max **2 exchanges** on this surface.
+
 - **Shared budget: 6 exchanges per change** across all three surfaces (2+2+2 fully
   subscribes it; an unused design exchange does NOT roll over — per-surface caps hold).
 - **AC mapping is mandatory:** every debate item cites the AC id(s) the contested test
@@ -209,7 +210,7 @@ surfaces draw from the pool in pipeline order: design first, then execution, the
 per ADR 002 — bash + python3 stdlib permitted — mirroring `render-dashboard.sh`, which is
 itself a bash wrapper around an inline python3 heredoc).
 
-```
+```text
 .aidd/context/                 (gitignored; never committed, never pushed)
   snapshot.md                  repo tree + module map + public API surface + entry points
   quality-baseline.md          measured sigmas: test count, coverage %, lint status,

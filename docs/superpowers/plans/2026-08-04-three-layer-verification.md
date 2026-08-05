@@ -28,10 +28,12 @@
 ### Task 1: build-snapshot.sh script + test suite
 
 **Files:**
+
 - Create: `core/scripts/build-snapshot.sh`
 - Create: `tests/snapshot.test.sh`
 
 **Interfaces:**
+
 - Produces: `bash core/scripts/build-snapshot.sh [tag]` → writes `.aidd/context/{snapshot.md,quality-baseline.md,delta.md}` + copies pack into `.aidd/context/history/<UTC-stamp>-<tag>/`; stores last-built commit in `.aidd/context/.last-ref`. Exit 0 on success, 1 outside a git repo. Later tasks reference the vendored path `.aidd/framework/scripts/build-snapshot.sh`.
 
 - [ ] **Step 1: Write the failing test**
@@ -202,11 +204,13 @@ git commit -m "feat(snapshots): repo-level context pack builder + contract tests
 ### Task 2: Snapshot protocol + templates
 
 **Files:**
+
 - Create: `core/protocol/context-snapshots.md`
 - Create: `core/templates/snapshot.md`, `core/templates/quality-baseline.md`, `core/templates/context-delta.md`
 - Modify: `tests/templates.test.sh` (add the three template names to its existence list, matching its current assertion style)
 
 **Interfaces:**
+
 - Produces: protocol path `../protocol/context-snapshots.md` referenced by playbooks (Task 4) and role Inputs; template names `snapshot.md`, `quality-baseline.md`, `context-delta.md`.
 
 - [ ] **Step 1: Write `core/protocol/context-snapshots.md`** — must contain exactly these rules (concise prose, mirror the style of `core/protocol/evidence.md`):
@@ -227,6 +231,7 @@ git commit -m "feat(snapshots): protocol + pack templates" -m "Co-Authored-By: C
 ### Task 3: Hook wrapper + gitignore plumbing
 
 **Files:**
+
 - Create: `hooks/scripts/build-snapshot.sh` (thin wrapper)
 - Modify: `hooks/hooks.json` (register wrapper on the `Stop` event, alongside `gate-check.sh`)
 - Modify: `install.sh` (append `.aidd/context/` to the target repo's `.gitignore`, creating file/entry if absent)
@@ -234,6 +239,7 @@ git commit -m "feat(snapshots): protocol + pack templates" -m "Co-Authored-By: C
 - Modify: `tests/hooks.test.sh`, `tests/install.test.sh` (assert wrapper registered / gitignore line appended, in each file's existing style)
 
 **Interfaces:**
+
 - Consumes: `core/scripts/build-snapshot.sh` from Task 1 (vendored at `.aidd/framework/scripts/build-snapshot.sh`).
 - Produces: session-stop snapshot refresh on Claude Code; other runtimes rely on the orchestrator protocol duty (Task 4 playbook text).
 
@@ -250,6 +256,7 @@ git commit -m "feat(snapshots): stop-hook refresh + gitignore vendoring" -m "Co-
 ### Task 4: Wire snapshots into playbooks, roles, docs; ADR 007
 
 **Files:**
+
 - Modify: `core/playbooks/00-pipeline.md` (orchestrator duties: rebuild pack at every phase boundary), `core/playbooks/30-construction.md` (rebuild after each wave, tag `post-wave-<n>`), `core/playbooks/20-inception.md` + `core/playbooks/40-qa.md` + `core/playbooks/50-delivery.md` (phase-boundary rebuild line)
 - Modify: every file in `core/roles/` — insert one Inputs line: `` - `.aidd/context/snapshot.md` (+ `quality-baseline.md` where relevant) — read FIRST; do not re-crawl the repo. Missing pack → proceed and note the degradation. ``
 - Create: `docs/context-snapshots.md` (user-facing summary, opens with `Canonical: core/protocol/context-snapshots.md`)
@@ -272,12 +279,14 @@ git commit -m "feat(snapshots): wire pack into playbooks + all role inputs; ADR 
 ### Task 5: Schema — `audit` block + three new quality gates
 
 **Files:**
+
 - Modify: `core/schemas/change-state.schema.json`
 - Modify: `core/templates/change-state.yaml`
 - Create: `tests/fixtures/states/change-valid-audit.yaml`, `tests/fixtures/states/change-invalid-audit-overbudget.yaml`
 - Modify: `tests/schemas.test.sh` (two new expectations)
 
 **Interfaces:**
+
 - Produces (exact keys later tasks + playbooks use): `quality_gates.auditor_approved`, `quality_gates.debate_complete`, `quality_gates.tally_reconciled` (enum `pending|passed|failed|na`); top-level optional `audit` object:
 
 ```json
@@ -314,10 +323,12 @@ git commit -m "feat(schema): audit budgets block + auditor/debate/tally quality 
 ### Task 6: Rename master-supervisor → supervisor
 
 **Files:**
+
 - Rename: `core/roles/master-supervisor.md` → `core/roles/supervisor.md`; `agents/aidd-master-supervisor.md` → `agents/aidd-supervisor.md` (use `git mv`)
 - Modify: every reference — sweep `core/playbooks/`, `core/protocol/`, `core/prompts/`, `core/AGENTS.md`, `agents/`, `docs/`, `skills/`, `core/templates/`, `commands/`, **and `tests/install.test.sh`** (asserts `.aidd/framework/roles/master-supervisor.md`). `CHANGELOG.md` history intentionally keeps the old name.
 
 **Interfaces:**
+
 - Produces: role path `../roles/supervisor.md`; agent name `aidd-supervisor` (frontmatter `name:` updated). All later tasks reference `supervisor`.
 
 - [ ] **Step 1: `git mv` both files; update the agent wrapper frontmatter `name: aidd-supervisor` and its vendored path reference.**
@@ -333,11 +344,13 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 7: Interrogation protocol + templates
 
 **Files:**
+
 - Create: `core/protocol/interrogation.md`
 - Create: `core/templates/interrogation-challenge.md`, `core/templates/interrogation-response.md`, `core/templates/auditor-verdict.md`
 - Modify: `tests/templates.test.sh` (three names)
 
 **Interfaces:**
+
 - Produces: artifact paths `audit/interrogation/<subject-id>-round<N>-challenge.md`, `...-response.md`, `<subject-id>-verdict.md`; verdict vocabulary `PROVEN | DISPUTED` per AC; budget `max 2 rounds` (counted in state `audit.interrogation`).
 
 - [ ] **Step 1: Write the protocol** — must specify: challenge names AC id + evidence gap + exact proof demanded; responses use the evidence-block format from `../protocol/evidence.md`; the orchestrator dispatches all parties (Auditor writes challenges; the challenged sub-agent is re-dispatched once per round to write the response); after round 2 every AC is `PROVEN` or `DISPUTED`; DISPUTED → `../protocol/negotiation.md`; applies per-wave in Construction (subjects = Builder Reports) and in QA final audit (subjects = tester/reviewer reports + AC-matrix rows).
@@ -347,10 +360,12 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 8: Negotiation protocol + template
 
 **Files:**
+
 - Create: `core/protocol/negotiation.md`, `core/templates/negotiation-log.md`
 - Modify: `tests/templates.test.sh`
 
 **Interfaces:**
+
 - Produces: `audit/negotiation-log.md` (one appended section per disputed AC); trigger/short-circuit semantics; adjudication vocabulary `PROVEN | DEFECT | UNRESOLVABLE`; budget `max 2 exchanges` per AC (1 exchange = one position artifact + its response).
 
 - [ ] **Step 1: Write the protocol** — exact semantics from the spec: trigger = Auditor DISPUTED **and** Master Agent monitoring accepts the work; short-circuit = Master Agent concurs → fix-loop defect directly (no negotiation); accept = fix-loop defect (no adjudication); contest = counter-evidence; exhaustion → Supervisor adjudicates (`PROVEN | DEFECT | UNRESOLVABLE`); `UNRESOLVABLE` → forced-human gate in both autonomy modes; every outcome mirrored to state `audit.negotiation` and the change history.
@@ -360,10 +375,12 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 9: Master Agent role + wrapper + monitoring template
 
 **Files:**
+
 - Create: `core/roles/master-agent.md`, `agents/aidd-master-agent.md`, `core/templates/monitoring-report.md`
 - Modify: `tests/templates.test.sh`, `tests/manifest.test.sh` (if it enumerates agents — check and extend in its style)
 
 **Interfaces:**
+
 - Consumes: sub-agent reports (Builder Reports, `qa/*` reports), `.aidd/context/snapshot.md`, `audit/interrogation/*`.
 - Produces: `audit/monitoring/<phase>-<step>.md` (template above); negotiation-log entries (accept/contest); debate-record contributions. Dispatched after every construction wave and every QA step batch.
 
@@ -374,10 +391,12 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 10: Auditor role + wrapper
 
 **Files:**
+
 - Create: `core/roles/auditor.md`, `agents/aidd-auditor.md`
 - Modify: `tests/manifest.test.sh` (as in Task 9)
 
 **Interfaces:**
+
 - Consumes: story files (`ac_ids`), Builder Reports, `qa/tests/*`, `qa/findings*`, `ac-matrix.md`, Jira read ladder (`../protocol/jira-sync.md`), snapshot pack.
 - Produces: `audit/interrogation/*` challenges + verdicts (`PROVEN | DISPUTED` per AC, Task 7 templates); negotiation positions; debate contributions; appended `## Auditor Report` section per story file.
 
@@ -387,10 +406,12 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 11: Tally role + wrapper + template
 
 **Files:**
+
 - Create: `core/roles/tally.md`, `agents/aidd-tally.md`, `core/templates/tally.md`
 - Modify: `tests/templates.test.sh`, `tests/manifest.test.sh`
 
 **Interfaces:**
+
 - Consumes: Jira read ladder, `prd.md` AC table, `stories/*` frontmatter + Builder Reports, Construction diff (`git diff`), `qa/test-report.md`, `evidence/manifest.md` (+ `evidence/pre/`, `evidence/post/`).
 - Produces: `qa/tally.md` — one row per work item: `item id | type | ACs | stories | diff files | tests | pre evidence | post evidence | verdict RECONCILED|GAP` + `## Orphans` section (diff files traceable to no work item). Sets nothing itself; orchestrator folds into `quality_gates.tally_reconciled`.
 
@@ -401,9 +422,11 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 12: Supervisor super-context + supervision protocol + playbook rewrites
 
 **Files:**
+
 - Modify: `core/roles/supervisor.md` (Inputs + adjudication duty), `core/protocol/supervision.md` (checklists), `core/playbooks/00-pipeline.md` (three-layer description), `core/playbooks/30-construction.md` (wave steps), `core/playbooks/40-qa.md` (renumbered steps incl. Tally + final audit + negotiation)
 
 **Interfaces:**
+
 - Consumes: everything Tasks 5–11 produced (paths + vocabularies above).
 - Produces: the canonical phase flows every runtime follows.
 
@@ -417,6 +440,7 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 13: ADR 006 + Layer-2 docs
 
 **Files:**
+
 - Create: `docs/design/decisions/006-three-layer-verification.md`, `docs/three-layer-verification.md`
 - Modify: `docs/supervision.md`, `README.md`
 
@@ -431,10 +455,12 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 14: Reviewer `mode=delta` + ADR 008
 
 **Files:**
+
 - Modify: `core/roles/reviewer.md` (add the third mode), `core/playbooks/40-qa.md` (replace Task 12's placeholder note: `mode=delta` joins the step-1 fan-out), `docs/phases/qa.md` (dimension list)
 - Create: `docs/design/decisions/008-delta-review.md`
 
 **Interfaces:**
+
 - Consumes: `.aidd/context/history/` pre-phase pack + current pack (Task 1), `pre-review/<dimension>.md` (existing Inception artifacts), Construction diff.
 - Produces: `qa/findings-delta.md` in the standard `qa-findings.md` row format → existing funnel.
 
@@ -449,12 +475,14 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 15: Debate protocol + test-engineer wiring + ADR 009
 
 **Files:**
+
 - Create: `core/protocol/test-debate.md`, `core/templates/debate-record.md`
 - Modify: `core/roles/test-engineer.md` (publish-before-execute + debate participation), `core/roles/master-agent.md` + `core/roles/auditor.md` (debate duties cross-reference), `core/playbooks/40-qa.md` (replace Task 12's debate placeholder notes with protocol references; set `debate_complete`), `tests/templates.test.sh`
 - Create: `docs/design/decisions/009-continuous-test-debate.md`
 - Modify: `docs/testing.md`
 
 **Interfaces:**
+
 - Produces: `audit/debate/<category>.md` records; accounting unit (1 exchange = challenge artifact + response pair; batched design round = 1 exchange); per-surface caps 2/2/2 under dominant shared cap 6, no rollover; draw order design → execution → results; exhaustion → AC-mapped items DISPUTED → negotiation; unmapped items advisory. State counter `audit.debate.exchanges_used`.
 
 - [ ] **Step 1: Write `test-debate.md`** with exactly the accounting + caps + mapping rules above, the three surfaces (design: TC matrices challenged before execution; execution: contested TCs re-executed, batched per wave, 2 exchanges total on the surface; results: disputed PASSes re-proven live — **Playwright MCP** browser runs for UI-facing flows with screenshots as evidence, CLI/API transcripts otherwise, explicit fallback to `core/templates/playwright-capture.mjs` where MCP is unavailable), and the learning feed (invalidated designs → `learnings.md`).
@@ -465,6 +493,7 @@ git commit -m "refactor: rename master-supervisor role to supervisor (Layer 3)" 
 ### Task 16: Release v0.3.0
 
 **Files:**
+
 - Modify: `VERSION` (`0.3.0`), `CHANGELOG.md` (v0.3.0 section: three layers, Tally, snapshots, delta review, test debate, rename note), `ROADMAP.md` (tick delivered items), `core/prompts/qa.md` + `core/prompts/construction.md` + `commands/*.md` if they enumerate roles/steps (sweep for stale step lists)
 
 - [ ] **Step 1: Sweep `core/prompts/` and `commands/` for any enumerated QA/Construction steps or role lists that Tasks 6–15 changed; update them.**

@@ -8,12 +8,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      # CI must never silently skip a linter: a missing tool fails the run.
+      AIDD_STRICT_LINT: "1"
     steps:
       - uses: actions/checkout@v4
-      - name: Install linters
+      - name: Install linters (pinned — an unpinned linter broke CI for three releases)
         run: |
           sudo apt-get update -y
           sudo apt-get install -y shellcheck
-          npm install -g markdownlint-cli2
+          npm install -g "markdownlint-cli2@$(grep -m1 '^MDLINT_VERSION=' tests/run.sh | cut -d'"' -f2)"
+      - name: Assert no linter version drift
+        run: |
+          want="$(grep -m1 '^MDLINT_VERSION=' tests/run.sh | cut -d'"' -f2)"
+          got="$(markdownlint-cli2 --version 2>/dev/null | head -1 | tr -d 'v')"
+          echo "tests/run.sh pins ${want}; installed ${got}"
+          case "${got}" in
+            "${want}"*) ;;
+            *) echo "::error::markdownlint drift: pinned ${want}, installed ${got}"; exit 1 ;;
+          esac
       - name: Self-tests
         run: bash tests/run.sh

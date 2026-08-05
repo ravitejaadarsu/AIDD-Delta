@@ -1,9 +1,14 @@
 {
   // AIDD Delta markdown lint policy: strict structure, relaxed prose width.
+  // The pinned linter version lives in tests/run.sh (MDLINT_VERSION) so local
+  // and CI run byte-identical checks — an unpinned linter silently broke CI
+  // for three releases (a new rule appeared upstream), so never unpin it.
   "default": true,
   "MD013": false, // line length — playbooks favor readable long lines
   "MD033": false, // inline HTML — needed for details/summary in reports
   "MD041": false, // first-line heading — templates start with frontmatter
   "MD024": { "siblings_only": true },
-  "MD036": false  // emphasis-as-heading — used in gate digests
+  "MD025": false, // multiple H1 — templates embed example documents with their own title
+  "MD036": false, // emphasis-as-heading — used in gate digests
+  "globs": ["**/*.md", "!node_modules", "!.superpowers", "!.aidd"]
 }

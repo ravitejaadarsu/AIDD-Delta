@@ -16,9 +16,11 @@ jobs:
           V="$(tr -d '[:space:]' < VERSION)"
           [ "v${V}" = "${GITHUB_REF_NAME}" ] || { echo "VERSION ${V} != tag ${GITHUB_REF_NAME}"; exit 1; }
       - name: Self-tests
+        env:
+          AIDD_STRICT_LINT: "1"
         run: |
           sudo apt-get update -y && sudo apt-get install -y shellcheck
-          npm install -g markdownlint-cli2
+          npm install -g "markdownlint-cli2@$(grep -m1 '^MDLINT_VERSION=' tests/run.sh | cut -d'"' -f2)"
           bash tests/run.sh
       - name: Package core
         run: tar -czf aidd-core.tar.gz core install.sh VERSION LICENSE
