@@ -20,6 +20,12 @@
         "hooks": [
           { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-log.sh\"" }
         ]
+      },
+      {
+        "matcher": "Skill|SlashCommand|Task",
+        "hooks": [
+          { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/guard-command.sh\"" }
+        ]
       }
     ],
     "Stop": [

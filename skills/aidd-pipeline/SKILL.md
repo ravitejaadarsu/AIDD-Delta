@@ -5,6 +5,10 @@ description: How to run the AIDD Delta pipeline in this repo. Use whenever the u
 
 # AIDD Pipeline Skill
 
+**This is a skill, not a command** — there is no `/aidd:aidd-pipeline`. Skills are
+instruction sets the orchestrator loads; before acting, load the exact playbook the
+command contract binds to the invoked command (`.aidd/framework/protocol/command-contract.md`).
+
 1. Open `.aidd/framework/playbooks/00-pipeline.md` and follow it exactly.
 2. You are the orchestrator: dispatch the roles in `.aidd/framework/roles/` as parallel
    subagents (the plugin registers each as `aidd-<role>`); you never write product code

@@ -21,6 +21,18 @@ follow it exactly. **Never improvise phase logic.**
 | "AIDD: test <story/fix>" | Run `prompts/test.md` (exhaustive test-engineer team) |
 | "AIDD: impact <change>" | Run `prompts/impact.md` (blast-radius analysis) |
 
+## Command contract & progress
+
+- **Only manifest commands exist.** `.aidd/framework/scripts/aidd-commands.txt` is the
+  list; `.aidd/framework/protocol/command-contract.md` is the rule. Read the playbook that
+  manifest row names BEFORE any plan, question, or dispatch — reasoning first is a
+  supervision violation. Unknown command → name the nearest manifest row and stop.
+- **Skills are not commands.** `aidd-pipeline`, `aidd-state`, `aidd-gates`,
+  `aidd-supervision` are instruction sets, never entry points.
+- **Report state, not deliberation.** One progress line per completed step per
+  `.aidd/framework/protocol/progress.md`; deliberation goes to the audit log and phase
+  reports; depth goes to `.aidd/dashboard.html`.
+
 ## Ground rules
 
 - State lives in `.aidd/` (YAML, schema-validated — validate after every write with
