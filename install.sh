@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-AIDD_VERSION="0.3.0"
+AIDD_VERSION="0.4.0"
 # AIDD Delta universal installer.
 # Vendors the portable core into ./.aidd/framework/, patches AGENTS.md (managed block),
 # and seeds state — idempotently. Never touches your constitution, memory, learnings,

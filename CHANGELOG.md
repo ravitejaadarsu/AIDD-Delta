@@ -5,6 +5,84 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-06
+
+### Added
+
+- Rigor modes (ADR 010, `core/protocol/rigor-modes.md`): `fast` / `standard` / `critical`
+  decide how much verification a change earns, selected by a **deterministic classifier**
+  that matches the change's own evidence — path-pattern trigger tables for authn/authz,
+  secrets/crypto, money, tenancy, migrations, PII, public API, concurrency and infra; a
+  `fast` allow-list requiring every condition; everything else `standard`, with all three
+  tie-breaks resolving upward. Escalation is **one-way and automatic** (`fast` → `standard`
+  → `critical`), re-seeds the audit budgets, voids every `na` earned under the outgone
+  mode, back-fills the steps the new mode requires, and sets the take-care escalation flag.
+  Rigor is orthogonal to autonomy and never touches the floor. New `/aidd:rigor` command,
+  `rigor` state block, and `docs/rigor-modes.md`.
+- Deterministic dispatch (ADR 011, `core/protocol/dispatch.md`): a decision table covering
+  every fan-out in all four phases — unit counts per rigor mode, ownership rule, dispatch
+  mode, cap, and a deterministic order. The orchestrator resolves a step's plan **once**,
+  records it in `supervision/audit.log`, and re-deciding it mid-step is a supervision
+  VIOLATION. Parallelism requires provably pairwise-disjoint ownership sets; unproven means
+  sequential, with no case-by-case reasoning.
+- Command contract (ADR 012, `docs/command-contract.md`): every `/aidd:*` command is
+  declared in a manifest (`core/scripts/aidd-commands.txt`) binding it to the protocol file
+  it executes, enforced by a guard hook and `tests/manifest.test.sh`. Skills are not
+  commands — a skill name used as a command is named as such rather than silently routed.
+- Progress contract (ADR 013, `core/protocol/progress.md`): one fixed, machine-parseable
+  line per completed step, a distinct BLOCKED/FAILED shape carrying its remediation, an
+  explicit forbidden-output list (dispatch deliberation, re-litigation, playbook echoes,
+  filler), and a five-line cap on gate asks. The dashboard gains a **Recent progress**
+  section that replays those lines from change history.
+- Benchmark harness (ADR 014, `bench/`): a reproducible corpus of **28 tasks** and a
+  **15-defect** injection catalogue with a shared `defect_class` / `visible_to` vocabulary,
+  runnable scripts, a metrics schema, and a report template. **No results are published** —
+  `bench/results/` ships its template and nothing else, and the README says so.
+- Capability tiers (ADR 015, `docs/capability-matrix.md`): Tier 1 Claude Code · Tier 2
+  Codex CLI · Tier 3 any other agent CLI, with every capability stating a
+  supported / degraded / unsupported value for all three tiers and a named degradation
+  path. Every README claim is re-grounded as `[designed]` / `[measured]` / `[planned]`, and
+  `tests/claims.test.sh` fails CI on a claim that outruns its evidence.
+- Cost governance (ADR 016, `core/protocol/cost-governance.md`): a per-change budget seeded
+  from the rigor mode (**derived, not measured** — the formula is printed and the numbers
+  are labelled seeds), an append-only `cost/ledger.md` with one row per dispatch, a
+  deterministic projection with a stated tie rule and lower-bound reporting for unmeasured
+  classes, and three thresholds with three distinct behaviors — soft reports, hard STOPs and
+  asks (forced-human in both autonomy modes), runaway aborts the dispatch and never silently
+  retries. An `na` justified by cost is forbidden outright. New `aidd-cost.sh` (read-only by
+  contract), `/aidd:cost`, `cost` state block, and `docs/cost-governance.md`.
+- Escape analysis (ADR 017, `core/protocol/escape-analysis.md`): the backward-looking
+  counter-metric. When a defect reaches production, a nine-row per-layer verdict table
+  determines which layer should have caught it and why it did not — including the
+  caught-then-dropped case — and produces a permanent regression test plus a diff-level
+  protocol amendment that is **never auto-applied**. Escape rate and per-layer blindness are
+  recorded in `.aidd/escapes/register.md`, always with numerator and denominator, and read
+  `not measured` rather than `0%` when the window has no analyzed escape. New Escape Analyst
+  role, `/aidd:escape`, `escapes` state block, and `docs/escape-analysis.md`.
+- Determinism proof (ADR 018, `core/protocol/determinism.md`): a green claim that gates
+  delivery is not trusted until it has been reproduced. Two runs for the three claim classes
+  a delivery decision rests on, per rigor mode; agreement defined as identical exit code
+  plus an identical test-id → outcome map; six nondeterminism sources each with one
+  discriminating check. **A repeat is a measurement, never a second chance** — re-running a
+  red claim until it comes back green is a supervision VIOLATION. Disagreeing repeats
+  quarantine the test, which may never again stand as evidence for an AC, a gate, or a
+  debate defence. New `determinism` state block and `docs/determinism.md`.
+- Two mode-independent quality gates — `within_cost_budget` and `evidence_reproduced` —
+  bringing the set to sixteen, and four new change-state blocks: `rigor`, `cost`,
+  `determinism`, `escapes`.
+- ADRs 010 (rigor modes), 011 (deterministic dispatch), 012 (command contract), 013
+  (progress contract), 014 (benchmark harness), 015 (capability tiers), 016 (cost
+  governance), 017 (escape analysis), 018 (determinism proof).
+
+### Fixed
+
+- CI had failed on every run since v0.2.0: `markdownlint-cli2` was installed unpinned, so a
+  new upstream rule (MD060) failed a build nobody had changed, while local runs skipped the
+  linter entirely and never saw it. The toolchain is now pinned (`MDLINT_VERSION` in
+  `tests/run.sh`; both workflows install that exact version and CI asserts no drift), local
+  runs fall back to `npx` at the same pinned version so local == CI, `AIDD_STRICT_LINT=1`
+  fails instead of skipping a missing linter, and all 143 real violations are cleared.
+
 ## [0.3.0] - 2026-08-04
 
 ### Added

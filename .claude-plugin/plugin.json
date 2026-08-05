@@ -1,6 +1,6 @@
 {
   "name": "aidd",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "AIDD Delta \u2014 autonomous multi-agent engineering fabric: one prompt to a merge-ready, CI-green PR. Specialist agents drive spec synthesis, parallel test-first builds, adversarial verification, exhaustive test generation, and continuous self-audit.",
   "author": {
     "name": "AIDD Delta contributors"
