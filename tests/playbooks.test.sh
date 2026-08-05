@@ -14,6 +14,12 @@ need() { # file, extended-regex, what-it-wires
   fi
 }
 
+# Pipeline: the canonical contract must wire rigor selection and table-driven dispatch —
+# a mode nobody selects and a table nobody consults are dead files.
+P=core/playbooks/00-pipeline.md
+need "${P}" 'protocol/rigor-modes\.md'  "the rigor-mode classifier + escalation protocol"
+need "${P}" 'protocol/dispatch\.md'     "the deterministic dispatch decision table"
+
 # Construction: monitoring per wave, interrogation/negotiation ladder, delta baseline.
 C=core/playbooks/30-construction.md
 need "${C}" 'roles/master-agent\.md'                "the Master Agent role"
