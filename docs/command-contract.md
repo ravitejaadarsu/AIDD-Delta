@@ -14,7 +14,8 @@ Two field failures motivated it:
 
 ## Skills are not commands
 
-The four skills (`aidd-pipeline`, `aidd-state`, `aidd-gates`, `aidd-supervision`) are
+The five skills (`aidd-pipeline`, `aidd-state`, `aidd-gates`, `aidd-supervision`,
+`aidd-pr-review`) are
 instruction sets the orchestrator loads — they describe *how to behave*. A command's
 playbook describes *what steps to execute*. No skill has a manifest row, so
 `/aidd:aidd-pipeline` and friends do not exist. Loading a skill never substitutes for
@@ -42,7 +43,7 @@ command and stop. Never invent a phase, a gate key, a quality gate, or an agent 
   commands. It degrades silently outside an AIDD repo, without a manifest, or on a payload
   it cannot parse — a guard must never break an unrelated session.
 - **Tests**: `tests/commands.test.sh` asserts manifest ↔ `commands/` are 1:1 (no phantom
-  rows, no missing ones), that the contract names all four skills as non-commands, and
+  rows, no missing ones), that the contract names all five skills as non-commands, and
   that the guard denies an unknown command while allowing a real one.
 
 ## Progress contract

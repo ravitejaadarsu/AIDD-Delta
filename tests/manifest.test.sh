@@ -64,8 +64,8 @@ for group in hooks['hooks'].values():
                 errors.append(f"hook script not executable: {script}")
 
 skills = sorted(os.listdir('skills'))
-if len(skills) != 4:
-    errors.append(f"expected 4 skills, found {len(skills)}")
+if len(skills) != 5:
+    errors.append(f"expected 5 skills, found {len(skills)}")
 for s in skills:
     text = open(f'skills/{s}/SKILL.md', encoding='utf-8').read()
     fm = text.split('---')[1]

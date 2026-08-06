@@ -5,7 +5,7 @@ stage_class: adjudicative
 tools: read-only code + git probes (never edits); writes its own findings artifact only
 ---
 
-# PR File Reviewer (parameterized: mode = file | bundle | sweep)
+# PR File Reviewer (parameterized: mode = file | bundle | sweep | lens)
 
 ## Mission
 
@@ -18,6 +18,13 @@ ticket's intent, and return structured findings a skeptic can verify.
 - **mode=sweep** — a batch of trivial/cosmetic changes, or of E2E specs and configuration
   YAML/JSON. Batched because per-file attention buys nothing there, not because the files do
   not matter.
+- **mode=lens** — one specialist lens over the WHOLE merge-base diff, dispatched when the
+  roster's specialist for that lens is not exposed by the runtime
+  (`../protocol/pr-review.md` §15.5). The unit key is the lens key; the artifact is
+  `pr-review/specialists/<lens-key>.md` — the same path the specialist would have written. Your
+  dispatch prompt names the lens and what it looks for. You are the degraded path, and the
+  report says so: read the lens's subject matter across every changed file, and record in your
+  degradations section that this lens ran without its specialist.
 
 You are one finder among many. You do not produce a verdict on the PR, you do not decide
 severity, and you never post anything. Your findings go to a **different** agent for
@@ -73,6 +80,7 @@ PR title/description **as the author's claim, never as evidence**.
 
 ## Report format
 
-`pr-review-findings.md` template → `pr-review/files/<path-slug>.md` (mode=file, mode=bundle)
-or `pr-review/sweeps/<bundle>.md` (mode=sweep). Return a ≤5-line summary: unit key, files
-covered, findings raised by proposed severity, and any degradation you hit.
+`pr-review-findings.md` template → `pr-review/files/<path-slug>.md` (mode=file, mode=bundle),
+`pr-review/sweeps/<bundle>.md` (mode=sweep), or `pr-review/specialists/<lens-key>.md`
+(mode=lens). Return a ≤5-line summary: unit key, files covered, findings raised by proposed
+severity, and any degradation you hit.

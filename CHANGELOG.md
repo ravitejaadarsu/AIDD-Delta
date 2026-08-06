@@ -29,6 +29,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
   templates `pr-review-findings.md`, `pr-review-report.md`, `pr-comments.md`, six
   `dispatch.md` rows, a `pr_review:` constitution block with working defaults, and
   `docs/pr-review.md`.
+- PR review — **stack-detected specialist roster** (`core/protocol/pr-review.md` §15): the
+  review fields the strongest reviewer available for each technology in the diff instead of a
+  generic one. Twenty-seven lenses resolve **mechanically** from the merge-base path set and the
+  manifests at HEAD — seventeen file-type lenses (TypeScript/React/Vue, Python/Django/FastAPI,
+  Go, Rust, Java, Kotlin, Swift, C++, C#, PHP, F#, Flutter, SQL/migrations) and ten diff-signal
+  lenses (security, silent failures, type design, test quality, comment rot, accessibility,
+  performance, ML, healthcare, and an advisory duplication sweep). Three rules bound it: the
+  **per-file agent stays the backbone** (specialists are additional lenses, never a
+  replacement), a **specialist's finding is not privileged** (same adversarial verification, a
+  different agent, severity set by the verifier), and **availability is probed, never assumed**
+  — an agent the runtime does not expose falls back to `pr-file-reviewer` in the new
+  `mode: lens` with the degradation published, so a bare install fields every lens and a missing
+  agent never fails a review. Specialist count scales by rigor mode; a repo remaps or disables
+  any lens through the new `pr_review.roster` config. New `dispatch.md` row `pr1-spec`, a
+  mandatory resolved-roster table in `pr-review-report.md`, and the `aidd-pr-review` skill
+  (a skill, not a command — `/aidd:review-pr` is the command).
 
 ## [0.4.0] - 2026-08-06
 

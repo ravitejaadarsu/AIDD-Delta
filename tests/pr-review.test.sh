@@ -266,7 +266,62 @@ need core/protocol/command-contract.md '\| .\/aidd:review-pr. \| .\.aidd/framewo
 need tests/manifest.test.sh 'expected 21 commands' "the bumped command count"
 need tests/manifest.test.sh 'expected 29 agents'   "the bumped agent count"
 
-# ── 17. Docs surface: capability-matrix row and the ADR
+# ── 17. The stack-detected specialist roster, probed and degraded (never silently)
+need "${P}" '^## 15\. The specialist roster' "the specialist-roster section"
+need "${P}" 'stack-detected'                 "stack detection as the resolution input"
+for lens in typescript react vue python django fastapi go rust java kotlin swift cpp \
+            csharp php fsharp flutter database security silent-failure type-design \
+            test-quality comments a11y performance mle healthcare simplify; do
+  need "${P}" "^\| .${lens}. \|" "the '${lens}' lens row in the roster table"
+done
+for agent in 'ecc:typescript-reviewer' 'ecc:react-reviewer' 'ecc:vue-reviewer' \
+             'ecc:python-reviewer' 'ecc:django-reviewer' 'ecc:fastapi-reviewer' \
+             'ecc:go-reviewer' 'ecc:rust-reviewer' 'ecc:java-reviewer' \
+             'ecc:kotlin-reviewer' 'ecc:swift-reviewer' 'ecc:cpp-reviewer' \
+             'ecc:csharp-reviewer' 'ecc:php-reviewer' 'ecc:fsharp-reviewer' \
+             'ecc:flutter-reviewer' 'ecc:database-reviewer' 'ecc:security-reviewer' \
+             'ecc:silent-failure-hunter' 'ecc:type-design-analyzer' \
+             'ecc:pr-test-analyzer' 'ecc:comment-analyzer' 'ecc:a11y-architect' \
+             'ecc:performance-optimizer' 'ecc:mle-reviewer' 'ecc:healthcare-reviewer' \
+             'ecc:code-simplifier'; do
+  need "${P}" "${agent}" "the '${agent}' default specialist in the roster table"
+done
+need "${P}" 'Availability is probed'         "the availability probe (never assumed)"
+need "${P}" 'a lens is a brief, not a vendor|falls? back to .pr-file-reviewer|fall back to .pr-file-reviewer' \
+                                             "the fallback to AIDD's own reviewer when absent"
+need "${P}" 'degrade|degraded|degrades'      "graceful degradation of a missing specialist"
+need "${P}" 'mode: lens'                     "the degraded lens mode on pr-file-reviewer"
+need "${P}" 'never fails a review|never fail' "the no-hard-fail rule on a missing agent"
+need "${P}" 'evidence\.md'                   "the evidence/degradation-discipline citation"
+need "${P}" 'per-file agent stays the backbone|backbone' "specialists never replacing per-file review"
+need "${P}" 'not privileged'                 "a specialist finding entering the same verification"
+need "${P}" 'advisory'                       "the advisory-only duplication sweep"
+need "${P}" 'pr_review\.roster|roster:'      "the per-repo roster override"
+need "${P}" 'disabled by config'             "a lens the repo disabled, recorded not passed"
+need "${P}" '### 15\.6'                      "the rigor scaling of the specialist count"
+need "${RF}" 'mode: lens|mode=lens'          "the file reviewer's degraded-lens mode"
+need "${RF}" 'pr-review/specialists/'        "the specialist artifact path"
+need "${TR}" '^## Specialist roster'         "the report's resolved-roster table"
+need "${TR}" 'Agent dispatched'              "the dispatched-agent column"
+need "${TR}" 'degraded'                      "the degradation status value"
+need core/templates/constitution.md 'roster:' "the roster key in the constitution block"
+need docs/pr-review.md 'roster'              "the roster in the docs page"
+need docs/pr-review.md 'isa-appsec|isa-typescript-review' "the Phoenix custom roster mapping"
+need "${D}" 'pr1-spec'                       "the specialist dispatch row"
+need "${D}" 'pr-review/specialists/'         "the specialist artifact in the disjointness proof"
+
+# ── 18. The PR-review skill is a skill, not a command
+exists skills/aidd-pr-review/SKILL.md
+need skills/aidd-pr-review/SKILL.md '^name: aidd-pr-review$' "the skill name"
+need skills/aidd-pr-review/SKILL.md '^description: '         "the skill description"
+need skills/aidd-pr-review/SKILL.md 'This is a skill, not a command' \
+                                             "the skills-are-not-commands statement"
+need skills/aidd-pr-review/SKILL.md '/aidd:review-pr'        "the real command it points at"
+need skills/aidd-pr-review/SKILL.md 'command-contract\.md'   "the command-contract citation"
+need core/protocol/command-contract.md 'aidd-pr-review'      "the contract naming the new skill"
+need hooks/scripts/guard-command.sh 'aidd-pr-review'         "the guard allowing the new skill"
+
+# ── 19. Docs surface: capability-matrix row and the ADR
 need docs/capability-matrix.md 'External PR review' "the capability-matrix row"
 need docs/capability-matrix.md 'core/protocol/pr-review\.md' "the matrix row's canonical link"
 need docs/design/decisions/019-pr-review.md '^# ADR 019' "the ADR heading"

@@ -71,6 +71,7 @@ pr_review:
     - test-coverage
     - security
     - tenant-boundary
+  roster: {}                        # stack-detected specialist overrides (§15); {} = the shipped roster
   framework_paths: []               # paths that count as "framework code" for the redline scan
   redline_patterns: []              # ripgrep patterns; empty = the shipped defaults (§9.3)
   allowlist_file: null              # e.g. .framework-allowlist.json — must be untouched by the PR
@@ -86,6 +87,7 @@ pr_review:
 | `platform` | `local` if no PR id is supplied, else inferred from the remote URL | `dev.azure.com`/`visualstudio.com` ⇒ `azure-devops`; `github.com` ⇒ `github` |
 | `invariants_files` | the first of `AGENTS.md`, `CLAUDE.md`, `.aidd/constitution.md` that exists (all of them if several do) | finders judge against the repo's written law; none present ⇒ recorded as a degradation, and only the ticket intent and the code remain |
 | `dimension_agents` | the six AIDD dimensions listed above, run as `../roles/reviewer.md` `mode: post` dispatches | a repo naming its own roster (`isa-*`, `platform-*`, anything) gets those agents instead, one dispatch each |
+| `roster` | the shipped stack-detected roster (§15.1–§15.2), resolved against the agents the runtime exposes | a repo maps a lens key to its own agent (`typescript: isa-typescript-review`) or to `null` to disable it; keys it omits keep the shipped default; an agent the runtime does not expose degrades to `pr-file-reviewer` `mode: lens` with the degradation recorded (§15.5) |
 | `framework_paths` | every path added by the diff | the redline scan needs a target set; with none configured, new files are the target |
 | `redline_patterns` | the three shipped patterns in §9.3 | inline token arrays, entity-type equality, business-status literals |
 | `allowlist_file` | none | with none configured, the "allowlist untouched" check records `N/A (no allowlist configured)` — never `PASS` |
@@ -205,9 +207,13 @@ orchestrator does not decide the shape.
    (defaults in §3): correctness/types, framework/metadata invariants,
    duplication/consistency, test coverage, security, tenant/boundary isolation. Each reads
    the whole diff for its dimension and writes `pr-review/dimensions/<dimension>.md`.
+   **Stack-detected specialist lenses run in addition to these** — the strongest reviewer the
+   runtime exposes for each technology in the diff, resolved mechanically and probed for
+   availability (§15), one dispatch each, writing `pr-review/specialists/<lens-key>.md`.
 5. **Every unit is capped and ordered** by `dispatch.md`: cap per row, deterministic order
-   **path ascending** for files and sweeps, dimension name ascending for specialists. Units
-   beyond the cap queue; none is dropped.
+   **path ascending** for files and sweeps, dimension name ascending for dimension
+   specialists, resolved agent name ascending for the stack-detected lenses. Units beyond the
+   cap queue; none is dropped.
 
 ### 5.2 What every finder does
 
@@ -543,6 +549,7 @@ dimension roster for the dimensions the lower mode skipped.
 | Per-file finders | one per changed source file | one per changed source file | one per changed source file |
 | Sweep bundles | 1 (cosmetic and config merged) | 2 (cosmetic · config/E2E) | 2 (cosmetic · config/E2E) |
 | Dimension specialists | 2 — `correctness-types`, `framework-invariants` | all 6 (or the repo's full roster) | all 6 (or the repo's full roster) |
+| Stack specialist lenses (§15) | none, unless the diff touches a redline path (then `security`) | the stack's primary reviewer + `security` when triggered + `test-quality` | the full triggered set |
 | Adversarial verification | **every finding** | **every finding** | **every finding** |
 | Consumer trace (§10) | required on every shared-symbol finding | required | required |
 | Cross-cutting agent | 1 | 1 | 1 |
@@ -572,3 +579,159 @@ and in `critical`. A mode that would drop one of them is a bug, not a mode.
 ```text
 [pr-review 3/5] 14 findings verified, 5 confirmed · .aidd/pr-reviews/PR-4821/report.md · gates: 0/0 · rigor: standard · next: cross-cutting pass
 ```
+
+## 15. The specialist roster — stack-detected, availability-probed
+
+A generic reviewer reads a Rust diff the way it reads a Python diff. A Rust specialist knows
+what an `unwrap()` in a request path costs, which lifetime the borrow checker let through, and
+what the new `unsafe` block is buying. The roster exists so a review always fields the
+**strongest reviewer available for the technology in front of it**, resolved by lookup from
+the changed paths — never by the orchestrator's opinion of the stack.
+
+Three rules bound this whole section, and none of them bends:
+
+1. **The per-file agent stays the backbone.** Specialists are *additional lenses over the same
+   diff*, never a replacement for per-file review. A run that drops `pr1-file` units because a
+   language specialist "covered" the stack is incomplete by format — §5.1 rule 1 holds in every
+   rigor mode, and the per-file count in §13 never moves.
+2. **A specialist's finding is not privileged.** It enters the **same** §6 adversarial
+   verification phase as every other finding: it carries `raised_by: <lens-key>`, it is verified
+   by a **different** agent (the `adversarial-verifier` role, never a role that raises
+   findings), and **the verifier sets the severity** (§6.3). A language specialist's CRITICAL
+   is a proposal like anyone else's.
+3. **Availability is probed, never assumed.** Each lens names the specialist this environment
+   commonly exposes for it (the `Default specialist` column below), and the orchestrator resolves
+   that name against the agents the **runtime actually exposes** (§15.5). Present ⇒ the specialist
+   is dispatched. Absent ⇒ **a lens is a brief, not a vendor**: the same lens runs as
+   `pr-file-reviewer` in `mode: lens`, carrying the lens key and its "what the lens adds" column
+   as the brief, and the degradation is recorded in the report with its reason (`evidence.md`
+   discipline). So a bare AIDD install fields every lens in this section, a missing agent never
+   fails a review, and a lens never silently disappears from one.
+
+### 15.1 The default roster — file-type signals
+
+Resolution input is the merge-base path set (`git diff --name-only "${BASE}..${HEAD}"`) plus the
+dependency manifests as they stand at `HEAD`. Same diff ⇒ same roster, every run, on every host.
+
+The `Default specialist` column is the agent dispatched **when the runtime exposes it**; every row
+falls back to `pr-file-reviewer` in `mode: lens` with `lens: <key>`, briefed by the last column,
+when it does not (§15.5) or when `pr_review.roster` maps the key elsewhere (§15.4).
+
+| Lens key | Signal in the changed path set | Default specialist | What the lens adds |
+|---|---|---|---|
+| `typescript` | `**/*.ts`, `**/*.tsx`, `**/*.mts`, `**/*.cts`, `**/*.js`, `**/*.mjs`, `**/*.cjs`, `tsconfig*.json` | `ecc:typescript-reviewer` | type safety, async correctness, Node/web security idiom |
+| `react` | `**/*.tsx`, `**/*.jsx`, or a changed file importing `react` | `ecc:react-reviewer` — **alongside** `typescript`, not instead of it | hook correctness, render cost, server/client boundary |
+| `vue` | `**/*.vue`, `nuxt.config.*`, or a changed file importing `vue` | `ecc:vue-reviewer` | Composition API, reactivity pitfalls, template escaping |
+| `python` | `**/*.py`, `pyproject.toml`, `requirements*.txt` | `ecc:python-reviewer` | typing, idiom, packaging, injection surfaces |
+| `django` | `manage.py`, `**/settings.py`, or `django` in the manifest | `ecc:django-reviewer` — alongside `python` | ORM correctness, migration safety, DRF, misconfiguration |
+| `fastapi` | `fastapi` in the manifest, or a changed file constructing `FastAPI(` | `ecc:fastapi-reviewer` — alongside `python` | async correctness, dependency injection, Pydantic schemas |
+| `go` | `**/*.go`, `go.mod` | `ecc:go-reviewer` | concurrency, error handling, idiom |
+| `rust` | `**/*.rs`, `Cargo.toml` | `ecc:rust-reviewer` | ownership, lifetimes, `unsafe`, error handling |
+| `java` | `**/*.java`, `pom.xml`, `build.gradle*` | `ecc:java-reviewer` | layering, JPA, Spring/Quarkus config, concurrency |
+| `kotlin` | `**/*.kt`, `**/*.kts` | `ecc:kotlin-reviewer` | null safety, coroutine safety, Compose |
+| `swift` | `**/*.swift`, `Package.swift` | `ecc:swift-reviewer` | value semantics, ARC, Swift concurrency |
+| `cpp` | `**/*.cpp`, `**/*.cc`, `**/*.hpp`, `**/*.h`, `CMakeLists.txt` | `ecc:cpp-reviewer` | memory safety, modern idiom, concurrency |
+| `csharp` | `**/*.cs`, `**/*.csproj` | `ecc:csharp-reviewer` | async patterns, nullable reference types, security |
+| `php` | `**/*.php`, `composer.json` | `ecc:php-reviewer` | typing, Eloquent/ORM patterns, injection surfaces |
+| `fsharp` | `**/*.fs`, `**/*.fsproj` | `ecc:fsharp-reviewer` | functional idiom, exhaustiveness, type safety |
+| `flutter` | `**/*.dart`, `pubspec.yaml` | `ecc:flutter-reviewer` | widget/state patterns, rebuild cost, accessibility |
+| `database` | `**/*.sql`, `**/migrations/**`, `**/alembic/**`, `**/*.prisma`, any DDL hunk | `ecc:database-reviewer` | index and query plans, schema design, migration safety |
+
+### 15.2 The default roster — diff-signal lenses (language-independent)
+
+| Lens key | Signal in the diff (matched mechanically) | Default specialist | What the lens adds |
+|---|---|---|---|
+| `security` | a `critical` trigger row of `rigor-modes.md` fires for authn/authz, secrets/crypto or PII; **or** the diff adds a route, an HTTP/RPC client, a deserializer, a subprocess/shell call, or a template render of caller-supplied input | `ecc:security-reviewer` | OWASP surfaces, secrets, SSRF/injection, unsafe crypto |
+| `silent-failure` | the diff adds or edits a `catch`/`except`/`rescue`/`recover()`/`if err != nil`/`.catch(`, an empty handler body, or a fallback default that stands in for a failure | `ecc:silent-failure-hunter` | swallowed errors, bad fallbacks, missing propagation |
+| `type-design` | the diff adds or changes an exported type, interface, struct, enum, dataclass, protocol, or published schema | `ecc:type-design-analyzer` | encapsulation, and which invariants the type could enforce but does not |
+| `test-quality` | any test file added or changed, **or** a source file changed with no test file anywhere in the diff | `ecc:pr-test-analyzer` | behavioral coverage, and the vacuous-assertion classes of §9.3 part 4 |
+| `comments` | the diff changes a comment or a docstring | `ecc:comment-analyzer` | comment rot — a comment that now describes the behavior the diff removed |
+| `a11y` | the diff touches a component, template, view, or stylesheet (`**/*.tsx`, `**/*.jsx`, `**/*.vue`, `**/*.html`, `**/*.css`, `**/components/**`) | `ecc:a11y-architect` | WCAG 2.2 semantics, focus order, labelling, contrast |
+| `performance` | the diff touches a request handler, a render path, a query builder, a worker/queue consumer, or a loop over caller-sized data | `ecc:performance-optimizer` | N+1 queries, unbounded work, sync work in a render path |
+| `mle` | the diff touches training/inference/feature code — `**/train*`, `**/model*`, `**/*.ipynb`, or `torch`/`tensorflow`/`sklearn`/`xgboost` in the manifest | `ecc:mle-reviewer` | data contracts, reproducibility, offline/online eval, rollback |
+| `healthcare` | the diff touches clinical or health data — FHIR/HL7 resources, EMR/EHR paths, PHI fields, clinical decision logic | `ecc:healthcare-reviewer` | clinical safety, PHI handling, medical data integrity |
+| `simplify` | always — one sweep per review | `ecc:code-simplifier` | duplication and consistency across the diff (**advisory**, below) |
+
+**`simplify` is advisory by construction.** Its findings enter verification with proposed
+severity `LOW` whatever it proposes, and they reach the report only if a verifier **promotes**
+them — which the verifier may do, because severity is the verifier's under §6.3. A
+simplification is an opinion about code the author chose; on someone else's PR it is never a
+merge blocker on its own.
+
+### 15.3 Resolving the roster — four mechanical steps
+
+Run once, after phase 0 and before phase 1 dispatches:
+
+1. **Detect.** Match §15.1 and §15.2 against the merge-base path set and the manifests at HEAD.
+   The output is a set of **lens keys**, ordered by resolved agent name ascending (lens key
+   ascending as tie-break, so two lenses resolving to one agent still order deterministically).
+2. **Override.** Apply `pr_review.roster` (§15.4). A key the repo maps takes the repo's agent; a
+   key it maps to `null` is disabled and recorded as disabled-with-reason; a key it omits keeps
+   the shipped default.
+3. **Probe.** Resolve every surviving agent name — the shipped default or the repo's mapping —
+   against the agents the **runtime actually exposes** (§15.5). Present ⇒ dispatch that
+   specialist. Absent ⇒ fall back to `pr-file-reviewer` `mode: lens` with the same brief, and
+   record the degradation. The fallback always exists, so the lens always runs.
+4. **Scale.** Cut the resolved set to the rigor mode's allowance (§15.6), then dispatch through
+   `dispatch.md` row `PR review 1d` (`pr1-spec`) — cap, order and queueing come from the table,
+   not from judgment.
+
+The resolved roster — every lens key, its default agent, the agent actually dispatched, and its
+status — is a **mandatory table in the report** (`../templates/pr-review-report.md`). A review
+whose report omits it cannot be audited for what it did not look at.
+
+### 15.4 Config — `pr_review.roster`
+
+`roster` is a **map of lens key → agent name**, merged over the shipped default; `{}` (the
+default) means "use the shipped roster unchanged". It is orthogonal to `dimension_agents`:
+`dimension_agents` names the standing dimension lenses that read the whole diff (§5.1 rule 4),
+`roster` names the stack-detected specialists (§15.1–§15.2). Both are additional lenses; neither
+replaces the per-file backbone.
+
+```yaml
+pr_review:
+  roster:                           # {} (default) = the shipped roster of §15.1–§15.2
+    typescript: isa-typescript-review   # this repo's own specialist replaces the default
+    security: isa-appsec
+    a11y: null                          # disabled here — reason recorded in the report
+```
+
+| Repo writes | Result |
+|---|---|
+| a key with an agent name | that agent is dispatched for the lens when the lens's signal fires |
+| a key with `null` | the lens is **disabled**, recorded `disabled by config` in the roster table — never reported as clean |
+| nothing for a key | the shipped default agent (§15.1–§15.2) |
+| a key that is not a lens key | recorded as a degradation with its reason; the review runs (§3's rule for unsatisfiable config) |
+
+### 15.5 The availability probe
+
+The probe is one lookup against the runtime's own agent registry — at Tier 1, the agents the
+session exposes to the Task tool; at Tier 2/3, the operator's declared list
+(`../../docs/capability-matrix.md`). It runs once per review and is recorded as an evidence
+block (`evidence.md`): the probe command or the enumeration, its output, exit code, timestamp.
+
+- A name in `pr_review.roster` proves the **repo asked for** that agent. It never proves the
+  runtime has it. The roster is resolved against the registry, never against the config.
+- **Absent ⇒ degrade, never skip and never fail.** The lens still runs, as `pr-file-reviewer`
+  `mode: lens` over the whole merge-base diff, writing the same artifact path. The report's
+  roster table records `degraded → pr-file-reviewer (agent not exposed by the runtime)`.
+- A degraded lens is still a lens: its findings carry the same `raised_by`, go through the same
+  §6 verification, and are counted in the same funnel. What changes is the depth of the read,
+  which is exactly why the degradation is published rather than absorbed.
+- **Silent degradation is a supervision VIOLATION** (`supervision.md`): a roster table listing a
+  specialist that was never dispatched, or a lens missing from the table entirely, is the
+  evidence of the breach.
+
+### 15.6 How many specialists each rigor mode fields
+
+| Rigor mode | Specialist lenses dispatched |
+|---|---|
+| `fast` | **none** beyond the per-file pass — unless the diff touches a **redline path** (a configured `framework_paths` glob, or a path matching a `critical` trigger row of `rigor-modes.md`, which also escalates the mode), and then the `security` lens runs |
+| `standard` | the detected stack's **primary** language reviewer (one per detected language; framework companions like `react`/`django`/`fastapi` count as primary for their stack), plus `security` when its signal fires, plus `test-quality` when the diff changes tests or ships none |
+| `critical` | **the full triggered set** — every lens whose signal fired, capped and queued by `dispatch.md`, none dropped |
+
+The mode reduces **breadth**, exactly as §13 says: it never reduces the per-file backbone, never
+skips verification of a specialist's finding, and never turns a degradation into a pass. A
+specialist the mode did not field is recorded in the roster table as
+`not run (rigor:<mode>)` — the same honest-`na` encoding the rest of the framework uses
+(`gates.md` §The `na` encoding).

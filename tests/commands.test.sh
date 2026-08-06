@@ -78,8 +78,9 @@ for key in sorted(table):
     if key[len('/aidd:'):] not in rows:
         errors.append(f'contract binding table has phantom row {key}')
 
-# All four skills must be named as non-commands.
-for skill in ('aidd-pipeline', 'aidd-state', 'aidd-gates', 'aidd-supervision'):
+# All five skills must be named as non-commands.
+for skill in ('aidd-pipeline', 'aidd-state', 'aidd-gates', 'aidd-supervision',
+              'aidd-pr-review'):
     if skill not in contract:
         errors.append(f'contract does not name the skill {skill}')
     if f'/aidd:{skill}' not in contract:
@@ -136,6 +137,14 @@ rm -rf "${NOAIDD}"
   [ $? -eq 0 ] || { echo "guard denied the legitimate skill aidd-supervision"; code=1; }
   echo "${note}" | grep -qi 'not a command' \
     || { echo "guard did not note that skills are not commands: ${note}"; code=1; }
+  # the pr-review skill is allowed too, and an unknown /aidd:review still points at the
+  # real command rather than at that skill's name
+  skill "aidd-pr-review" | bash "${ROOT}/${GUARD}" >/dev/null 2>&1
+  [ $? -eq 0 ] || { echo "guard denied the legitimate skill aidd-pr-review"; code=1; }
+  out="$(slash "review" | bash "${ROOT}/${GUARD}" 2>&1)"
+  [ $? -eq 2 ] || { echo "guard allowed the unknown command /aidd:review"; code=1; }
+  echo "${out}" | grep -q '/aidd:review-pr' \
+    || { echo "deny message lacks the nearest match /aidd:review-pr: ${out}"; code=1; }
   # an unrelated (non-AIDD) skill is none of the guard's business
   printf '{"tool_name":"Skill","tool_input":{"skill":"dataviz"}}' \
     | bash "${ROOT}/${GUARD}" >/dev/null 2>&1

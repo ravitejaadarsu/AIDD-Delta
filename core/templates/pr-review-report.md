@@ -31,6 +31,29 @@ $ git rev-parse <source>
 [exit 0] <ISO-8601 timestamp>
 ```
 
+## Specialist roster (resolved)
+
+<!-- MANDATORY. The stack-detected roster after detection → config override → availability probe
+     → rigor scaling (protocol/pr-review.md §15). Every lens whose signal fired gets a row,
+     including the ones that did not run: a lens missing from this table, or a specialist listed
+     here that was never dispatched, is a supervision VIOLATION (protocol/supervision.md).
+     Degradation is explicit, never silent (protocol/evidence.md). -->
+
+| Lens key | Signal that fired | Default agent | Agent dispatched | Status |
+|---|---|---|---|---|
+| `<lens>` | `<the path/diff signal, quoted>` | `<the shipped default specialist \| the repo's roster mapping>` | `<agent \| pr-file-reviewer mode=lens>` | `<available \| degraded → pr-file-reviewer mode=lens (agent not exposed by the runtime) \| disabled by config (reason) \| not run (rigor:<mode>)>` |
+
+```text
+$ <availability probe: the runtime's agent enumeration>
+<trimmed output>
+[exit <code>] <ISO-8601 timestamp>
+```
+
+<!-- The per-file agents remain the backbone in every mode: specialists are additional lenses
+     over the same diff, and every specialist finding goes through the SAME adversarial
+     verification, by a different agent, with the severity set by the verifier
+     (protocol/pr-review.md §15 rules 1–3). -->
+
 ## Conclusion
 
 <!-- One paragraph. What this PR does, whether it should merge, and what has to change first.

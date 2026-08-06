@@ -64,6 +64,30 @@ Every agent reviews against the repo's own invariants (`AGENTS.md`, `CLAUDE.md`,
 constitution) **and the ticket**. Code that is correct and not what the ticket asked for is a
 finding.
 
+## The strongest reviewer for the stack in front of it
+
+A generic reviewer reads a Rust diff the way it reads a Python diff. So the review resolves a
+**specialist roster** mechanically from the changed paths and manifests — TypeScript, React,
+Vue, Python, Django, FastAPI, Go, Rust, Java, Kotlin, Swift, C++, C#, PHP, F#, Flutter, SQL and
+migrations — plus language-independent lenses that fire on diff signals: security (auth,
+secrets, input handling, network surface), silent failures, type design, test quality, comment
+rot, accessibility, performance, ML and healthcare. A duplication sweep runs advisory-only.
+
+Three rules keep it honest (`core/protocol/pr-review.md` §15):
+
+- **The per-file agent stays the backbone.** Specialists are additional lenses over the same
+  diff, never a replacement — the per-file count does not move in any rigor mode.
+- **A specialist's finding is not privileged.** It goes through the same adversarial
+  verification, by a different agent, and the verifier sets the severity.
+- **Availability is probed, not assumed.** A specialist the runtime does not expose degrades to
+  AIDD's own `pr-file-reviewer` in `mode: lens`, and the report's roster table says so. A
+  missing agent never fails a review and never silently disappears from one.
+
+How many specialists run scales with rigor: `fast` fields none beyond the per-file pass unless
+the diff touches a redline path; `standard` fields the stack's primary reviewer plus security
+when triggered and test quality; `critical` fields the full triggered set. A repo replaces any
+lens with its own agent — or disables it — through `pr_review.roster`.
+
 ## Every finding is attacked by a different agent
 
 The routing rule is mechanical, not aspirational: every finding carries `raised_by`,
@@ -157,6 +181,12 @@ pr_review:
     - isa-test-quality
     - isa-security
     - isa-tenant-isolation
+  roster:                           # this repo's stack specialists replace the shipped defaults
+    typescript: isa-typescript-review
+    react: isa-react-review
+    database: isa-data-platform
+    security: isa-appsec
+    a11y: null                      # disabled: accessibility is gated by the design system's CI
   framework_paths:
     - packages/framework/**
     - packages/gadgets/**
@@ -171,8 +201,13 @@ pr_review:
     max_lines: 4
 ```
 
-What that buys, concretely: the six `isa-*` specialists run instead of AIDD's defaults, one
-dispatch each; the redline scan runs only over `packages/framework/**` and
+What that buys, concretely: the six `isa-*` dimension specialists run instead of AIDD's
+defaults, one dispatch each; the five mapped roster keys route the stack lenses to this repo's
+own agents while every unmapped key (`python`, `go`, `silent-failure`, `test-quality`, …) keeps
+its shipped default, and `a11y: null` is recorded as `disabled by config` in the report's
+roster table rather than reported as clean; a mapped agent the runtime does not expose degrades
+to `pr-file-reviewer` `mode: lens` with the reason published; the redline scan runs only over
+`packages/framework/**` and
 `packages/gadgets/**`, so application code that legitimately names its own entities is not
 flagged; `.framework-allowlist.json` must be untouched by the PR, and a diff that widens the
 escape list while adding the code that needs it fails the third acceptance verdict; work

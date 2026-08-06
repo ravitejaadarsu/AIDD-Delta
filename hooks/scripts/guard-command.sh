@@ -21,7 +21,7 @@ done
 verdict="$(printf '%s' "${payload}" | python3 -c '
 import json, re, sys
 
-SKILLS = ("aidd-pipeline", "aidd-state", "aidd-gates", "aidd-supervision")
+SKILLS = ("aidd-pipeline", "aidd-state", "aidd-gates", "aidd-supervision", "aidd-pr-review")
 CONTRACT = "protocol/command-contract.md"
 
 def norm(raw):
@@ -81,8 +81,11 @@ for name in names:
     elif name not in cmds:
         # The observed failure mode: a skill name used as a command (/aidd:supervision
         # for the aidd-supervision skill). Say that, instead of a misleading near-match.
-        skill_confusion = next(
-            (s for s in SKILLS if s == "aidd-" + name or s.endswith("-" + name)), "")
+        skill_confusion = next((s for s in SKILLS if s == "aidd-" + name), "")
+        if not skill_confusion and not any(c.startswith(name) for c in cmds):
+            # Suffix confusion only when no real command starts with the typed name --
+            # /aidd:review must still point at /aidd:review-pr, not at the pr-review skill.
+            skill_confusion = next((s for s in SKILLS if s.endswith("-" + name)), "")
         if skill_confusion:
             tail = ("`" + skill_confusion + "` is a SKILL, not a command — there is no "
                     "/aidd:" + name + ". Load the skill by name, or run the phase command "

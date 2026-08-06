@@ -72,6 +72,7 @@ within this table, and an id is never reused for a different unit of work.
 | PR review 1a | `pr1-file` | PR file reviewer (one changed source file, or a component + its helper as one bundle) | one per changed source file (all modes) | parallel (artifact-disjoint) | 6 | path asc |
 | PR review 1b | `pr1-sweep` | PR sweep agent (batched trivial/cosmetic · batched E2E + config YAML) | 1 / 2 / 2 | parallel (artifact-disjoint) | 2 | bundle asc: `config-e2e`, `cosmetic` (fast: one merged `sweep` bundle) |
 | PR review 1c | `pr1-dim` | PR dimension specialist (the repo's roster, or AIDD's six) | 2 / 6 / 6 | parallel (artifact-disjoint) | 6 | dimension asc: `correctness-types`, `duplication-consistency`, `framework-invariants`, `security`, `tenant-boundary`, `test-coverage` (fast set: `correctness-types`, `framework-invariants`) |
+| PR review 1d | `pr1-spec` | PR specialist lens (stack-detected roster, availability-probed — `pr-review.md` §15) | 0 unless a redline path is touched / stack primary + `security` when triggered + `test-quality` / the full triggered set | parallel (artifact-disjoint: one `pr-review/specialists/<lens-key>.md` each) | 4 | resolved agent name asc, lens key asc as tie-break |
 | PR review 2 | `pr2-verify` | adversarial verifier `mode: pr` (per finding) | every finding / every finding / every finding | parallel (artifact-disjoint per finding id); file-grouped above 12 findings, never grouped back to the finder | 6 | finding id asc |
 | PR review 3 | `pr3-cross` | PR cross-cutting reviewer | 1 / 1 / 1 | sequential, after every verdict is in | 1 | — |
 | PR review 4 | `pr4-comments` | PR comment validator | 1 / 1 / 1 | sequential, last | 1 | — |
@@ -106,10 +107,18 @@ order.
 The `PR review` rows are artifact-disjoint by construction (rule 1), and their unit keys are
 what proves it: `pr1-file` writes `pr-review/files/<path-slug>.md`, one per changed source
 file; `pr1-sweep` writes `pr-review/sweeps/<bundle>.md`; `pr1-dim` writes
-`pr-review/dimensions/<dimension>.md`; `pr2-verify` writes
+`pr-review/dimensions/<dimension>.md`; `pr1-spec` writes
+`pr-review/specialists/<lens-key>.md`; `pr2-verify` writes
 `pr-review/verdicts/<finding-id>.md`; `pr3-cross` and `pr4-comments` write one file each.
 Distinct keys ⇒ distinct paths ⇒ parallel is permitted with no further reasoning. Per-file
 agents never share an artifact, so two agents can never both own a file's findings.
+
+`pr1-spec` keys its artifact on the **lens key**, not on the resolved agent, so two lenses that
+a repo's `pr_review.roster` maps onto the same agent still write disjoint artifacts — and so a
+lens that degraded to `pr-file-reviewer` `mode: lens` (`pr-review.md` §15.5) writes the same
+path its specialist would have. A specialist's findings enter `pr2-verify` exactly like a
+per-file agent's: `raised_by` is the lens key, `verified_by` is a different unit, and the
+verifier sets the severity. A missing specialist degrades the row; it never removes it.
 
 `pr2-verify` carries one extra mechanical rule the other rows do not (`pr-review.md` §6.1):
 **a finding is never verified by the agent that raised it.** Every finding carries
@@ -236,13 +245,16 @@ phase 1  pr1-file : 4 units (the component + its helper are ONE bundle, one agen
                     ⇒ parallel, cap 6, order path asc
          pr1-sweep: 2 units (cosmetic = the 2 renames · config-e2e = the 2 YAMLs)
          pr1-dim  : 6 units ⇒ parallel, cap 6, dimension asc
+         pr1-spec : 3 units (typescript · react · test-quality; security not triggered)
+                    ⇒ probed against the runtime; react absent ⇒ pr-file-reviewer mode=lens
+                    ⇒ parallel, cap 4, resolved agent name asc
 phase 2  pr2-verify: 14 units (EVERY finding, not only CRITICAL/HIGH)
                     ⇒ parallel, cap 6 ⇒ 6 dispatched, 8 queued, finding id asc
                     each verified_by ≠ raised_by, asserted on the plan line
-phase 3  pr3-cross: 1 unit, sequential, holds all 12 finder artifacts + all 14 verdicts
+phase 3  pr3-cross: 1 unit, sequential, holds all 15 finder artifacts + all 14 verdicts
 phase 4  pr4-comments: 1 unit, sequential, last
 ```
 
 Four plan lines, one per phase with a fan-out. In `fast` the same rows yield the same 4
-per-file agents (the floor does not move), **1** merged sweep bundle, and **2** dimension
-specialists.
+per-file agents (the floor does not move), **1** merged sweep bundle, **2** dimension
+specialists, and **no** stack specialist lenses (no redline path in this diff).

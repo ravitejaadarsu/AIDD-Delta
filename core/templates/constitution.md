@@ -57,6 +57,8 @@ pr_review:
     - test-coverage
     - security
     - tenant-boundary
+  roster: {}                        # stack-detected specialist lenses; {} = the shipped roster (pr-review.md §15)
+                                    # e.g. typescript: isa-typescript-review · security: isa-appsec · a11y: null (disabled)
   framework_paths: []               # what counts as "framework code" (default: every added path)
   redline_patterns: []              # ripgrep patterns (default: the three shipped in pr-review.md §9.3)
   allowlist_file: null              # e.g. .framework-allowlist.json — the PR must not touch it
@@ -72,3 +74,8 @@ pr_review:
   autonomy modes, exactly as Jira write-back does.
 - A configured value the repo cannot satisfy (a glob matching nothing, a missing allowlist
   file) is recorded as a degradation with its reason — never silently dropped, never passed.
+- **The roster is resolved against the runtime, not against this file.** Naming an agent under
+  `roster:` says the repo wants it; a specialist the runtime does not expose degrades to
+  `pr-file-reviewer` in `mode: lens` and the degradation is published in the report
+  (`protocol/pr-review.md` §15.5). A missing agent never fails a review and never silently
+  vanishes from one.
