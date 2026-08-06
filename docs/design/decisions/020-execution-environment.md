@@ -114,13 +114,33 @@ Two things that number must be read against, or it will be quoted wrongly:
   index costs proportionally more in tokens than its byte size implies. The byte
   measurement is an upper bound on the token saving, not a proxy for it.
 
-**Defect-detection parity is still unmeasured, and no cost constant in
-`cost-governance.md` has been revised.** Tokens alone do not license that change:
-the ADR 016 rule is unchanged — a cheaper run that finds fewer real defects is a
-regression, not a win. Closing it needs graded `bench-run.sh` runs at three or
-more reps per task per arm, and a baseline arm does not currently exist: the
-framework has no switch to disable the query path, so there is nothing to compare
-against without building one first.
+**Defect-detection parity was measured, and found no regression — on a corpus too
+easy to prove much.** `bench-parity.py` injects one defect, sends the same
+instruction to both arms (whole file vs index plus the changed symbol's span), and
+grades mechanically: caught iff a reported line falls inside the injected span.
+Three defect shapes, three reps each, both arms:
+
+| Shape | Baseline | Query |
+| --- | --- | --- |
+| local — assertion inverted inside the span | 3/3 | 3/3 |
+| non-local — shared helper inverted | 3/3 | 3/3 |
+| subtle-non-local — helper silently no-ops | 3/3 | 3/3 |
+
+18/18, $4.22 to measure. No defect was lost by reading spans, including the case
+built specifically to punish spans: a three-line helper that reads as a plausible
+early return in isolation while silently disabling every assertion in the file.
+
+**The result's own weakness matters more than the result.** The baseline never
+dropped below 100%, so the experiment has **no discriminating power** — it shows
+the query arm does not lose defects at this difficulty, and says nothing about
+behaviour near the detection threshold. Parity here is *unfalsified on this
+corpus*, not *established*.
+
+**No cost constant in `cost-governance.md` has been revised**, and this evidence
+does not license one. Three defects in one 194-line fixture is not the graded
+`bench-run.sh` corpus that ADR 016 requires, and a probe where nothing failed
+cannot distinguish "the arms are equal" from "the test was too easy". Moving a
+constant needs a run whose baseline arm misses defects some of the time.
 
 ## Alternatives considered
 
