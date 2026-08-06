@@ -65,12 +65,43 @@ the run continues and says so. The alternative — silent fallback — produces 
 caller that believes it was isolated, or parsed, or measured, when it was not.
 `AIDD_SANDBOX_REQUIRED=1` exists for callers who would rather fail than degrade.
 
-**The savings claim is not yet measured.** The design predicts a large token
-reduction and a single spot check showed roughly 98% on one symbol read, but a
-prediction is not a measurement. `bench/harness.md` is what converts it, and the
-ADR 016 rule holds: a cheaper run that finds fewer real defects is a regression,
-not a win. Until parity is measured, no cost constant in `cost-governance.md`
-should be revised on the strength of this ADR.
+**Context cost is measured in bytes; tokens and parity are still not.** The
+`bench-context.py` arm (`bench/harness.md`) measures both read strategies
+over the same deterministic target set, with no credentials and no model call. On
+this repository — 173 symbols across 48 files — the query path reads **70.9%
+fewer bytes** than reading whole files, or **47.6% fewer** once the index's fixed
+cost is charged. Measured from a clean tree at `54644f7`, which is what makes the
+figure quotable — the metrics object records `framework_tree_dirty`, and a dirty
+run is disqualified.
+
+The run output is deliberately **not committed**: this repository publishes no
+measured results (`bench/results/TEMPLATE.md`), and `tests/bench.test.sh`
+enforces that `bench/results/` ships no run output. A number that ships as a file
+becomes a claim nobody re-checks; a number that ships as a command stays
+falsifiable. Reproduce with:
+
+```bash
+python3 bench/scripts/bench-context.py
+```
+
+Those corpus numbers replace the headline the design was first argued from. A
+single symbol pulled from a large file shows roughly 98% reduction, and quoting
+that as the framework's number would have been a sample-of-one dressed up as a
+result — the honest figure is roughly half to two-thirds, depending on whether
+the index is amortized.
+
+**The reduction can also be negative, and the benchmark reports it.** Spans are
+charged per target while a whole-file read is charged once, so *many symbols from
+one small file* costs more via spans than simply reading the file. Querying wins
+where files are large and the needed slice is small; it loses where files are
+small and most of the file is wanted. That bounds the pivot's claim honestly: a
+large win on service-sized code, a wash or a loss on small modules.
+
+**Tokens and defect-detection parity remain unmeasured**, and no cost constant in
+`cost-governance.md` has been revised. Bytes drive tokens but are not tokens, and
+the ADR 016 rule is unchanged: a cheaper run that finds fewer real defects is a
+regression, not a win. Closing that gap needs two graded `bench-run.sh` runs with
+a funded driver.
 
 ## Alternatives considered
 

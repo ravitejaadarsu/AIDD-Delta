@@ -383,6 +383,62 @@ $ <command>
 `bench-grade.sh` writes exactly that into `grade.md`, and `bench-report.sh` quotes it. A
 grade with no evidence block is not a grade.
 
+## Context-cost arm — bytes, with no driver and no credentials
+
+`bench-run.sh` measures a *run*: tokens from the runtime's own usage output, defects caught,
+wall clock. It needs a funded driver, which is why the framework's token claim stayed open
+after the query-locally pivot shipped.
+
+`bench-context.py` measures the one thing that can be established with **no credentials and
+no model call**: how many bytes of context each read strategy assembles for the same set of
+questions.
+
+```bash
+python3 bench/scripts/bench-context.py                    # report
+python3 bench/scripts/bench-context.py --json             # metrics object
+python3 bench/scripts/bench-context.py --out bench/results/RUN-ID/context-cost.json
+```
+
+Two arms answer the same question — "show me symbol S":
+
+| Arm | What it reads |
+| --- | --- |
+| `baseline` | the whole file containing S, **deduplicated** across targets — a role that already read a file does not re-read it |
+| `query` | `index.json` once, then S's span per target |
+
+Both are reported with and without the index's fixed cost, because the index is paid once
+per rebuild rather than once per read. Targets are selected by sorting every indexed symbol
+and striding, so the set is identical on every host — a benchmark whose corpus moves between
+runs cannot be compared against itself.
+
+### What this arm may and may not claim
+
+- **It measures bytes, and says so.** `tokens_input`, `tokens_output`, and
+  `defect_detection_parity` are `null` with `usage_source: not-measured`. Bytes drive tokens
+  but are not tokens, and the harness never tokenizes or estimates (see *How tokens and time
+  are recorded*).
+- **No cost constant may move on this arm alone.** Revising `cost-governance.md` needs a
+  token count *and* defect-detection parity from two graded `bench-run.sh` runs. A cheaper
+  run that catches fewer real defects is a regression, not a win.
+- **A dirty framework tree disqualifies the result**, exactly as for a driver run. The
+  metrics object records `framework_head` and `framework_tree_dirty` so this is checkable
+  after the fact rather than promised.
+- **A sample-of-one figure is not a corpus figure.** A single large file yields a dramatic
+  ratio; the corpus number is the one that may be quoted.
+- **The ratio can be negative, and that is a real result, not a bug.** Spans are charged per
+  target while the baseline charges a file once, so *many symbols from one small file* costs
+  more via spans than reading the file. Querying wins where files are large and the needed
+  slice is small, and loses where files are small and most of the file is wanted. The tool
+  reports the negative number rather than clamping it, and the suite asserts that it does —
+  a benchmark that can only report a win is not a benchmark.
+
+This is the arm's most useful output: it tells a repo *whether* the query path pays there,
+rather than assuming it does everywhere.
+
+`schema: aidd-bench-context/1`. Fields: `targets`, `baseline_files_read`, `baseline_bytes`,
+`query_bytes`, `index_bytes`, `query_bytes_with_index`, `reduction_ratio`,
+`reduction_ratio_with_index`, plus the run-identity and `not measured` fields above.
+
 ## Suite
 
 The bench suite runs as part of the repository's test runner:
