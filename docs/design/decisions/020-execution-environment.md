@@ -66,7 +66,7 @@ caller that believes it was isolated, or parsed, or measured, when it was not.
 `AIDD_SANDBOX_REQUIRED=1` exists for callers who would rather fail than degrade.
 
 **Context cost is measured in bytes; tokens and parity are still not.** The
-`bench-context.py` arm (`../../bench/harness.md`) measures both read strategies
+`bench-context.py` arm (`bench/harness.md`) measures both read strategies
 over the same deterministic target set, with no credentials and no model call. On
 this repository — 173 symbols across 48 files — the query path reads **70.6%
 fewer bytes** than reading whole files, or **47.1% fewer** once the index's fixed
