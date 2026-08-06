@@ -307,6 +307,13 @@ one file:
   route, key, or threshold now existing in two places, which is a defect with a delay fuse.
 - **Missing cross-boundary tests** — the change spans a boundary (component → store, service
   → repository, web → shared package) and every test lands on one side of it.
+- **The unknown-unknowns pass — what is NOT in the diff.** Mandatory, in every rigor mode, as its
+  own dispatch and its own artifact (§16.2): what should have changed and did not. The missing
+  test, the missing down-path, the missing flag, the missing doc or changelog entry, the missing
+  telemetry, the sibling call site nobody updated, the second implementation of the same rule left
+  stale. Each item answered `present` / `missing` / `n/a` **with the search that proves it**.
+- **Contract and compat across consumers** (§16 dimension 2) — the semver implication of every
+  changed public API, exported type, schema, wire format, or event payload, stated per consumer.
 - **Dedup.** Overlapping findings from different units collapse into one, keeping the
   strongest evidence and the verifier's severity, and recording the merged ids.
 
@@ -550,6 +557,9 @@ dimension roster for the dimensions the lower mode skipped.
 | Sweep bundles | 1 (cosmetic and config merged) | 2 (cosmetic · config/E2E) | 2 (cosmetic · config/E2E) |
 | Dimension specialists | 2 — `correctness-types`, `framework-invariants` | all 6 (or the repo's full roster) | all 6 (or the repo's full roster) |
 | Stack specialist lenses (§15) | none, unless the diff touches a redline path (then `security`) | the stack's primary reviewer + `security` when triggered + `test-quality` | the full triggered set |
+| Review dimensions (§16) | baseline 8 · 11 · 12, **plus every fired trigger** | baseline 1 · 2 · 3 · 6 · 7 · 8 · 11 · 12, plus every fired trigger | all twelve, each with a verdict row |
+| Unknown-unknowns pass (§16.2) | required | required | required |
+| Per-lens funnel + refuted appendix (§17) | required | required | required |
 | Adversarial verification | **every finding** | **every finding** | **every finding** |
 | Consumer trace (§10) | required on every shared-symbol finding | required | required |
 | Cross-cutting agent | 1 | 1 | 1 |
@@ -735,3 +745,149 @@ skips verification of a specialist's finding, and never turns a degradation into
 specialist the mode did not field is recorded in the roster table as
 `not run (rigor:<mode>)` — the same honest-`na` encoding the rest of the framework uses
 (`gates.md` §The `na` encoding).
+
+## 16. Review dimensions — what a world-class review actually covers
+
+§5 says who reads; this section says **what they are looking for**. Twelve dimensions, each with
+one mechanical trigger and one evidence standard, so that "did the review cover rollback?" has an
+answer in the report rather than in someone's memory.
+
+Every dimension whose trigger fires gets a row in the report's **dimension verdict table**, with
+one of `PASS` (looked, found nothing, evidence attached), `FINDINGS (n)` (raised into the §6
+funnel), or `N/A (why)`. **A fired trigger with no row is incomplete by format** — the same
+standard the three acceptance verdicts hold in §9. A dimension whose trigger did not fire is
+recorded `N/A (trigger not matched)`; a dimension the rigor mode did not run is recorded
+`N/A (rigor:<mode>)`. Nothing is silently absent.
+
+| # | Dimension | What it asks | Trigger (mechanical) | Evidence that proves the verdict |
+|---|---|---|---|---|
+| 1 | **Diff-coverage** | Are the **changed lines** exercised by a test that would fail without them? Not project-wide coverage — coverage OF THE DIFF. | any changed source file that is not docs/config-only | the test id covering each changed hunk, plus one of: a run with the new path reverted or disabled going red; a coverage report scoped to `${BASE}..${HEAD}`; or an explicit "could not run cheaply" recorded as a finding with its reason (§9.3 part 4). **A passing test whose assertions are all on mocks proves nothing** — including the case where the unit under test is itself mocked, so the assertion compares a configured return value with itself (`../../bench/defects/D-008-mocked-proof-patched-add.md`, class `mocked-proof`; proof standard `determinism.md`) |
+| 2 | **Contract / compat** | Public API, exported types, DB schema, wire formats, event payloads — is this **additive or breaking**, and for whom? | diff touches `**/api/**`, `**/routes/**`, `**/openapi*`, `**/*.proto`, `**/schema.graphql`, `**/*.d.ts`, `**/migrations/**`, an exported symbol, or an event/topic definition | the §10 consumer trace, **per consumer, by importer grep**, plus the **semver implication stated** (`major` / `minor` / `patch`) and, for `major`, one named caller that breaks |
+| 3 | **Failure-mode analysis** | For each new code path: null/empty/oversized input, timeout, partial failure, retry, concurrent execution. **What breaks in production at 3am.** | any new function, branch, external call, or I/O in the diff | per new path, the unhappy-path branch quoted from `git show` — or its **named absence** (no timeout, no size bound, no error branch) together with the input class that reaches it and where that input comes from |
+| 4 | **Rollback & migration safety** | Is the change reversible? Down-path present and tested? Data-loss risk? Backfill idempotent? Deploy ordering — does new code **require** new schema, or tolerate both? | `**/migrations/**`, `**/alembic/**`, any `*.sql` with `DROP`/`DELETE`/`TRUNCATE`/`ALTER`, a change to a persisted shape, or `Dockerfile*`/`**/k8s/**`/`**/helm/**`/`**/terraform/**` | the down migration quoted, or its absence named; the backfill's idempotency key or `WHERE` guard; and the two-version statement — old code against new schema, new code against old schema — each answered `tolerated` or `breaks, here` |
+| 5 | **Feature-flag / kill-switch** | For a risky or user-visible change: is there an **off switch**, and does the OFF path equal today's behavior? | new user-visible behavior, a new external call, a new write path, or any diff that cannot prove §9.2 | the flag name and its resolution path, plus the §9.2 inactive-path trace **under OFF**: a pure pass-through with no extra DOM node, query, handler, ordering or timing change. "The default is off" is the premise, not the proof |
+| 6 | **Observability** | Can a responder **act** on a new failure path — logs with context, metrics, propagated errors? | any new `catch`/`except`/`rescue`/`recover()`/`if err != nil`, any new external call, any new background job | the log or metric quoted **with its context fields** (what identifies the request/tenant/record), or the swallowed handler quoted — which routes to the `silent-failure` lens (§15.2) and becomes a finding like any other |
+| 7 | **Dependency & supply-chain delta** | For each added or updated dependency: **why**, license, transitive weight, known CVEs — and whether the stdlib or an existing util already does it | diff touches `package.json`/lockfiles, `requirements*.txt`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle*`, `composer.json`, `Gemfile`, `pubspec.yaml` | the manifest hunk, the lockfile's added-package count, the license field, and an audit evidence block (`npm audit` / `pip-audit` / `cargo audit` / `govulncheck` / `osv-scanner`) — or the explicit degradation when no auditor is available on the host |
+| 8 | **Secrets & sensitive data in the diff** | Does the diff add credentials, tokens, keys, or PII into code, logs, fixtures, or snapshots? | **every diff** — this one is always on | the scan command and exit code as an evidence block; per hit the `file:line` and the **value class** (never the value itself); for PII, the log or fixture line quoted with the field name |
+| 9 | **Performance on hot paths** | Added N+1 queries, unbounded loops or allocations in a request path, sync work in a render path, a new query with no index | diff touches a request handler, a render path, an ORM/query builder, a worker/queue consumer, or a loop over caller-sized data | the call site with the loop bound (or its absence), the query inside the loop quoted, or the new `WHERE`/`JOIN` column named against the index list at `HEAD` |
+| 10 | **Concurrency & idempotency** | Shared mutable state, lock ordering, retry-safety of new writes | `**/*lock*`, `**/*mutex*`, `**/*queue*`, `**/worker*/**`, `**/*transaction*`, `**/*idempot*`, any change to thread/async primitives, or any new write a retry could repeat | the critical section named with the guard that protects it; the idempotency key or unique constraint that makes the new write repeat-safe — or its absence plus the duplicate-write scenario that follows |
+| 11 | **Dead / unreachable code and constant drift** | A branch nothing can enter, a prop nothing passes, a flag no metadata sets, an exported symbol nobody imports — and a value duplicated instead of imported | any added exported symbol, branch, prop or flag; any literal, enum member, route, key or threshold the diff adds that already exists elsewhere | the grep that found **no caller**, with the search stated so a skeptic can re-run it; for drift, **both** locations cited (§7) |
+| 12 | **Unknown-unknowns — what is NOT in the diff** | **What should have changed and did not?** The highest-value question a reviewer asks, and the one a diff-shaped review structurally never asks | **every review, every rigor mode** — a mandatory cross-cutting duty (§16.2) | per checklist item: `present` with the path that proves it, `missing` with the search that came back empty, or `n/a` with why. A "missing test" claim without the search that found none is invalid by format |
+
+### 16.1 Which dimensions run, per rigor mode
+
+Mode sets the **baseline** set. **A fired trigger always adds its dimension, in every mode** —
+so a `fast` diff that touches a migration still gets dimension 4, and a mode never silences a
+signal the diff actually produced.
+
+| Rigor mode | Baseline dimensions |
+|---|---|
+| `fast` | 8 (secrets), 11 (dead code / drift), 12 (unknown-unknowns) |
+| `standard` | the `fast` set + 1 (diff-coverage), 2 (contract/compat), 3 (failure-mode), 6 (observability), 7 (dependency delta) |
+| `critical` | **all twelve**, each with a verdict row |
+
+### 16.2 The unknown-unknowns pass (dimension 12) — mandatory, with its own report section
+
+This is a **duty of the cross-cutting agent** (`../roles/pr-cross-cutting-reviewer.md`), dispatched
+as its own unit (`dispatch.md` row `PR review 3b`, class `pr3-unknowns`) writing
+`pr-review/unknown-unknowns.md`, and surfaced as its own section of the report. It runs in every
+rigor mode: no mode removes it, because it costs one dispatch of an agent that is already holding
+the whole feed and it is where the expensive misses live.
+
+The checklist, each item answered `present` / `missing` / `n/a` **with the search that proves it**:
+
+1. **A test for the changed behavior** — the diff changes behavior and no test covers it.
+2. **A migration down-path** — an up migration with no down, or a down that cannot restore.
+3. **A kill-switch** — a risky or user-visible change with no off switch (dimension 5).
+4. **Doc, changelog, or API-reference updates** the repo's own convention requires — judged from
+   the repo's history (does a comparable past change carry one?), never from the reviewer's taste.
+5. **Telemetry on the new failure path** — a new error branch nothing reports (dimension 6).
+6. **A sibling call site not updated** — the same function is called in N places and N−1 changed.
+   Proven by the caller grep, with the un-updated site named.
+7. **A second implementation of the same rule left stale** — the duplicated evaluator of §10 step
+   4: the same key or rule read by another engine the diff did not touch.
+8. **A config or env key added in code but absent from the example config, deploy manifest, or
+   secret store** — the change works locally and fails on deploy.
+9. **A schema or type updated on one side of a boundary only** — client without server, producer
+   without consumer, model without serializer.
+
+Anything this pass raises is a **finding like any other**: it goes through §6 verification, by a
+different agent, with the severity set by the verifier. The cross-cutting agent does not get to
+confirm its own absence claims.
+
+## 17. Review quality discipline — how the review holds itself to its own standard
+
+A review that demands evidence, concrete scenarios and honest degradation from an author owes the
+same back. This section is that debt, made mechanical.
+
+### 17.1 False-positive discipline, published per lens
+
+The funnel of §14 (`raised → verified → CONFIRMED → REFUTED`) is extended with a **per-lens
+breakdown**: one row per finder unit — each per-file agent, each sweep, each dimension specialist,
+each stack lens (§15), the cross-cutting agent, and the unknown-unknowns pass — with its raised,
+confirmed and refuted counts and its **confirm rate**.
+
+The point is not to punish a lens. It is that a chronically over-flagging lens is **invisible in a
+totals-only funnel** and obvious in a per-lens one: an agent that raised nine findings and had
+nine refuted is noise wearing the costume of thoroughness, and the next run's configuration should
+know that. The per-dimension counts (§16) are published beside it, so the same question can be
+asked of a *dimension* as of an *agent*.
+
+### 17.2 Every finding carries a concrete failure scenario
+
+Same standard, same wording, as the pipeline's own findings template
+(`../templates/qa-findings.md`): **`Concrete failure scenario (inputs/state → wrong outcome)`**.
+Named inputs, named state, named caller, and the wrong outcome that follows.
+
+**A finding without a concrete failure scenario is invalid by format** and never reaches
+verification (§5.2 rule 4). "This looks risky", "this could break", and "consider handling the
+error" are not scenarios; they are impressions, and they are dropped by the finder itself rather
+than passed on for a verifier to refute.
+
+### 17.3 No style-only findings the repo's linter already owns
+
+§1 says the review is not a linter. The mechanical test:
+
+1. Does the repo ship a config that governs this rule — `.eslintrc*`, `eslint.config.*`,
+   `.prettierrc*`, `ruff.toml`/`pyproject.toml` `[tool.ruff]`, `.golangci.yml`, `rustfmt.toml`,
+   `.editorconfig`, `checkstyle.xml`, `.rubocop.yml`, `phpcs.xml`?
+2. Is the rule **enabled** there?
+
+Both yes ⇒ the finding is dropped as `duplicate-of-linter`, **citing the config path and the rule
+id**, and it never becomes a comment: a reviewer that flags what CI already enforces spends the
+author's attention on something a machine will tell them for free. Both are checked against the
+repo, not assumed. The exception is explicit: a style finding stands when the repo's linter is
+**silent** on it *and* the repo's own invariants files (`pr_review.invariants_files`) ask for that
+style — then it is an invariant finding, and it cites the invariant.
+
+### 17.4 Confidence and blast radius on every surviving finding
+
+Set by the **verifier**, alongside the severity, for the same reason (§6.3): the verifier is the
+one who just traced the mechanism.
+
+| Field | Values | Meaning |
+|---|---|---|
+| Confidence | `proven` · `traced` | `proven` — the failure was reproduced, or the code path was executed and observed. `traced` — the mechanism and its runtime path are named and quoted from `git show`, but nothing was executed. Anything below `traced` is REFUTED by §6.2, so these are the only two values a surviving finding can carry |
+| Blast radius | `single call site` · `module` · `all consumers of <symbol>` · `every request` · `data at rest` | how far the wrong outcome reaches, named concretely — the symbol, the endpoint, the table |
+
+The confirmed-findings table is sorted **severity descending, then blast radius descending, then
+confidence descending** — a deterministic order that also happens to be the order the author
+should fix in. Two findings with identical keys order by finding id ascending, so two runs of the
+same review print the same list.
+
+### 17.5 Refuted findings are published, not buried
+
+Every REFUTED finding appears in a **report appendix**: id, the claim, `raised_by`, the verifier
+unit, and **the refutation reason** — the guard the finder missed, the caller that never passes
+that value, the type that makes it impossible.
+
+Two things this buys, both worth the lines it costs:
+
+- **The author learns what was considered and dismissed.** "We checked whether the new flag path
+  can reach the legacy renderer; it cannot, because `resolveTarget` filters it upstream" is
+  useful review output even though it produced no comment.
+- **It keeps the finders honest.** A lens whose refuted list is long and whose confirmed list is
+  empty is visible to everyone, including the next run's configuration.
+
+Refuted findings are **never** posted as comments and never counted as confirmed. They live in
+the appendix, and the funnel counts them.

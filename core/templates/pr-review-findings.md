@@ -12,13 +12,19 @@
 
 ## Findings
 
-| # | raised_by | file:line | side | Proposed severity | Defect claim (one sentence) | Concrete scenario (inputs/state → wrong outcome) | Invariant / ticket ref | Shared symbol? |
-|---|---|---|---|---|---|---|---|---|
+| # | raised_by | Dimension | file:line | side | Proposed severity | Defect claim (one sentence) | Concrete failure scenario (inputs/state → wrong outcome) | Invariant / ticket ref | Shared symbol? |
+|---|---|---|---|---|---|---|---|---|---|
 
 <!-- side: `right` for added/modified code (line at HEAD), `left` for removed code (line at BASE).
-     Proposed severity is a PROPOSAL. The adversarial verifier sets the final severity
-     (protocol/pr-review.md §6.3).
-     A finding without a concrete scenario is invalid by format and never reaches verification.
+     Dimension: the §16 review dimension this finding belongs to — it is what makes the report's
+     per-dimension verdict table and the per-lens funnel (§17.1) add up.
+     Proposed severity is a PROPOSAL. The adversarial verifier sets the final severity, and the
+     confidence and blast radius with it (protocol/pr-review.md §6.3, §17.4).
+     A finding without a concrete failure scenario is invalid by format and never reaches
+     verification — same standard, same wording, as templates/qa-findings.md. "This looks risky"
+     is an impression, not a scenario.
+     A style finding a repo linter config already enables is dropped as duplicate-of-linter,
+     citing the config path and the rule id (§17.3).
      A finding without raised_by is rejected by format — it is what makes the different-agent
      routing rule mechanical (protocol/pr-review.md §6.1).
      Shared symbol = yes ⇒ the consumer trace below is mandatory BEFORE the finding is raised. -->

@@ -213,7 +213,7 @@ need "${TF}" 'raised_by'                     "the raised_by column"
 need "${TF}" 'file:line'                     "the file:line column"
 need "${TF}" 'side'                          "the side column"
 need "${TF}" 'Proposed severity'             "the proposed-severity column"
-need "${TF}" 'Concrete scenario'             "the concrete-scenario column"
+need "${TF}" 'Concrete (failure )?scenario' "the concrete-scenario column"
 need "${TF}" '^## Consumer traces'           "the consumer-trace section"
 need "${TF}" 'invalid by format'             "the format rejection of an unscenarioed finding"
 need "${TR}" '^## Ground truth'              "the report's ground-truth header"
@@ -321,7 +321,76 @@ need skills/aidd-pr-review/SKILL.md 'command-contract\.md'   "the command-contra
 need core/protocol/command-contract.md 'aidd-pr-review'      "the contract naming the new skill"
 need hooks/scripts/guard-command.sh 'aidd-pr-review'         "the guard allowing the new skill"
 
-# ── 19. Docs surface: capability-matrix row and the ADR
+# ── 19. The twelve review dimensions, each with a mechanical trigger
+need "${P}" '^## 16\. Review dimensions'    "the review-dimensions section"
+for dim in 'Diff-coverage' 'Contract / compat' 'Failure-mode analysis' \
+           'Rollback & migration safety' 'Feature-flag / kill-switch' 'Observability' \
+           'Dependency & supply-chain delta' 'Secrets & sensitive data' \
+           'Performance on hot paths' 'Concurrency & idempotency' \
+           'Dead / unreachable code and constant drift' 'Unknown-unknowns'; do
+  need "${P}" "\*\*${dim}" "the '${dim}' dimension"
+done
+need "${P}" 'Trigger \(mechanical\)'        "the mechanical trigger column"
+need "${P}" 'Evidence that proves the verdict' "the per-dimension evidence standard"
+need "${P}" 'FINDINGS \(n\)'                "the per-dimension verdict values"
+need "${P}" 'A fired trigger with no row is incomplete by format|fired trigger with no row' \
+                                            "the incomplete-by-format rule for a fired dimension"
+need "${P}" 'N/A \(trigger not matched\)'   "the honest N/A for a dimension that did not fire"
+need "${P}" 'semver'                        "the semver implication on contract changes"
+need "${P}" '3am'                           "the production-at-3am failure-mode question"
+need "${P}" 'idempot'                       "idempotency of new writes and backfills"
+need "${P}" 'N\+1'                          "the N+1 hot-path check"
+need "${P}" 'D-008-mocked-proof-patched-add\.md' "the mocked-proof cross-reference in diff-coverage"
+need "${P}" '### 16\.1'                     "the per-rigor-mode dimension baseline"
+need "${P}" 'fired trigger always adds'     "a fired trigger adding its dimension in every mode"
+need "${P}" '### 16\.2'                     "the unknown-unknowns pass"
+need "${P}" 'what is NOT in the diff'       "the what-is-not-in-the-diff framing"
+need "${P}" 'what should have changed and did not|what SHOULD have changed and did not' \
+                                            "the unknown-unknowns question"
+need "${P}" 'sibling call site'             "the un-updated sibling call site"
+need "${P}" 'second implementation of the same rule left stale' "the stale duplicate implementation"
+need "${P}" 'with the search that proves it' "the search that proves an absence claim"
+need "${RX}" 'unknown-unknowns'             "the cross-cutting agent's unknown-unknowns duty"
+need "${RX}" 'MANDATORY'                    "that duty being mandatory in every mode"
+need "${RX}" 'pr-review/unknown-unknowns\.md' "the unknown-unknowns artifact"
+need "${RX}" 'semver'                       "the cross-cutting contract/compat duty"
+need "${RF}" 'dimensions your unit owns'    "the per-file agent's dimension duties"
+need "${D}" 'pr3-unknowns'                  "the unknown-unknowns dispatch row"
+need "${D}" 'never skipped in any mode'     "the unknown-unknowns row never being skipped"
+need "${TR}" '^## Review dimensions'        "the report's dimension verdict table"
+need "${TR}" '^## Unknown-unknowns'         "the report's unknown-unknowns section"
+need docs/pr-review.md 'Unknown-unknowns'   "the dimensions in the docs page"
+
+# ── 20. Review quality discipline: the reviewer held to its own standard
+need "${P}" '^## 17\. Review quality discipline' "the quality-discipline section"
+need "${P}" 'per-lens|per lens'             "the per-lens funnel breakdown"
+need "${P}" 'confirm rate'                  "the per-lens confirm rate"
+need "${P}" 'Concrete failure scenario \(inputs/state → wrong outcome\)' \
+                                            "the concrete-failure-scenario wording from qa-findings"
+need "${P}" 'qa-findings\.md'               "the alignment with the pipeline findings template"
+need "${P}" 'invalid by format'             "an unscenarioed finding being invalid by format"
+need "${P}" 'duplicate-of-linter'           "the no-duplicate-of-linter rule"
+need "${P}" 'eslintrc|golangci'             "the linter configs the rule is checked against"
+need "${P}" 'Confidence'                    "the confidence field on surviving findings"
+need "${P}" 'Blast radius'                  "the blast-radius field on surviving findings"
+need "${P}" 'proven'                        "the proven confidence value"
+need "${P}" 'traced'                        "the traced confidence value"
+need "${P}" '### 17\.5'                     "the refuted-findings appendix rule"
+need "${P}" 'refutation reason'             "the refutation reason published with each"
+need "${P}" 'never counted as confirmed|never .* posted as comments' \
+                                            "refuted findings never posted and never counted"
+need "${TR}" '^## Appendix — refuted findings' "the report's refuted appendix"
+need "${TR}" 'Refutation reason'            "the refutation-reason column"
+need "${TR}" 'Per-lens funnel'              "the per-lens funnel table"
+need "${TR}" 'Confidence'                   "the confidence column on confirmed findings"
+need "${TR}" 'Blast radius'                 "the blast-radius column on confirmed findings"
+need "${TR}" 'duplicate-of-linter'          "the dropped-as-duplicate-of-linter table"
+need "${TF}" 'Dimension'                    "the dimension column on findings"
+need "${RF}" 'duplicate-of-linter'          "the file reviewer's linter-duplication drop"
+need docs/pr-review.md 'duplicate-of-linter' "the quality discipline in the docs page"
+need docs/pr-review.md 'Refuted findings ship in an appendix|refuted' "the refuted appendix in the docs"
+
+# ── 21. Docs surface: capability-matrix row and the ADR
 need docs/capability-matrix.md 'External PR review' "the capability-matrix row"
 need docs/capability-matrix.md 'core/protocol/pr-review\.md' "the matrix row's canonical link"
 need docs/design/decisions/019-pr-review.md '^# ADR 019' "the ADR heading"

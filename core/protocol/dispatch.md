@@ -75,6 +75,7 @@ within this table, and an id is never reused for a different unit of work.
 | PR review 1d | `pr1-spec` | PR specialist lens (stack-detected roster, availability-probed — `pr-review.md` §15) | 0 unless a redline path is touched / stack primary + `security` when triggered + `test-quality` / the full triggered set | parallel (artifact-disjoint: one `pr-review/specialists/<lens-key>.md` each) | 4 | resolved agent name asc, lens key asc as tie-break |
 | PR review 2 | `pr2-verify` | adversarial verifier `mode: pr` (per finding) | every finding / every finding / every finding | parallel (artifact-disjoint per finding id); file-grouped above 12 findings, never grouped back to the finder | 6 | finding id asc |
 | PR review 3 | `pr3-cross` | PR cross-cutting reviewer | 1 / 1 / 1 | sequential, after every verdict is in | 1 | — |
+| PR review 3b | `pr3-unknowns` | PR unknown-unknowns pass (what SHOULD have changed and did not — `pr-review.md` §16.2) | 1 / 1 / 1 | sequential, same role as `pr3-cross`, own artifact `pr-review/unknown-unknowns.md` | 1 | — (never skipped in any mode) |
 | PR review 4 | `pr4-comments` | PR comment validator | 1 / 1 / 1 | sequential, last | 1 | — |
 | Every phase boundary | `phase-supervisor` | Supervisor phase audit | 1 / 1 / 1 | sequential | 1 | — (never skipped in any mode) |
 
@@ -109,7 +110,9 @@ what proves it: `pr1-file` writes `pr-review/files/<path-slug>.md`, one per chan
 file; `pr1-sweep` writes `pr-review/sweeps/<bundle>.md`; `pr1-dim` writes
 `pr-review/dimensions/<dimension>.md`; `pr1-spec` writes
 `pr-review/specialists/<lens-key>.md`; `pr2-verify` writes
-`pr-review/verdicts/<finding-id>.md`; `pr3-cross` and `pr4-comments` write one file each.
+`pr-review/verdicts/<finding-id>.md`; `pr3-cross`, `pr3-unknowns` and `pr4-comments` write one
+file each (`pr-review/cross-cutting.md`, `pr-review/unknown-unknowns.md`,
+`pr-review/comments.md`).
 Distinct keys ⇒ distinct paths ⇒ parallel is permitted with no further reasoning. Per-file
 agents never share an artifact, so two agents can never both own a file's findings.
 
@@ -252,9 +255,11 @@ phase 2  pr2-verify: 14 units (EVERY finding, not only CRITICAL/HIGH)
                     ⇒ parallel, cap 6 ⇒ 6 dispatched, 8 queued, finding id asc
                     each verified_by ≠ raised_by, asserted on the plan line
 phase 3  pr3-cross: 1 unit, sequential, holds all 15 finder artifacts + all 14 verdicts
+         pr3-unknowns: 1 unit, same role, own artifact — what SHOULD have changed and did not
 phase 4  pr4-comments: 1 unit, sequential, last
 ```
 
 Four plan lines, one per phase with a fan-out. In `fast` the same rows yield the same 4
 per-file agents (the floor does not move), **1** merged sweep bundle, **2** dimension
-specialists, and **no** stack specialist lenses (no redline path in this diff).
+specialists, **no** stack specialist lenses (no redline path in this diff) — and the
+unknown-unknowns pass unchanged, because no mode removes it.

@@ -120,6 +120,53 @@ Three verdicts, every review, `PASS | FAIL | N/A (why)`, proven against the code
 
 A review missing any of the three is incomplete by format.
 
+## The twelve dimensions a world-class review covers
+
+The fan-out says who reads; the dimensions say what they look for, each with one mechanical
+trigger and one evidence standard (`core/protocol/pr-review.md` §16):
+
+| # | Dimension | The question |
+|---|---|---|
+| 1 | Diff-coverage | are the **changed lines** exercised by a test that would fail without them? Not project-wide coverage — and a test asserting on a mock proves nothing |
+| 2 | Contract / compat | public API, exported types, schema, wire format, events: additive or breaking, per consumer, with the semver implication stated |
+| 3 | Failure-mode analysis | null/empty/oversized input, timeout, partial failure, retry, concurrency — what breaks in production at 3am |
+| 4 | Rollback & migration safety | reversible? down-path tested? data loss? idempotent backfill? does new code require new schema or tolerate both? |
+| 5 | Feature-flag / kill-switch | is there an off switch, and does OFF equal today's behavior? |
+| 6 | Observability | can a responder act on the new failure path, or is it a swallowed catch? |
+| 7 | Dependency & supply-chain delta | why this dependency, its license, its transitive weight, its CVEs — and would the stdlib do? |
+| 8 | Secrets & sensitive data | credentials, tokens, PII in code, logs, fixtures, snapshots (always on) |
+| 9 | Performance on hot paths | N+1, unbounded work in a request path, sync work in a render path, a new query with no index |
+| 10 | Concurrency & idempotency | shared mutable state, lock ordering, retry-safety of new writes |
+| 11 | Dead code & constant drift | a branch nothing enters, a symbol nobody imports, a value duplicated instead of imported |
+| 12 | **Unknown-unknowns** | **what should have changed and did not** — the missing test, down-path, flag, doc, telemetry, the sibling call site nobody updated, the second implementation left stale |
+
+Mode sets the baseline set — `fast` runs three, `standard` eight, `critical` all twelve — and **a
+fired trigger always adds its dimension in every mode**, so a `fast` diff that touches a migration
+still gets rollback safety. Every fired dimension gets a verdict row in the report; a fired
+trigger with no row is incomplete by format.
+
+Dimension 12 is a **mandatory cross-cutting duty with its own dispatch and its own report
+section**, in every rigor mode. It is the highest-value question a reviewer asks and the one a
+diff-shaped review structurally never asks — and every item is answered `present` / `missing` /
+`n/a` **with the search that proves it**. A "missing test" claim without the search that came back
+empty is invalid by format.
+
+## How the review holds itself to the same standard
+
+- **The funnel is published per lens**, not just in total: raised → confirmed → refuted with a
+  confirm rate for every finder. An agent that raised nine findings and had nine refuted is noise
+  wearing the costume of thoroughness, and a totals-only funnel hides it.
+- **Every finding carries a concrete failure scenario** (inputs/state → wrong outcome), the same
+  standard the pipeline's own findings template holds. Without one it is invalid by format and the
+  finder drops it rather than passing it on.
+- **No style findings the repo's linter already owns.** Mechanical: if the repo ships a config
+  enabling that rule, the finding is dropped as `duplicate-of-linter`, citing the config and the
+  rule id. Flagging what CI enforces spends the author's attention for nothing.
+- **Confidence (`proven` / `traced`) and blast radius** on every surviving finding, set by the
+  verifier — so the confirmed list sorts into the order the author should fix in.
+- **Refuted findings ship in an appendix** with the refutation reason. The author learns what was
+  considered and dismissed, and the finders stay honest.
+
 ## Trace the real consumer before flagging shared code
 
 The rule that stops the most expensive kind of wrong comment. When a PR edits a shared util

@@ -45,6 +45,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
   any lens through the new `pr_review.roster` config. New `dispatch.md` row `pr1-spec`, a
   mandatory resolved-roster table in `pr-review-report.md`, and the `aidd-pr-review` skill
   (a skill, not a command — `/aidd:review-pr` is the command).
+- PR review — **twelve review dimensions** (`core/protocol/pr-review.md` §16), each with one
+  mechanical trigger and one evidence standard: diff-coverage (coverage OF THE DIFF, with the
+  mocked-proof problem named), contract/compat with the semver implication stated, failure-mode
+  analysis ("what breaks in production at 3am"), rollback & migration safety, feature-flag /
+  kill-switch, observability, dependency & supply-chain delta, secrets & sensitive data,
+  performance on hot paths, concurrency & idempotency, dead code & constant drift, and the
+  **unknown-unknowns pass — what is NOT in the diff**, a mandatory cross-cutting duty in every
+  rigor mode with its own dispatch (`pr3-unknowns`), its own artifact and its own report section,
+  answering nine "should this have been here?" items with the search that proves each. Mode sets
+  the baseline set (3 / 8 / 12) and **a fired trigger always adds its dimension in every mode**;
+  a fired trigger with no verdict row is incomplete by format.
+- PR review — **reviewer quality discipline** (`core/protocol/pr-review.md` §17): the funnel is
+  published **per lens** with a confirm rate, so a chronically over-flagging agent is visible;
+  every finding carries a **concrete failure scenario (inputs/state → wrong outcome)**, aligned
+  word-for-word with `qa-findings.md`, or it is invalid by format; a style finding the repo's own
+  linter config already enables is dropped as **`duplicate-of-linter`** citing the config path and
+  rule id; every surviving finding carries **confidence** (`proven` / `traced`) and **blast
+  radius** set by the verifier, which is also the report's deterministic sort order; and every
+  REFUTED finding ships in an **appendix with its refutation reason** — the author learns what was
+  considered and dismissed, and the finders stay honest.
 
 ## [0.4.0] - 2026-08-06
 

@@ -46,12 +46,29 @@ out), the resolved `BASE`/`HEAD` SHAs, the merge-base diff, the repo at `HEAD`, 
 5. **Missing cross-boundary tests.** The change spans a boundary (component → store, service
    → repository, web → shared package) and every test lands on one side of it. Name the
    boundary and the untested direction.
-6. **Deduplicate.** Overlapping findings from different units collapse into one: keep the
+6. **The unknown-unknowns pass — what is NOT in the diff.** MANDATORY, in every rigor mode, as a
+   separate dispatch writing its own artifact (`../protocol/pr-review.md` §16.2,
+   `../protocol/dispatch.md` row `pr3-unknowns`). The highest-value question a reviewer asks is
+   **what should have changed and did not**, and a diff-shaped review structurally never asks it.
+   Answer every item `present` / `missing` / `n/a` **with the search that proves it** — a
+   "missing test" claim without the search that came back empty is invalid by format:
+   a test for the changed behavior · a migration down-path · a kill-switch for a risky change ·
+   the doc/changelog/API-reference update this repo's own history shows a comparable change
+   carries · telemetry on the new failure path · a sibling call site not updated (the caller grep
+   with the un-updated site named) · a second implementation of the same rule left stale (§10 step
+   4) · a config or env key added in code but absent from the example config or deploy manifest ·
+   a schema or type updated on one side of a boundary only.
+7. **Contract and compat across consumers** (§16 dimension 2). For every public API, exported
+   type, DB schema, wire format, or event payload the diff changes: additive or breaking **per
+   consumer**, with the importer trace, and the **semver implication stated** (`major` / `minor` /
+   `patch`). A `major` claim names one existing caller that breaks.
+8. **Deduplicate.** Overlapping findings from different units collapse into one: keep the
    strongest evidence and the verifier's severity, record the merged finding ids, and never
    silently drop the weaker text — it stays in the merged row's provenance.
-7. **Your own new findings go back through verification** like any other
+9. **Your own new findings go back through verification** like any other
    (`../protocol/pr-review.md` §6). You do not verify yourself, and you do not confirm a
-   finding a verifier refuted.
+   finding a verifier refuted. This includes every unknown-unknowns item: an absence claim is a
+   claim, and a different agent tests it.
 
 ## Self-verification
 
@@ -59,6 +76,8 @@ out), the resolved `BASE`/`HEAD` SHAs, the merge-base diff, the repo at `HEAD`, 
   claim provable from one file belonged to that file's agent.
 - Every consumer verdict has the importer grep that proves it, per consumer.
 - Every dead-path claim states the search that found no caller, so a skeptic can re-run it.
+- Every unknown-unknowns item has a verdict and the search behind it; none is left blank, and
+  `n/a` carries its reason.
 - Every dedup records the ids it merged and which evidence survived.
 - You added no finding that a verdict in `pr-review/verdicts/` already REFUTED, unless you
   have new evidence — and then you say what is new.
@@ -66,5 +85,7 @@ out), the resolved `BASE`/`HEAD` SHAs, the merge-base diff, the repo at `HEAD`, 
 ## Report format
 
 `pr-review-findings.md` template → `pr-review/cross-cutting.md`, with a `## Dedup` section
-listing merged finding ids. Return a ≤5-line summary: cross-cutting findings raised by class,
-dedups applied, and consumers traced.
+listing merged finding ids; and, as its own unit, `pr-review/unknown-unknowns.md` carrying the
+§16.2 checklist with a verdict and a search per item. Return a ≤5-line summary: cross-cutting
+findings raised by class, unknown-unknowns items marked missing, dedups applied, and consumers
+traced.

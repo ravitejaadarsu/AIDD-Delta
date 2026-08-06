@@ -56,22 +56,42 @@ PR title/description **as the author's claim, never as evidence**.
    applies to your unit (additive · non-breaking · no hardcodes,
    `../protocol/pr-review.md` §9); the ticket intent; tests that accompany the change and
    whether they would fail if the implementation were removed.
-5. **Trace before you flag a shared symbol.** If your finding is about a shared, exported, or
+5. **Cover the dimensions your unit owns** (`../protocol/pr-review.md` §16), each only when its
+   trigger fires in YOUR paths, each with the evidence that section demands:
+   **diff-coverage** (is each changed line exercised by a test that would fail without it — and
+   is that test asserting on real behavior or on a mock?), **failure-mode analysis** (null/empty/
+   oversized input, timeout, partial failure, retry, concurrency on every new path),
+   **feature-flag/kill-switch** (is the OFF path identical to today's behavior?),
+   **observability** (can a responder act on the new failure path, or is it a swallowed catch?),
+   **secrets and sensitive data** (always — credentials, tokens, PII in code, logs, fixtures,
+   snapshots), **performance on hot paths** (N+1, unbounded loops, sync work in a render path),
+   **concurrency and idempotency** (shared mutable state, retry-safe writes), and
+   **contract/compat** for any public or exported symbol your unit changes, with the §10 trace and
+   the semver implication. A dimension whose trigger fires and that you did not cover is a gap in
+   your artifact, not a silence.
+6. **Trace before you flag a shared symbol.** If your finding is about a shared, exported, or
    re-used symbol, run the consumer trace (`../protocol/pr-review.md` §10) BEFORE raising it,
    and attach the greps. A "breaking change" claim reached by matching metadata shape is
    refused at verification.
-6. **Raise findings** in the template. Each carries `raised_by` (your unit key), `file:line`
-   **and side** (right for added/modified code, left for removed), a **proposed** severity, a
-   one-sentence claim, and a concrete scenario (inputs/state → wrong outcome). A finding
-   without its concrete scenario is invalid by format and never reaches verification.
-7. **Raise nothing a lint rule owns.** If the repo's formatter or linter would flag it, it is
-   not a review finding.
+7. **Raise findings** in the template. Each carries `raised_by` (your unit key), `file:line`
+   **and side** (right for added/modified code, left for removed), a **proposed** severity, the
+   dimension it belongs to (§16), a one-sentence claim, and a **concrete failure scenario
+   (inputs/state → wrong outcome)** — the same standard as `../templates/qa-findings.md`. A
+   finding without its concrete failure scenario is invalid by format and never reaches
+   verification. "This looks risky" is an impression, not a scenario.
+8. **Raise nothing a lint rule owns.** Mechanical (`../protocol/pr-review.md` §17.3): if the repo
+   ships a linter config governing the rule (`.eslintrc*`, `ruff.toml`, `.golangci.yml`,
+   `rustfmt.toml`, `.editorconfig`, `checkstyle.xml`, `.rubocop.yml`, `phpcs.xml`, …) **and** the
+   rule is enabled there, drop the finding as `duplicate-of-linter` citing the config path and
+   the rule id. A style finding stands only when the linter is silent on it AND the repo's own
+   invariants files ask for that style — and then it cites the invariant.
 
 ## Self-verification
 
 - Every finding cites a line you read at `HEAD`, not a line you inferred from the diff hunk.
 - Every finding has a scenario a verifier can construct: named inputs, named state, named
-  caller.
+  caller — and names the §16 dimension it belongs to, so the per-dimension funnel adds up.
+- No finding duplicates a rule the repo's own linter config already enables (§17.3).
 - Every shared-symbol finding carries its importer greps.
 - Nothing rests on the PR description. Re-read each finding asking "would this survive if the
   description said the opposite?"
