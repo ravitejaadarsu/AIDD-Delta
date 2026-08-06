@@ -97,11 +97,30 @@ where files are large and the needed slice is small; it loses where files are
 small and most of the file is wanted. That bounds the pivot's claim honestly: a
 large win on service-sized code, a wash or a loss on small modules.
 
-**Tokens and defect-detection parity remain unmeasured**, and no cost constant in
-`cost-governance.md` has been revised. Bytes drive tokens but are not tokens, and
-the ADR 016 rule is unchanged: a cheaper run that finds fewer real defects is a
-regression, not a win. Closing that gap needs two graded `bench-run.sh` runs with
-a funded driver.
+**Tokens are now measured too, and they are less flattering than bytes.** Running
+`bench-context.py --tokens` weighs both payloads through the agent CLI and reads
+its own usage output — three calls, a control plus each arm, with the control
+subtracted so what remains is the payload's own cost. On a 60-symbol sample from
+a clean tree: **93,024 to 46,130 prompt tokens, a 50.4% reduction**, for $2.06 of
+measurement.
+
+Two things that number must be read against, or it will be quoted wrongly:
+
+- **The weighed query payload includes the index**, so 50.4% is comparable to the
+  index-amortized byte figure (56.2% on the same sample), **not** to the
+  spans-only 87.4%. Pairing the spans-only byte figure with a token claim would
+  overstate the saving by roughly 37 points.
+- **Tokens reduce less than bytes.** JSON tokenizes worse than prose, so the
+  index costs proportionally more in tokens than its byte size implies. The byte
+  measurement is an upper bound on the token saving, not a proxy for it.
+
+**Defect-detection parity is still unmeasured, and no cost constant in
+`cost-governance.md` has been revised.** Tokens alone do not license that change:
+the ADR 016 rule is unchanged — a cheaper run that finds fewer real defects is a
+regression, not a win. Closing it needs graded `bench-run.sh` runs at three or
+more reps per task per arm, and a baseline arm does not currently exist: the
+framework has no switch to disable the query path, so there is nothing to compare
+against without building one first.
 
 ## Alternatives considered
 
