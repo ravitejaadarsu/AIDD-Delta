@@ -79,6 +79,22 @@ Badges: **[all tiers]** works identically on Tier 1/2/3 · **[Tier 1]** Claude C
   read it first, and a missing pack degrades context explicitly rather than silently.
   → [context snapshots](docs/context-snapshots.md),
   [ADR 007](docs/design/decisions/007-context-snapshots.md)
+- **Query the repo instead of reading it.** **[built]** **[all tiers]** A dual-state index
+  records every symbol's span plus the git blob hash of the bytes it was parsed from, so a
+  role pulls one function instead of the file containing it, and a rebuild reparses only
+  what moved. Tree-sitter is used when importable and never required; a file no parser
+  understands still gets a path-and-hash entry. A span is re-verified against live bytes
+  before it is served, so a stale span is never handed to a reader.
+  → [context index](docs/context-index.md),
+  [ADR 020](docs/design/decisions/020-execution-environment.md)
+- **Sandboxed test execution, model routing, and self-triggering.** **[built]**
+  **[all tiers]** Agent-issued test commands run in a disposable container (network off,
+  repo read-only, never root); dispatch classes route to different models with per-model
+  rates feeding the cost ledger; a pre-commit hook and a PR workflow trigger the framework
+  without anyone remembering to. Every degradation is announced — a silent fallback that
+  leaves a caller believing it was isolated is the one unacceptable outcome.
+  → [execution environment](docs/execution-environment.md),
+  [ADR 020](docs/design/decisions/020-execution-environment.md)
 - **Parallel subagent dispatch.** **[designed]** **[Tier 1]** Fan-outs run concurrently,
   each subagent with its own context window. Tiers 2 and 3 run the same fan-out
   sequentially — same artifacts, proportionally more wall clock.

@@ -7,6 +7,52 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ### Added
 
+- Execution-environment surface (ADR 020): the framework now manages *where and how* it
+  runs, not only what it says.
+  - **Dual-state context index** (`core/scripts/aidd-index.py`,
+    `core/protocol/context-index.md`) — every tracked file gets its symbols with line
+    spans **and** the git blob hash of the bytes they were parsed from. The hash is what
+    makes a span trustworthy: consumers compare hashes before believing a span, and a
+    rebuild reparses only files whose hash moved. Tree-sitter is used when importable and
+    is never required (ADR 002); unknown, binary, or oversized files still get a
+    path-and-hash entry so staleness stays detectable. Emitted alongside the prose pack by
+    `build-snapshot.sh`; `--check` reports stale files without writing.
+  - **Just-in-time symbol reads** (`core/scripts/aidd-read-block.py`) — returns one
+    symbol's span plus its signature-scoped type dependencies, re-hashing the file first
+    and reparsing that file alone on a mismatch, so a stale span is never served.
+  - **Signal-preserving test-log redaction** (`core/scripts/aidd-redact-log.py`) — reduces
+    a failure log to error type, failing assertion, and `file:line`, and reports the
+    reduction ratio. Any line carrying an error, an assertion, or a `file:line` is never
+    dropped; repeated lines collapse **with a count**; an unrecognized format is truncated
+    **and labelled**, never silently emptied.
+  - **Container-sandboxed test execution** (`core/scripts/aidd-sandbox.sh`) — `--rm`,
+    network off, repo mounted read-only unless `--writable`, never root, memory and pids
+    capped. No runtime degrades to host execution **loudly**; `AIDD_SANDBOX_REQUIRED=1`
+    makes it a hard failure. Sandbox failures exit 125, distinct from any test exit code.
+  - **Model routing and cost attribution** (`core/scripts/aidd-route.sh`,
+    `core/templates/config.json`) — dispatch classes map to models and effort in
+    `.aidd/config.json`, with per-model rates feeding the ledger. An unmapped class falls
+    back to the default rather than failing; an unpriced model records `na`, never `0`;
+    `aidd-route.sh audit` fails the run on any credential-shaped entry, because
+    credentials come from the environment only.
+  - **Native git and CI integration** (`core/scripts/aidd-install-hooks.sh`,
+    `.github/workflows/aidd-review.yml`) — an opt-in, idempotent, reversible `pre-commit`
+    hook that preserves and chains any existing hook, and a PR workflow running only the
+    checks that need no model and no credentials (so it works on fork PRs). CI never posts
+    to a PR thread: automating the trigger does not automate the consent.
+  - Suites: `tests/context-index.test.sh`, `tests/environment.test.sh`.
+
+### Changed
+
+- The PR-review specialist roster (`core/protocol/pr-review.md` §15) now dispatches
+  **AIDD's own** `pr-file-reviewer` in `mode: lens` for every lens by default, instead of
+  binding lens keys to another vendor's agent registry. A bare AIDD install now fields
+  every lens; repos with a stronger specialist map it via `pr_review.roster`, and only
+  those mapped names are availability-probed. Removes the framework's last external
+  agent-registry dependency.
+- Planning artifacts moved out of a vendor-namespaced directory: `docs/superpowers/plans/`
+  → `docs/plans/`, `docs/superpowers/specs/` → `docs/specs/`.
+
 - External PR review (ADR 019, `core/protocol/pr-review.md`): `/aidd:review-pr` reviews a
   pull request the pipeline did **not** write, in five phases. Ground truth comes from the
   commits — the platform's PR record (Azure DevOps `az repos pr show`/REST, GitHub

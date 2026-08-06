@@ -24,6 +24,39 @@ Once per step, in this order:
 6. Record the resolved plan in `supervision/audit.log` (format below).
 7. Execute exactly that plan. Do not revisit it within the step.
 
+## Context brief — what every dispatched agent reads first
+
+The table above decides *how many* agents run. This decides *what each one reads*, and it
+is the same for every row: **structure first, spans on demand, never a file to find a
+symbol** (`context-index.md`).
+
+Every dispatch brief carries, in this order:
+
+1. The **snapshot pack** (`snapshot.md`, and `quality-baseline.md` where the role's
+   dimension needs it) — what the repo is (`context-snapshots.md`).
+2. The **index** (`.aidd/context/index.json`) — where every symbol lives.
+3. The role's **own inputs** — its ownership set, its brief, its artifacts.
+
+Source text is **not** part of a brief. An agent that needs a symbol queries for it:
+
+```bash
+.aidd/framework/scripts/aidd-read-block.py <file> <symbol>
+```
+
+Three consequences the orchestrator enforces rather than hopes for:
+
+- **A verification dispatch carries a patch reference, not file bodies.** The verifier
+  resolves surrounding context through `read_block` (`pr-review.md` §6, `context-index.md`
+  §6). Findings still cite `file:line` against the post-change tree.
+- **Test output reaches a role redacted**, never raw — error type, failing assertion, and
+  `file:line`, with the reduction ratio recorded (`aidd-redact-log.py`).
+- **A missing index never blocks a dispatch.** The agent falls back to reading files and
+  the degradation is recorded, exactly as a missing snapshot pack is (`evidence.md`).
+
+Reading a whole file is still correct when the file *is* the unit — a config, a short
+module, a diff. The rule is not "never open a file"; it is **never open a file merely to
+locate something the index already knows**.
+
 ## Decision table
 
 Unit counts read `fast / standard / critical`. A unit is one dispatch of one role.

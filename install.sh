@@ -59,6 +59,9 @@ mkdir -p "${TARGET}/.aidd/changes/_archive"
 }
 [ -f "${TARGET}/.aidd/memory.md" ]    || cp "${SRC}/templates/memory.md"    "${TARGET}/.aidd/memory.md"
 [ -f "${TARGET}/.aidd/learnings.md" ] || cp "${SRC}/templates/learnings.md" "${TARGET}/.aidd/learnings.md"
+# Machine-tunable routing config. Seeded once, then owned by the repo — an
+# upgrade never overwrites a routing table someone tuned.
+[ -f "${TARGET}/.aidd/config.json" ]  || cp "${SRC}/templates/config.json"  "${TARGET}/.aidd/config.json"
 
 # 4. AGENTS.md managed block (append-not-clobber; replace between markers on re-run).
 AGENTS="${TARGET}/AGENTS.md"
