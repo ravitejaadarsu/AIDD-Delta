@@ -435,6 +435,34 @@ runs cannot be compared against itself.
 This is the arm's most useful output: it tells a repo *whether* the query path pays there,
 rather than assuming it does everywhere.
 
+### `--tokens` — real prompt tokens, from the runtime's usage output
+
+```bash
+python3 bench/scripts/bench-context.py --tokens --sample 60    # COSTS MONEY: 3 CLI calls
+```
+
+Opt-in, because it spends. It makes **three** calls to the agent CLI — a control with no
+payload, then each arm — and reads `usage` from the CLI's own JSON output. The control
+measures the CLI's fixed prompt overhead; subtracting it leaves the payload's own token
+cost. That subtraction is arithmetic on two measured values, not an estimate, and nothing is
+tokenized locally.
+
+Three rules for reading the result:
+
+- **The weighed query payload includes the index.** Its ratio is comparable to
+  `reduction_ratio_with_index`, **not** to the spans-only ratio.
+  `tokens_query_includes_index` is recorded so the two cannot be paired wrongly by accident.
+- **Tokens reduce less than bytes.** JSON tokenizes worse than prose, so the index costs
+  proportionally more in tokens than its byte size implies. Quoting a byte figure as a token
+  saving overstates the win.
+- **Tokens still do not license a cost-constant change.** Defect-detection parity is a
+  separate measurement (`bench-run.sh`, at least 3 reps per task per arm). A cheaper run that
+  catches fewer real defects is a regression, and only bytes plus tokens plus parity closes
+  that question.
+
+`usage_source` becomes `runtime-usage` only when all three calls returned usage; otherwise it
+stays `not-measured` and the token fields stay `null`.
+
 `schema: aidd-bench-context/1`. Fields: `targets`, `baseline_files_read`, `baseline_bytes`,
 `query_bytes`, `index_bytes`, `query_bytes_with_index`, `reduction_ratio`,
 `reduction_ratio_with_index`, plus the run-identity and `not measured` fields above.

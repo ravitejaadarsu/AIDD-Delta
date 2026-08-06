@@ -286,6 +286,13 @@ assert d["reduction_ratio"] < 1, "ratio of 1 would mean zero-cost reads"
 # Run identity is recorded so a dirty-tree result is detectable after the fact.
 assert "framework_tree_dirty" in d, "tree-dirty flag missing"
 assert "framework_head" in d, "head missing"
+# The token fields exist but stay null without --tokens: the default path must
+# never spend money, and must never imply a token measurement it did not make.
+for k in ("tokens_baseline", "tokens_query", "tokens_control", "token_reduction_ratio"):
+    assert d[k] is None, "%s must be null without --tokens" % k
+# The weighed query payload includes the index, so a reader must not pair its
+# ratio with the spans-only byte ratio. The flag makes that explicit in the data.
+assert d["tokens_query_includes_index"] is True, "index-inclusion flag must be recorded"
 '
 check "bench-context.py measures bytes and leaves tokens/parity unmeasured" $?
 
