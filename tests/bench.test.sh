@@ -311,6 +311,48 @@ check "bench-context.py reports a negative ratio when spans lose (small file, ma
 
 rm -rf "${CTX_TMP}"
 
+# 16. The parity probe. Asserted OFFLINE — the suite must never spend money, so
+#     this exercises anchor resolution and payload construction without calling
+#     the CLI. A probe whose injection anchor silently stopped matching would
+#     patch nothing and still report a clean parity result: the dangerous failure.
+python3 - <<'PY'
+import importlib.util, os
+spec = importlib.util.spec_from_file_location("bp", "bench/scripts/bench-parity.py")
+bp = importlib.util.module_from_spec(spec); spec.loader.exec_module(bp)
+ix = bp.load_indexer(os.getcwd())
+index_path = os.path.join(os.getcwd(), ".aidd", "context", "index.json")
+index = ix.load_index(index_path)
+if index is None:
+    index, _ = ix.build(os.getcwd(), index_path)
+assert bp.SUBJECT in index["files"], "parity subject is not indexed"
+symbols = sorted(index["files"][bp.SUBJECT]["symbols"], key=lambda s: s["start"])
+original = open(bp.SUBJECT, encoding="utf-8").read()
+anchors = {
+    "local": [('need(not os.path.exists(os.path.join(outside, "escape")), '
+               '"save() wrote outside base")',
+               'need(os.path.exists(os.path.join(outside, "escape")), '
+               '"save() wrote outside base")')],
+    "non-local": [("if not cond:", "if cond:")],
+    "subtle-non-local": [("        fail(msg)", "        return")],
+}
+for name, spec_d in bp.DEFECTS.items():
+    sym = bp.find_symbol(index, bp.SUBJECT, spec_d["symbol"])
+    injected, _used = bp.inject(original, sym, anchors[name])   # raises if ambiguous
+    assert injected != original, "%s injection changed nothing" % name
+    base, query = bp.build_payloads(injected, bp.SUBJECT, sym, symbols)
+    assert len(query) < len(base), "%s: query payload must be smaller" % name
+    # The grader must be positional, not credulous: a finding outside the span is
+    # not a catch, and prose with no line number is never a catch.
+    assert bp.caught([{"line": sym["start"]}], sym) is True
+    assert bp.caught([{"line": sym["end"] + 500}], sym) is False
+    assert bp.caught([], sym) is False
+    assert bp.caught([{"problem": "sounds worrying"}], sym) is False
+PY
+check "bench-parity.py anchors resolve and grading is positional (offline)" $?
+
+grep -q 'no discriminating power' bench/harness.md
+check "harness.md states the parity probe's discriminating-power caveat" $?
+
 grep -q 'Context-cost arm' bench/harness.md
 check "harness.md documents the context-cost arm" $?
 grep -q 'No cost constant may move on this arm alone' bench/harness.md

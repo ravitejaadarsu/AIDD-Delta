@@ -463,6 +463,43 @@ Three rules for reading the result:
 `usage_source` becomes `runtime-usage` only when all three calls returned usage; otherwise it
 stays `not-measured` and the token fields stay `null`.
 
+## Parity probe — does reading spans lose defects?
+
+Tokens decide what the pivot costs. `bench-parity.py` asks what it buys, which is the
+question that actually settles it: **a cheaper run that catches fewer real defects is a
+regression**, so a token saving alone licenses nothing.
+
+```bash
+python3 bench/scripts/bench-parity.py --reps 3         # COSTS MONEY: 2 arms x reps x defects
+python3 bench/scripts/bench-parity.py --reps 1 --defect local
+```
+
+One defect is injected into a fixture, then the same instruction goes to two arms — the whole
+file, versus the structural index plus the changed symbol's span (what a diff-driven review
+would pull). Both must answer as JSON findings carrying a `line`, and **grading is mechanical:
+caught iff a reported line falls inside the injected symbol's span**. No keyword matching, so
+a model that merely sounds concerned scores nothing.
+
+Three defect shapes, chosen to probe different things:
+
+| Shape | Where the evidence lives | What it tests |
+| --- | --- | --- |
+| `local` | inside the span | whether spans work at all |
+| `non-local` | a shared helper, inverted | wrongness visible only at call sites |
+| `subtle-non-local` | the same helper silently no-ops | reads as a plausible early return in isolation; fatal across its call sites |
+
+### Reading the result honestly
+
+The probe's own weakness is the thing to state first: **if the baseline arm scores 100%, the
+run has no discriminating power.** It can show that the query arm does not *lose* defects at
+that difficulty; it cannot show how either arm behaves near the detection threshold, because
+nothing failed. A run where both arms score perfectly is evidence of no regression, not proof
+of parity — and it is emphatically not a licence to move a cost constant.
+
+To make the probe discriminate, it needs defects the baseline itself misses some of the time.
+Until a run produces a baseline below 100%, treat parity as *unfalsified on this corpus*
+rather than *established*.
+
 `schema: aidd-bench-context/1`. Fields: `targets`, `baseline_files_read`, `baseline_bytes`,
 `query_bytes`, `index_bytes`, `query_bytes_with_index`, `reduction_ratio`,
 `reduction_ratio_with_index`, plus the run-identity and `not measured` fields above.

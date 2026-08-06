@@ -57,8 +57,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
     against the index-amortized byte figure (56.2%), **not** the spans-only 87.4% — the
     weighed query payload includes the index, and pairing it with the spans-only number
     would overstate the saving by ~37 points. Tokens reduce **less** than bytes because JSON
-    tokenizes worse than prose. Defect-detection parity is still unmeasured and **no cost
-    constant has moved**.
+    tokenizes worse than prose.
+  - **Defect-detection parity probe** (`bench/scripts/bench-parity.py`) — injects a defect,
+    sends the same instruction to both arms (whole file vs index + the changed symbol's
+    span), and grades mechanically: caught iff a reported line falls inside the injected
+    span, so prose that merely sounds concerned scores nothing. Three defect shapes x 3 reps
+    x 2 arms: **18/18 caught, no regression** ($4.22 to measure) — including a helper that
+    silently no-ops, which reads as a plausible early return in isolation but disables every
+    assertion in the file. **The baseline never dropped below 100%, so the probe has no
+    discriminating power**: parity is *unfalsified on this corpus*, not established, and
+    **no cost constant in `cost-governance.md` has moved**.
 
 ### Changed
 
