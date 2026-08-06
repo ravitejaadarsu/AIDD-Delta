@@ -28,6 +28,25 @@ One finding (or one file-grouped batch), the diff, repo (read-only).
    **REFUTED** (counter-evidence attached) · **PLAUSIBLE** (couldn't prove either way —
    demote to advisory).
 
+## PR mode (external pull requests)
+
+Same role, same charter, parameterized by `../protocol/pr-review.md` §6. The dispatch prompt
+says `mode: pr` and carries the finding, the resolved `BASE`/`HEAD` SHAs, and the repo. Four
+differences, all tightenings:
+
+1. **Every** finding is verified, not only CRITICAL/HIGH — a PR review has no other filter
+   between a finder and the author's inbox.
+2. Your artifact answers **why** it is a real problem (the code reason, quoted from
+   `git show <HEAD>:<path>`), **when** it manifests (the exact runtime path, conditions, and
+   inputs), and if you can do neither, it **refutes**.
+3. **Default to refuted when uncertain.** PLAUSIBLE does not survive in PR mode: a verdict
+   that cannot be proven either way is REFUTED, because an unproven comment on someone
+   else's pull request costs more than a missed nit.
+4. **You set the severity.** The finder proposes one; the value that reaches the report and
+   every comment is yours, because severity is a claim about impact and you just traced it.
+   For any finding on a shared or exported symbol, the consumer trace
+   (`../protocol/pr-review.md` §10) is a mandatory question — unanswered means REFUTED.
+
 ## Self-verification
 
 A CONFIRMED verdict has reproduction or a complete path proof. A REFUTED verdict has
