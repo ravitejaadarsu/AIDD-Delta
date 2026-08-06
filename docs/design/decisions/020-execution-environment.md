@@ -68,9 +68,21 @@ caller that believes it was isolated, or parsed, or measured, when it was not.
 **Context cost is measured in bytes; tokens and parity are still not.** The
 `bench-context.py` arm (`bench/harness.md`) measures both read strategies
 over the same deterministic target set, with no credentials and no model call. On
-this repository — 173 symbols across 48 files — the query path reads **70.6%
-fewer bytes** than reading whole files, or **47.1% fewer** once the index's fixed
-cost is charged.
+this repository — 173 symbols across 48 files — the query path reads **70.9%
+fewer bytes** than reading whole files, or **47.6% fewer** once the index's fixed
+cost is charged. Measured from a clean tree at `54644f7`, which is what makes the
+figure quotable — the metrics object records `framework_tree_dirty`, and a dirty
+run is disqualified.
+
+The run output is deliberately **not committed**: this repository publishes no
+measured results (`bench/results/TEMPLATE.md`), and `tests/bench.test.sh`
+enforces that `bench/results/` ships no run output. A number that ships as a file
+becomes a claim nobody re-checks; a number that ships as a command stays
+falsifiable. Reproduce with:
+
+```bash
+python3 bench/scripts/bench-context.py
+```
 
 Those corpus numbers replace the headline the design was first argued from. A
 single symbol pulled from a large file shows roughly 98% reduction, and quoting

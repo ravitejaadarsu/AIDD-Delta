@@ -41,6 +41,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
     checks that need no model and no credentials (so it works on fork PRs). CI never posts
     to a PR thread: automating the trigger does not automate the consent.
   - Suites: `tests/context-index.test.sh`, `tests/environment.test.sh`.
+  - **Context-cost benchmark arm** (`bench/scripts/bench-context.py`) — measures how many
+    bytes of context each read strategy assembles, with no driver and no credentials.
+    Measured on this repo from a clean tree: **70.9%** fewer bytes reading spans, **47.6%**
+    once the index's fixed cost is amortized (173 symbols, 48 files). Tokens and
+    defect-detection parity remain `not measured` — bytes drive tokens but are not tokens,
+    so **no cost constant in `cost-governance.md` has been revised**. The arm also reports a
+    **negative** ratio where spans lose (many symbols from one small file), because a
+    benchmark that can only report a win is not a benchmark.
 
 ### Changed
 
