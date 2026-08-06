@@ -20,13 +20,14 @@ mechanically from the plugin's `commands/` directory and is the single source of
 
 ## 2. Skills are not commands
 
-AIDD ships four skills — `aidd-pipeline`, `aidd-state`, `aidd-gates`,
-`aidd-supervision`. They are **instruction sets the orchestrator loads**, not entry points
-a user runs.
+AIDD ships five skills — `aidd-pipeline`, `aidd-state`, `aidd-gates`,
+`aidd-supervision`, `aidd-pr-review`. They are **instruction sets the orchestrator loads**,
+not entry points a user runs.
 
 - **Forbidden:** treating a skill name as a command. `/aidd:aidd-supervision`,
-  `/aidd:aidd-pipeline`, `/aidd:aidd-state`, `/aidd:aidd-gates` are not commands and never
-  were; no manifest row exists for any of them.
+  `/aidd:aidd-pipeline`, `/aidd:aidd-state`, `/aidd:aidd-gates`, `/aidd:aidd-pr-review` are
+  not commands and never were; no manifest row exists for any of them. The PR-review
+  capability's command is `/aidd:review-pr`, which the binding table below names.
 - Invoking the skill itself is legitimate. What is forbidden is the inference that,
   because a skill exists, a matching command exists — and then improvising the phase logic
   that "command" would have run.
@@ -97,6 +98,7 @@ Generated from the manifest; `tests/commands.test.sh` asserts this table and
 | `/aidd:mode` | `.aidd/framework/protocol/autonomy-modes.md` | Set AIDD autonomy mode (take-care or let-me-look) |
 | `/aidd:qa` | `.aidd/framework/playbooks/40-qa.md` | Run the AIDD QA phase |
 | `/aidd:resume` | `.aidd/framework/prompts/resume.md` | Resume the active AIDD change from recorded state |
+| `/aidd:review-pr` | `.aidd/framework/protocol/pr-review.md` | Review an external pull request — two-phase, adversarially verified, nothing posted without approval |
 | `/aidd:revise` | `.aidd/framework/protocol/gates.md` | Send the pending AIDD gate back with feedback |
 | `/aidd:rigor` | `.aidd/framework/protocol/rigor-modes.md` | Set or report AIDD rigor mode (fast, standard, or critical) |
 | `/aidd:status` | `.aidd/framework/prompts/status.md` | Show AIDD pipeline status |

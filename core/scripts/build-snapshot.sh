@@ -123,4 +123,19 @@ HIST="${CTX}/history/${STAMP}-${TAG}"
 mkdir -p "${HIST}"
 cp "${CTX}/snapshot.md" "${CTX}/quality-baseline.md" "${CTX}/delta.md" "${HIST}/"
 
+# ── index.json: the dual-state symbol map ───────────────────────────────────
+# The prose pack above tells a role what the repo *is*; the index tells it
+# where every symbol *lives*, so the role pulls spans instead of whole files
+# (protocol/context-index.md). Advisory: a failed index never fails a snapshot.
+INDEXER="$(dirname "$0")/aidd-index.py"
+if [ -f "${INDEXER}" ] && command -v python3 >/dev/null 2>&1; then
+  if python3 "${INDEXER}" --root "${ROOT}" --out "${CTX}/index.json" --quiet 2>/dev/null; then
+    echo "index: built at ${CTX}/index.json"
+  else
+    echo "index: na (indexer failed; roles fall back to reading files)"
+  fi
+else
+  echo "index: na (no indexer or python3; roles fall back to reading files)"
+fi
+
 echo "snapshot pack built: ${CTX} (history: ${HIST})"

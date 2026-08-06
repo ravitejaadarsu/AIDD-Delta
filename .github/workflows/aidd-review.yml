@@ -1,0 +1,72 @@
+name: AIDD review
+
+# The framework triggering itself. A review that needs a human to remember to
+# ask for it is a review that stops happening under deadline.
+#
+# This runs the checks that need no model and no credentials, so it works on a
+# fork PR where secrets are unavailable. The adversarial review itself is
+# dispatched by the orchestrator per core/protocol/pr-review.md, and posting to
+# the PR thread stays behind the explicit human approval that protocol requires
+# — CI never posts on its own.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aidd-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # merge-base resolution needs full history
+
+      - name: Resolve BASE and HEAD
+        id: refs
+        run: |
+          base="$(git merge-base "origin/${{ github.base_ref || 'main' }}" HEAD)"
+          echo "base=${base}" >> "$GITHUB_OUTPUT"
+          echo "head=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "BASE ${base}"
+          echo "HEAD $(git rev-parse HEAD)"
+
+      - name: Audit routing config for credentials
+        run: bash core/scripts/aidd-route.sh audit
+
+      - name: Build the dual-state index
+        run: python3 core/scripts/aidd-index.py --stats
+
+      - name: Verify the index is current
+        run: |
+          # A stale index means a role would read spans that no longer exist.
+          python3 core/scripts/aidd-index.py --check || {
+            echo "::error::index stale immediately after build - the indexer is not deterministic"
+            exit 1
+          }
+
+      - name: Changed-file summary for the review dispatch
+        run: |
+          git diff --name-only "${{ steps.refs.outputs.base }}..${{ steps.refs.outputs.head }}" \
+            | tee changed-files.txt
+          echo "files changed: $(wc -l < changed-files.txt)"
+
+      - name: Self-tests
+        run: bash tests/run.sh
+
+      - name: Upload review inputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aidd-review-inputs
+          path: |
+            changed-files.txt
+            .aidd/context/index.json
+          if-no-files-found: warn
+          retention-days: 7

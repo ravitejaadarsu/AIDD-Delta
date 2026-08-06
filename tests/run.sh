@@ -47,7 +47,7 @@ else
   echo "── shellcheck not installed; skipping"
 fi
 
-MD_GLOBS=("**/*.md" "#node_modules" "#.superpowers" "#.aidd")
+MD_GLOBS=("**/*.md" "#node_modules" "#.aidd")
 
 mdlint() { # pinned so local and CI lint identically — never unpin (see .markdownlint.jsonc)
   if command -v markdownlint-cli2 >/dev/null 2>&1; then

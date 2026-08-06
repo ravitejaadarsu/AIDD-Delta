@@ -5,6 +5,113 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ## [Unreleased]
 
+### Added
+
+- Execution-environment surface (ADR 020): the framework now manages *where and how* it
+  runs, not only what it says.
+  - **Dual-state context index** (`core/scripts/aidd-index.py`,
+    `core/protocol/context-index.md`) — every tracked file gets its symbols with line
+    spans **and** the git blob hash of the bytes they were parsed from. The hash is what
+    makes a span trustworthy: consumers compare hashes before believing a span, and a
+    rebuild reparses only files whose hash moved. Tree-sitter is used when importable and
+    is never required (ADR 002); unknown, binary, or oversized files still get a
+    path-and-hash entry so staleness stays detectable. Emitted alongside the prose pack by
+    `build-snapshot.sh`; `--check` reports stale files without writing.
+  - **Just-in-time symbol reads** (`core/scripts/aidd-read-block.py`) — returns one
+    symbol's span plus its signature-scoped type dependencies, re-hashing the file first
+    and reparsing that file alone on a mismatch, so a stale span is never served.
+  - **Signal-preserving test-log redaction** (`core/scripts/aidd-redact-log.py`) — reduces
+    a failure log to error type, failing assertion, and `file:line`, and reports the
+    reduction ratio. Any line carrying an error, an assertion, or a `file:line` is never
+    dropped; repeated lines collapse **with a count**; an unrecognized format is truncated
+    **and labelled**, never silently emptied.
+  - **Container-sandboxed test execution** (`core/scripts/aidd-sandbox.sh`) — `--rm`,
+    network off, repo mounted read-only unless `--writable`, never root, memory and pids
+    capped. No runtime degrades to host execution **loudly**; `AIDD_SANDBOX_REQUIRED=1`
+    makes it a hard failure. Sandbox failures exit 125, distinct from any test exit code.
+  - **Model routing and cost attribution** (`core/scripts/aidd-route.sh`,
+    `core/templates/config.json`) — dispatch classes map to models and effort in
+    `.aidd/config.json`, with per-model rates feeding the ledger. An unmapped class falls
+    back to the default rather than failing; an unpriced model records `na`, never `0`;
+    `aidd-route.sh audit` fails the run on any credential-shaped entry, because
+    credentials come from the environment only.
+  - **Native git and CI integration** (`core/scripts/aidd-install-hooks.sh`,
+    `.github/workflows/aidd-review.yml`) — an opt-in, idempotent, reversible `pre-commit`
+    hook that preserves and chains any existing hook, and a PR workflow running only the
+    checks that need no model and no credentials (so it works on fork PRs). CI never posts
+    to a PR thread: automating the trigger does not automate the consent.
+  - Suites: `tests/context-index.test.sh`, `tests/environment.test.sh`.
+
+### Changed
+
+- The PR-review specialist roster (`core/protocol/pr-review.md` §15) now dispatches
+  **AIDD's own** `pr-file-reviewer` in `mode: lens` for every lens by default, instead of
+  binding lens keys to another vendor's agent registry. A bare AIDD install now fields
+  every lens; repos with a stronger specialist map it via `pr_review.roster`, and only
+  those mapped names are availability-probed. Removes the framework's last external
+  agent-registry dependency.
+- Planning artifacts moved out of a vendor-namespaced directory: `docs/superpowers/plans/`
+  → `docs/plans/`, `docs/superpowers/specs/` → `docs/specs/`.
+
+- External PR review (ADR 019, `core/protocol/pr-review.md`): `/aidd:review-pr` reviews a
+  pull request the pipeline did **not** write, in five phases. Ground truth comes from the
+  commits — the platform's PR record (Azure DevOps `az repos pr show`/REST, GitHub
+  `gh pr view --json`) plus `git merge-base <target> <source>`, with the resolved BASE/HEAD
+  SHAs recorded as evidence — never from the PR description. Finders fan out **per changed
+  source file** (helper bundled with its component, trivial/cosmetic and E2E/config batched
+  into sweeps) alongside the repo's dimension specialists. **Every** finding is then attacked
+  by a **different** agent under a mechanical routing rule (`raised_by` / `verified_by`,
+  verification dispatched only as the `adversarial-verifier` role), which answers why the
+  problem is real and when it manifests, refutes what it cannot trace, **defaults to refuted
+  when uncertain**, and **sets the severity**. A cross-cutting agent holds the whole feed for
+  shared-package impact, platform-only violations, dead paths, constant drift and missing
+  cross-boundary tests; a comment validator is the final gate and **drops rather than
+  softens**. Every report carries three mandatory `PASS | FAIL | N/A (why)` verdicts —
+  additive, non-breaking (proven by tracing the inactive path), no hardcodes (redline scan,
+  allowlist untouched, escape hatches, an honest vacuous-test assessment). Shared-symbol
+  verdicts are **per consumer, proven by importer greps**. Nothing is posted without explicit
+  human approval in the run, in both autonomy modes, mirroring Jira write-back. New roles
+  `pr-file-reviewer`, `pr-cross-cutting-reviewer`, `pr-comment-validator` (+ wrappers),
+  templates `pr-review-findings.md`, `pr-review-report.md`, `pr-comments.md`, six
+  `dispatch.md` rows, a `pr_review:` constitution block with working defaults, and
+  `docs/pr-review.md`.
+- PR review — **stack-detected specialist roster** (`core/protocol/pr-review.md` §15): the
+  review fields the strongest reviewer available for each technology in the diff instead of a
+  generic one. Twenty-seven lenses resolve **mechanically** from the merge-base path set and the
+  manifests at HEAD — seventeen file-type lenses (TypeScript/React/Vue, Python/Django/FastAPI,
+  Go, Rust, Java, Kotlin, Swift, C++, C#, PHP, F#, Flutter, SQL/migrations) and ten diff-signal
+  lenses (security, silent failures, type design, test quality, comment rot, accessibility,
+  performance, ML, healthcare, and an advisory duplication sweep). Three rules bound it: the
+  **per-file agent stays the backbone** (specialists are additional lenses, never a
+  replacement), a **specialist's finding is not privileged** (same adversarial verification, a
+  different agent, severity set by the verifier), and **availability is probed, never assumed**
+  — an agent the runtime does not expose falls back to `pr-file-reviewer` in the new
+  `mode: lens` with the degradation published, so a bare install fields every lens and a missing
+  agent never fails a review. Specialist count scales by rigor mode; a repo remaps or disables
+  any lens through the new `pr_review.roster` config. New `dispatch.md` row `pr1-spec`, a
+  mandatory resolved-roster table in `pr-review-report.md`, and the `aidd-pr-review` skill
+  (a skill, not a command — `/aidd:review-pr` is the command).
+- PR review — **twelve review dimensions** (`core/protocol/pr-review.md` §16), each with one
+  mechanical trigger and one evidence standard: diff-coverage (coverage OF THE DIFF, with the
+  mocked-proof problem named), contract/compat with the semver implication stated, failure-mode
+  analysis ("what breaks in production at 3am"), rollback & migration safety, feature-flag /
+  kill-switch, observability, dependency & supply-chain delta, secrets & sensitive data,
+  performance on hot paths, concurrency & idempotency, dead code & constant drift, and the
+  **unknown-unknowns pass — what is NOT in the diff**, a mandatory cross-cutting duty in every
+  rigor mode with its own dispatch (`pr3-unknowns`), its own artifact and its own report section,
+  answering nine "should this have been here?" items with the search that proves each. Mode sets
+  the baseline set (3 / 8 / 12) and **a fired trigger always adds its dimension in every mode**;
+  a fired trigger with no verdict row is incomplete by format.
+- PR review — **reviewer quality discipline** (`core/protocol/pr-review.md` §17): the funnel is
+  published **per lens** with a confirm rate, so a chronically over-flagging agent is visible;
+  every finding carries a **concrete failure scenario (inputs/state → wrong outcome)**, aligned
+  word-for-word with `qa-findings.md`, or it is invalid by format; a style finding the repo's own
+  linter config already enables is dropped as **`duplicate-of-linter`** citing the config path and
+  rule id; every surviving finding carries **confidence** (`proven` / `traced`) and **blast
+  radius** set by the verifier, which is also the report's deterministic sort order; and every
+  REFUTED finding ships in an **appendix with its refutation reason** — the author learns what was
+  considered and dismissed, and the finders stay honest.
+
 ## [0.4.0] - 2026-08-06
 
 ### Added
