@@ -97,6 +97,7 @@ Generated from the manifest; `tests/commands.test.sh` asserts this table and
 | `/aidd:mode` | `.aidd/framework/protocol/autonomy-modes.md` | Set AIDD autonomy mode (take-care or let-me-look) |
 | `/aidd:qa` | `.aidd/framework/playbooks/40-qa.md` | Run the AIDD QA phase |
 | `/aidd:resume` | `.aidd/framework/prompts/resume.md` | Resume the active AIDD change from recorded state |
+| `/aidd:review-pr` | `.aidd/framework/protocol/pr-review.md` | Review an external pull request — two-phase, adversarially verified, nothing posted without approval |
 | `/aidd:revise` | `.aidd/framework/protocol/gates.md` | Send the pending AIDD gate back with feedback |
 | `/aidd:rigor` | `.aidd/framework/protocol/rigor-modes.md` | Set or report AIDD rigor mode (fast, standard, or critical) |
 | `/aidd:status` | `.aidd/framework/prompts/status.md` | Show AIDD pipeline status |

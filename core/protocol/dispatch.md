@@ -13,7 +13,9 @@ none of those failure modes.
 
 Once per step, in this order:
 
-1. Read the step's `(phase, unit-of-work)` pair from its playbook.
+1. Read the step's `(phase, unit-of-work)` pair from its playbook — or, for the `PR review`
+   rows, from the numbered phases of `pr-review.md`, which is a protocol rather than a
+   playbook because an external PR review sits outside the phase machine.
 2. Read `rigor.mode` from change state (`rigor-modes.md`). Absent → `standard`.
 3. Look up the row. The row gives the unit count for that mode, the ownership rule, the
    dispatch mode, the cap, and the deterministic order.
@@ -67,6 +69,12 @@ within this table, and an id is never reused for a different unit of work.
 | Delivery 2–4 | `del2-delivery` | delivery agent | 1 / 1 / 1 | sequential | 1 | — |
 | Delivery 6 | `del6-supervisor` | Supervisor final session report | 1 / 1 / 1 | sequential | 1 | — |
 | Retro 1 | `retro1-learner` | retro learner | 1 / 1 / 1 | sequential | 1 | — |
+| PR review 1a | `pr1-file` | PR file reviewer (one changed source file, or a component + its helper as one bundle) | one per changed source file (all modes) | parallel (artifact-disjoint) | 6 | path asc |
+| PR review 1b | `pr1-sweep` | PR sweep agent (batched trivial/cosmetic · batched E2E + config YAML) | 1 / 2 / 2 | parallel (artifact-disjoint) | 2 | bundle asc: `config-e2e`, `cosmetic` (fast: one merged `sweep` bundle) |
+| PR review 1c | `pr1-dim` | PR dimension specialist (the repo's roster, or AIDD's six) | 2 / 6 / 6 | parallel (artifact-disjoint) | 6 | dimension asc: `correctness-types`, `duplication-consistency`, `framework-invariants`, `security`, `tenant-boundary`, `test-coverage` (fast set: `correctness-types`, `framework-invariants`) |
+| PR review 2 | `pr2-verify` | adversarial verifier `mode: pr` (per finding) | every finding / every finding / every finding | parallel (artifact-disjoint per finding id); file-grouped above 12 findings, never grouped back to the finder | 6 | finding id asc |
+| PR review 3 | `pr3-cross` | PR cross-cutting reviewer | 1 / 1 / 1 | sequential, after every verdict is in | 1 | — |
+| PR review 4 | `pr4-comments` | PR comment validator | 1 / 1 / 1 | sequential, last | 1 | — |
 | Every phase boundary | `phase-supervisor` | Supervisor phase audit | 1 / 1 / 1 | sequential | 1 | — (never skipped in any mode) |
 
 ## Ownership rule (mechanical)
@@ -89,8 +97,27 @@ pairwise disjoint per `file-scope.md`. Three ways a plan proves it, and one that
    case-by-case reasoning, no "probably fine", no reading the code to guess.
 
 Sequential order is the row's **deterministic order** — story-id, dimension name, category
-name, subject-id, or ac-id, ascending. Ascending means byte-wise ascending on the exact
-identifier string, so two runs of the same step produce the same order.
+name, subject-id, ac-id, or repo-relative path, ascending. Ascending means byte-wise
+ascending on the exact identifier string, so two runs of the same step produce the same
+order.
+
+### PR review: artifact-disjointness and the different-agent routing rule
+
+The `PR review` rows are artifact-disjoint by construction (rule 1), and their unit keys are
+what proves it: `pr1-file` writes `pr-review/files/<path-slug>.md`, one per changed source
+file; `pr1-sweep` writes `pr-review/sweeps/<bundle>.md`; `pr1-dim` writes
+`pr-review/dimensions/<dimension>.md`; `pr2-verify` writes
+`pr-review/verdicts/<finding-id>.md`; `pr3-cross` and `pr4-comments` write one file each.
+Distinct keys ⇒ distinct paths ⇒ parallel is permitted with no further reasoning. Per-file
+agents never share an artifact, so two agents can never both own a file's findings.
+
+`pr2-verify` carries one extra mechanical rule the other rows do not (`pr-review.md` §6.1):
+**a finding is never verified by the agent that raised it.** Every finding carries
+`raised_by: <unit-key>` written by its finder, verification is dispatched only as the
+`adversarial-verifier` role — never as a role that raises findings — and the plan line
+records `finding=<id> raised_by=<unit-key> verified_by=<verifier-unit>` with
+`verified_by ≠ raised_by` asserted before dispatch. Above 12 findings the row groups
+verification by FILE; a group is never handed to a finder that raised anything in it.
 
 ## Runtime without parallelism
 
@@ -196,3 +223,26 @@ plan   = sequential, documented order: doc-writer, then delivery-agent-prep
 
 Then steps 2–4 sequential (1 agent), the Supervisor final report, and the phase boundary
 audit — the two dispatches no mode and no table row ever removes.
+
+### PR review — 9 changed files, `standard`
+
+Merge-base diff: 5 source files (one of them a component whose `use-device-flags` helper
+landed in the same PR), 2 renamed-only files, 2 pipeline YAML files. Finders raise 14
+findings.
+
+```text
+phase 0  ground truth: git merge-base + git rev-parse; BASE/HEAD recorded as evidence
+phase 1  pr1-file : 4 units (the component + its helper are ONE bundle, one agent)
+                    ⇒ parallel, cap 6, order path asc
+         pr1-sweep: 2 units (cosmetic = the 2 renames · config-e2e = the 2 YAMLs)
+         pr1-dim  : 6 units ⇒ parallel, cap 6, dimension asc
+phase 2  pr2-verify: 14 units (EVERY finding, not only CRITICAL/HIGH)
+                    ⇒ parallel, cap 6 ⇒ 6 dispatched, 8 queued, finding id asc
+                    each verified_by ≠ raised_by, asserted on the plan line
+phase 3  pr3-cross: 1 unit, sequential, holds all 12 finder artifacts + all 14 verdicts
+phase 4  pr4-comments: 1 unit, sequential, last
+```
+
+Four plan lines, one per phase with a fan-out. In `fast` the same rows yield the same 4
+per-file agents (the floor does not move), **1** merged sweep bundle, and **2** dimension
+specialists.

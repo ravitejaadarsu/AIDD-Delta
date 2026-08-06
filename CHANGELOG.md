@@ -5,6 +5,31 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ## [Unreleased]
 
+### Added
+
+- External PR review (ADR 019, `core/protocol/pr-review.md`): `/aidd:review-pr` reviews a
+  pull request the pipeline did **not** write, in five phases. Ground truth comes from the
+  commits — the platform's PR record (Azure DevOps `az repos pr show`/REST, GitHub
+  `gh pr view --json`) plus `git merge-base <target> <source>`, with the resolved BASE/HEAD
+  SHAs recorded as evidence — never from the PR description. Finders fan out **per changed
+  source file** (helper bundled with its component, trivial/cosmetic and E2E/config batched
+  into sweeps) alongside the repo's dimension specialists. **Every** finding is then attacked
+  by a **different** agent under a mechanical routing rule (`raised_by` / `verified_by`,
+  verification dispatched only as the `adversarial-verifier` role), which answers why the
+  problem is real and when it manifests, refutes what it cannot trace, **defaults to refuted
+  when uncertain**, and **sets the severity**. A cross-cutting agent holds the whole feed for
+  shared-package impact, platform-only violations, dead paths, constant drift and missing
+  cross-boundary tests; a comment validator is the final gate and **drops rather than
+  softens**. Every report carries three mandatory `PASS | FAIL | N/A (why)` verdicts —
+  additive, non-breaking (proven by tracing the inactive path), no hardcodes (redline scan,
+  allowlist untouched, escape hatches, an honest vacuous-test assessment). Shared-symbol
+  verdicts are **per consumer, proven by importer greps**. Nothing is posted without explicit
+  human approval in the run, in both autonomy modes, mirroring Jira write-back. New roles
+  `pr-file-reviewer`, `pr-cross-cutting-reviewer`, `pr-comment-validator` (+ wrappers),
+  templates `pr-review-findings.md`, `pr-review-report.md`, `pr-comments.md`, six
+  `dispatch.md` rows, a `pr_review:` constitution block with working defaults, and
+  `docs/pr-review.md`.
+
 ## [0.4.0] - 2026-08-06
 
 ### Added
