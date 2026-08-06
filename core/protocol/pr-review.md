@@ -609,9 +609,10 @@ Three rules bound this whole section, and none of them bends:
    by a **different** agent (the `adversarial-verifier` role, never a role that raises
    findings), and **the verifier sets the severity** (§6.3). A language specialist's CRITICAL
    is a proposal like anyone else's.
-3. **Availability is probed, never assumed.** Each lens names the specialist this environment
-   commonly exposes for it (the `Default specialist` column below), and the orchestrator resolves
-   that name against the agents the **runtime actually exposes** (§15.5). Present ⇒ the specialist
+3. **Availability is probed, never assumed.** Every lens runs on **AIDD's own roles by default**
+   — `pr-file-reviewer` in `mode: lens`. A repo that has a stronger specialist maps the lens key
+   to it in `pr_review.roster` (§15.4), and only those **roster-mapped** names are resolved
+   against the agents the **runtime actually exposes** (§15.5). Present ⇒ the mapped specialist
    is dispatched. Absent ⇒ **a lens is a brief, not a vendor**: the same lens runs as
    `pr-file-reviewer` in `mode: lens`, carrying the lens key and its "what the lens adds" column
    as the brief, and the degradation is recorded in the report with its reason (`evidence.md`
@@ -623,44 +624,47 @@ Three rules bound this whole section, and none of them bends:
 Resolution input is the merge-base path set (`git diff --name-only "${BASE}..${HEAD}"`) plus the
 dependency manifests as they stand at `HEAD`. Same diff ⇒ same roster, every run, on every host.
 
+Every row below dispatches `pr-file-reviewer` in `mode: lens` with `lens: <key>`, briefed by the
+third column, unless `pr_review.roster` maps that key to a specialist (§15.4).
+
 The `Default specialist` column is the agent dispatched **when the runtime exposes it**; every row
 falls back to `pr-file-reviewer` in `mode: lens` with `lens: <key>`, briefed by the last column,
 when it does not (§15.5) or when `pr_review.roster` maps the key elsewhere (§15.4).
 
-| Lens key | Signal in the changed path set | Default specialist | What the lens adds |
-|---|---|---|---|
-| `typescript` | `**/*.ts`, `**/*.tsx`, `**/*.mts`, `**/*.cts`, `**/*.js`, `**/*.mjs`, `**/*.cjs`, `tsconfig*.json` | `ecc:typescript-reviewer` | type safety, async correctness, Node/web security idiom |
-| `react` | `**/*.tsx`, `**/*.jsx`, or a changed file importing `react` | `ecc:react-reviewer` — **alongside** `typescript`, not instead of it | hook correctness, render cost, server/client boundary |
-| `vue` | `**/*.vue`, `nuxt.config.*`, or a changed file importing `vue` | `ecc:vue-reviewer` | Composition API, reactivity pitfalls, template escaping |
-| `python` | `**/*.py`, `pyproject.toml`, `requirements*.txt` | `ecc:python-reviewer` | typing, idiom, packaging, injection surfaces |
-| `django` | `manage.py`, `**/settings.py`, or `django` in the manifest | `ecc:django-reviewer` — alongside `python` | ORM correctness, migration safety, DRF, misconfiguration |
-| `fastapi` | `fastapi` in the manifest, or a changed file constructing `FastAPI(` | `ecc:fastapi-reviewer` — alongside `python` | async correctness, dependency injection, Pydantic schemas |
-| `go` | `**/*.go`, `go.mod` | `ecc:go-reviewer` | concurrency, error handling, idiom |
-| `rust` | `**/*.rs`, `Cargo.toml` | `ecc:rust-reviewer` | ownership, lifetimes, `unsafe`, error handling |
-| `java` | `**/*.java`, `pom.xml`, `build.gradle*` | `ecc:java-reviewer` | layering, JPA, Spring/Quarkus config, concurrency |
-| `kotlin` | `**/*.kt`, `**/*.kts` | `ecc:kotlin-reviewer` | null safety, coroutine safety, Compose |
-| `swift` | `**/*.swift`, `Package.swift` | `ecc:swift-reviewer` | value semantics, ARC, Swift concurrency |
-| `cpp` | `**/*.cpp`, `**/*.cc`, `**/*.hpp`, `**/*.h`, `CMakeLists.txt` | `ecc:cpp-reviewer` | memory safety, modern idiom, concurrency |
-| `csharp` | `**/*.cs`, `**/*.csproj` | `ecc:csharp-reviewer` | async patterns, nullable reference types, security |
-| `php` | `**/*.php`, `composer.json` | `ecc:php-reviewer` | typing, Eloquent/ORM patterns, injection surfaces |
-| `fsharp` | `**/*.fs`, `**/*.fsproj` | `ecc:fsharp-reviewer` | functional idiom, exhaustiveness, type safety |
-| `flutter` | `**/*.dart`, `pubspec.yaml` | `ecc:flutter-reviewer` | widget/state patterns, rebuild cost, accessibility |
-| `database` | `**/*.sql`, `**/migrations/**`, `**/alembic/**`, `**/*.prisma`, any DDL hunk | `ecc:database-reviewer` | index and query plans, schema design, migration safety |
+| Lens key | Signal in the changed path set | What the lens adds |
+|---|---|---|
+| `typescript` | `**/*.ts`, `**/*.tsx`, `**/*.mts`, `**/*.cts`, `**/*.js`, `**/*.mjs`, `**/*.cjs`, `tsconfig*.json` | type safety, async correctness, Node/web security idiom |
+| `react` | `**/*.tsx`, `**/*.jsx`, or a changed file importing `react` | hook correctness, render cost, server/client boundary Runs **alongside** the `typescript` lens, not instead of it. |
+| `vue` | `**/*.vue`, `nuxt.config.*`, or a changed file importing `vue` | Composition API, reactivity pitfalls, template escaping |
+| `python` | `**/*.py`, `pyproject.toml`, `requirements*.txt` | typing, idiom, packaging, injection surfaces |
+| `django` | `manage.py`, `**/settings.py`, or `django` in the manifest | ORM correctness, migration safety, DRF, misconfiguration Runs alongside the `python` lens. |
+| `fastapi` | `fastapi` in the manifest, or a changed file constructing `FastAPI(` | async correctness, dependency injection, Pydantic schemas Runs alongside the `python` lens. |
+| `go` | `**/*.go`, `go.mod` | concurrency, error handling, idiom |
+| `rust` | `**/*.rs`, `Cargo.toml` | ownership, lifetimes, `unsafe`, error handling |
+| `java` | `**/*.java`, `pom.xml`, `build.gradle*` | layering, JPA, Spring/Quarkus config, concurrency |
+| `kotlin` | `**/*.kt`, `**/*.kts` | null safety, coroutine safety, Compose |
+| `swift` | `**/*.swift`, `Package.swift` | value semantics, ARC, Swift concurrency |
+| `cpp` | `**/*.cpp`, `**/*.cc`, `**/*.hpp`, `**/*.h`, `CMakeLists.txt` | memory safety, modern idiom, concurrency |
+| `csharp` | `**/*.cs`, `**/*.csproj` | async patterns, nullable reference types, security |
+| `php` | `**/*.php`, `composer.json` | typing, Eloquent/ORM patterns, injection surfaces |
+| `fsharp` | `**/*.fs`, `**/*.fsproj` | functional idiom, exhaustiveness, type safety |
+| `flutter` | `**/*.dart`, `pubspec.yaml` | widget/state patterns, rebuild cost, accessibility |
+| `database` | `**/*.sql`, `**/migrations/**`, `**/alembic/**`, `**/*.prisma`, any DDL hunk | index and query plans, schema design, migration safety |
 
 ### 15.2 The default roster — diff-signal lenses (language-independent)
 
-| Lens key | Signal in the diff (matched mechanically) | Default specialist | What the lens adds |
-|---|---|---|---|
-| `security` | a `critical` trigger row of `rigor-modes.md` fires for authn/authz, secrets/crypto or PII; **or** the diff adds a route, an HTTP/RPC client, a deserializer, a subprocess/shell call, or a template render of caller-supplied input | `ecc:security-reviewer` | OWASP surfaces, secrets, SSRF/injection, unsafe crypto |
-| `silent-failure` | the diff adds or edits a `catch`/`except`/`rescue`/`recover()`/`if err != nil`/`.catch(`, an empty handler body, or a fallback default that stands in for a failure | `ecc:silent-failure-hunter` | swallowed errors, bad fallbacks, missing propagation |
-| `type-design` | the diff adds or changes an exported type, interface, struct, enum, dataclass, protocol, or published schema | `ecc:type-design-analyzer` | encapsulation, and which invariants the type could enforce but does not |
-| `test-quality` | any test file added or changed, **or** a source file changed with no test file anywhere in the diff | `ecc:pr-test-analyzer` | behavioral coverage, and the vacuous-assertion classes of §9.3 part 4 |
-| `comments` | the diff changes a comment or a docstring | `ecc:comment-analyzer` | comment rot — a comment that now describes the behavior the diff removed |
-| `a11y` | the diff touches a component, template, view, or stylesheet (`**/*.tsx`, `**/*.jsx`, `**/*.vue`, `**/*.html`, `**/*.css`, `**/components/**`) | `ecc:a11y-architect` | WCAG 2.2 semantics, focus order, labelling, contrast |
-| `performance` | the diff touches a request handler, a render path, a query builder, a worker/queue consumer, or a loop over caller-sized data | `ecc:performance-optimizer` | N+1 queries, unbounded work, sync work in a render path |
-| `mle` | the diff touches training/inference/feature code — `**/train*`, `**/model*`, `**/*.ipynb`, or `torch`/`tensorflow`/`sklearn`/`xgboost` in the manifest | `ecc:mle-reviewer` | data contracts, reproducibility, offline/online eval, rollback |
-| `healthcare` | the diff touches clinical or health data — FHIR/HL7 resources, EMR/EHR paths, PHI fields, clinical decision logic | `ecc:healthcare-reviewer` | clinical safety, PHI handling, medical data integrity |
-| `simplify` | always — one sweep per review | `ecc:code-simplifier` | duplication and consistency across the diff (**advisory**, below) |
+| Lens key | Signal in the diff (matched mechanically) | What the lens adds |
+|---|---|---|
+| `security` | a `critical` trigger row of `rigor-modes.md` fires for authn/authz, secrets/crypto or PII; **or** the diff adds a route, an HTTP/RPC client, a deserializer, a subprocess/shell call, or a template render of caller-supplied input | OWASP surfaces, secrets, SSRF/injection, unsafe crypto |
+| `silent-failure` | the diff adds or edits a `catch`/`except`/`rescue`/`recover()`/`if err != nil`/`.catch(`, an empty handler body, or a fallback default that stands in for a failure | swallowed errors, bad fallbacks, missing propagation |
+| `type-design` | the diff adds or changes an exported type, interface, struct, enum, dataclass, protocol, or published schema | encapsulation, and which invariants the type could enforce but does not |
+| `test-quality` | any test file added or changed, **or** a source file changed with no test file anywhere in the diff | behavioral coverage, and the vacuous-assertion classes of §9.3 part 4 |
+| `comments` | the diff changes a comment or a docstring | comment rot — a comment that now describes the behavior the diff removed |
+| `a11y` | the diff touches a component, template, view, or stylesheet (`**/*.tsx`, `**/*.jsx`, `**/*.vue`, `**/*.html`, `**/*.css`, `**/components/**`) | WCAG 2.2 semantics, focus order, labelling, contrast |
+| `performance` | the diff touches a request handler, a render path, a query builder, a worker/queue consumer, or a loop over caller-sized data | N+1 queries, unbounded work, sync work in a render path |
+| `mle` | the diff touches training/inference/feature code — `**/train*`, `**/model*`, `**/*.ipynb`, or `torch`/`tensorflow`/`sklearn`/`xgboost` in the manifest | data contracts, reproducibility, offline/online eval, rollback |
+| `healthcare` | the diff touches clinical or health data — FHIR/HL7 resources, EMR/EHR paths, PHI fields, clinical decision logic | clinical safety, PHI handling, medical data integrity |
+| `simplify` | always — one sweep per review | duplication and consistency across the diff (**advisory**, below) |
 
 **`simplify` is advisory by construction.** Its findings enter verification with proposed
 severity `LOW` whatever it proposes, and they reach the report only if a verifier **promotes**
@@ -678,8 +682,8 @@ Run once, after phase 0 and before phase 1 dispatches:
 2. **Override.** Apply `pr_review.roster` (§15.4). A key the repo maps takes the repo's agent; a
    key it maps to `null` is disabled and recorded as disabled-with-reason; a key it omits keeps
    the shipped default.
-3. **Probe.** Resolve every surviving agent name — the shipped default or the repo's mapping —
-   against the agents the **runtime actually exposes** (§15.5). Present ⇒ dispatch that
+3. **Probe.** Resolve every **roster-mapped** agent name against the agents the **runtime
+   actually exposes** (§15.5). Unmapped keys skip this step — their built-in lens always exists. Present ⇒ dispatch that
    specialist. Absent ⇒ fall back to `pr-file-reviewer` `mode: lens` with the same brief, and
    record the degradation. The fallback always exists, so the lens always runs.
 4. **Scale.** Cut the resolved set to the rigor mode's allowance (§15.6), then dispatch through

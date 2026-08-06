@@ -274,19 +274,14 @@ for lens in typescript react vue python django fastapi go rust java kotlin swift
             test-quality comments a11y performance mle healthcare simplify; do
   need "${P}" "^\| .${lens}. \|" "the '${lens}' lens row in the roster table"
 done
-for agent in 'ecc:typescript-reviewer' 'ecc:react-reviewer' 'ecc:vue-reviewer' \
-             'ecc:python-reviewer' 'ecc:django-reviewer' 'ecc:fastapi-reviewer' \
-             'ecc:go-reviewer' 'ecc:rust-reviewer' 'ecc:java-reviewer' \
-             'ecc:kotlin-reviewer' 'ecc:swift-reviewer' 'ecc:cpp-reviewer' \
-             'ecc:csharp-reviewer' 'ecc:php-reviewer' 'ecc:fsharp-reviewer' \
-             'ecc:flutter-reviewer' 'ecc:database-reviewer' 'ecc:security-reviewer' \
-             'ecc:silent-failure-hunter' 'ecc:type-design-analyzer' \
-             'ecc:pr-test-analyzer' 'ecc:comment-analyzer' 'ecc:a11y-architect' \
-             'ecc:performance-optimizer' 'ecc:mle-reviewer' 'ecc:healthcare-reviewer' \
-             'ecc:code-simplifier'; do
-  need "${P}" "${agent}" "the '${agent}' default specialist in the roster table"
+for lens in typescript react vue python django fastapi go rust java kotlin swift cpp \
+            csharp php fsharp flutter database security silent-failure type-design \
+            test-quality comments a11y performance mle healthcare simplify; do
+  need "${P}" "^\| .${lens}. \|" "the '${lens}' lens row in the roster table"
 done
-need "${P}" 'Availability is probed'         "the availability probe (never assumed)"
+need "${P}" "AIDD's own roles by default"    "lenses defaulting to AIDD's own reviewer role"
+need "${P}" 'a lens is a brief, not a vendor' "the lens-is-a-brief rule"
+need "${P}" 'roster-mapped'                  "the probe applying only to roster-mapped agents"
 need "${P}" 'a lens is a brief, not a vendor|falls? back to .pr-file-reviewer|fall back to .pr-file-reviewer' \
                                              "the fallback to AIDD's own reviewer when absent"
 need "${P}" 'degrade|degraded|degrades'      "graceful degradation of a missing specialist"

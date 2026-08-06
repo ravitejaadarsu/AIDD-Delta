@@ -1,10 +1,11 @@
 # Three-Layer Verification Architecture Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** execute this plan one task at a time under `core/playbooks/00-pipeline.md`,
+> dispatching the role named by each task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Implement AIDD-Delta v0.3.0: snapshot context system, Layer-2 Master Agent + Auditor + Tally agents with interrogation/negotiation protocols, Supervisor rename + super-context, Reviewer `mode=delta`, and the continuous test-debate protocol with Playwright MCP.
 
-**Architecture:** Everything follows the repo's three-file role pattern (canonical `core/roles/<role>.md` + thin `agents/aidd-<role>.md` wrapper pointing at the vendored `.aidd/framework/roles/<role>.md` path + templates in `core/templates/`). Artifacts are the only inter-agent channel; all new loops are budget-bounded; new gates plug into the existing `quality_gates` enum pattern. Spec: `docs/superpowers/specs/2026-08-04-three-layer-verification-design.md` (read it before any task).
+**Architecture:** Everything follows the repo's three-file role pattern (canonical `core/roles/<role>.md` + thin `agents/aidd-<role>.md` wrapper pointing at the vendored `.aidd/framework/roles/<role>.md` path + templates in `core/templates/`). Artifacts are the only inter-agent channel; all new loops are budget-bounded; new gates plug into the existing `quality_gates` enum pattern. Spec: `docs/specs/2026-08-04-three-layer-verification-design.md` (read it before any task).
 
 **Tech Stack:** Markdown role/protocol/template files, bash + python3-stdlib scripts (ADR 002 zero-dep rule), JSON Schema, bash test suites under `tests/*.test.sh` run by `tests/run.sh`.
 
