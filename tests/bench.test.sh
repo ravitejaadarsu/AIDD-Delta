@@ -243,4 +243,70 @@ if command -v shellcheck >/dev/null 2>&1; then
   check "bench/scripts/*.sh are shellcheck-clean at -S warning" $?
 fi
 
+# 15. The context-cost arm: measures bytes, and never launders them into tokens.
+#     This arm is the one a reader is most likely to over-read, so the assertions
+#     cover what it refuses to claim as much as what it computes.
+CTX_TMP="$(mktemp -d)"
+mkdir -p "${CTX_TMP}/src"
+cat > "${CTX_TMP}/src/sample.py" <<'PY'
+class Widget:
+    def __init__(self, size):
+        self.size = size
+
+    def area(self):
+        return self.size * self.size
+
+
+def build(n):
+    return [Widget(i) for i in range(n)]
+PY
+git -C "${CTX_TMP}" init -q
+git -C "${CTX_TMP}" add -A
+git -C "${CTX_TMP}" -c user.email=t@t -c user.name=t commit -qm init
+
+python3 bench/scripts/bench-context.py --root "${CTX_TMP}" --json 2>/dev/null | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+assert d["schema"] == "aidd-bench-context/1", d.get("schema")
+# Tokens and parity must stay unmeasured — bytes are never laundered into either.
+assert d["tokens_input"] is None, "tokens_input must be null"
+assert d["tokens_output"] is None, "tokens_output must be null"
+assert d["usage_source"] == "not-measured", d["usage_source"]
+assert d["defect_detection_parity"] is None, "parity must be null without a graded run"
+# The measured half must actually be measured.
+assert d["targets"] > 0, "no targets selected"
+assert d["baseline_bytes"] > 0, "baseline not measured"
+assert d["query_bytes"] > 0, "query arm not measured"
+# NOT asserted: that the query arm is cheaper. On a small file with many targets
+# it is not — spans are charged per target while the baseline dedupes the file.
+# A benchmark that can only report a win is not a benchmark, so the tool must be
+# able to return a negative ratio and this suite must tolerate one.
+assert isinstance(d["reduction_ratio"], float), d["reduction_ratio"]
+assert d["reduction_ratio"] < 1, "ratio of 1 would mean zero-cost reads"
+# Run identity is recorded so a dirty-tree result is detectable after the fact.
+assert "framework_tree_dirty" in d, "tree-dirty flag missing"
+assert "framework_head" in d, "head missing"
+'
+check "bench-context.py measures bytes and leaves tokens/parity unmeasured" $?
+
+python3 bench/scripts/bench-context.py --root "${CTX_TMP}" --sample 2 --json 2>/dev/null \
+  | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d["targets"]==2 else 1)'
+check "bench-context.py --sample caps the target set deterministically" $?
+
+# The loss regime, asserted rather than assumed: many targets in one small file
+# is the shape where reading the whole file once beats reading spans repeatedly.
+# If this ever stops being negative the cost model has changed and the docs lie.
+python3 bench/scripts/bench-context.py --root "${CTX_TMP}" --json 2>/dev/null | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+sys.exit(0 if d["reduction_ratio"] < 0 else 1)'
+check "bench-context.py reports a negative ratio when spans lose (small file, many targets)" $?
+
+rm -rf "${CTX_TMP}"
+
+grep -q 'Context-cost arm' bench/harness.md
+check "harness.md documents the context-cost arm" $?
+grep -q 'No cost constant may move on this arm alone' bench/harness.md
+check "harness.md states the no-constant-moves rule for the bytes arm" $?
+
 exit "${fail}"
