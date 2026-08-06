@@ -49,6 +49,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
     so **no cost constant in `cost-governance.md` has been revised**. The arm also reports a
     **negative** ratio where spans lose (many symbols from one small file), because a
     benchmark that can only report a win is not a benchmark.
+  - **Real prompt tokens** (`bench-context.py --tokens`, opt-in because it spends) — weighs
+    both payloads through the agent CLI and reads its own usage output; a control call is
+    subtracted so what remains is the payload's own cost, arithmetic on measured values
+    rather than a local tokenizer. Measured on a 60-symbol sample from a clean tree:
+    **93,024 -> 46,130 prompt tokens, a 50.4% reduction** ($2.06 to measure). Read it
+    against the index-amortized byte figure (56.2%), **not** the spans-only 87.4% — the
+    weighed query payload includes the index, and pairing it with the spans-only number
+    would overstate the saving by ~37 points. Tokens reduce **less** than bytes because JSON
+    tokenizes worse than prose. Defect-detection parity is still unmeasured and **no cost
+    constant has moved**.
 
 ### Changed
 
