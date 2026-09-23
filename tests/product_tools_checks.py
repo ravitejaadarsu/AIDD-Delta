@@ -1,6 +1,8 @@
 """Test the installation experience and exported evidence without network calls."""
 import importlib.util
 import json
+import re
+import textwrap
 from pathlib import Path
 import subprocess
 import sys
@@ -18,6 +20,14 @@ def module(name):
 
 
 class ProductTools(unittest.TestCase):
+    def test_ci_placeholders_fail_closed(self):
+        template = (ROOT / 'core/templates/ci-workflow.yml').read_text()
+        for name in ['Build', 'Test', 'Lint']:
+            match = re.search(r'- name: ' + name + r'\n        run: \|\n((?:          .*\n)+)', template)
+            self.assertIsNotNone(match)
+            result = subprocess.run(['bash', '-c', textwrap.dedent(match.group(1))], capture_output=True)
+            self.assertNotEqual(result.returncode, 0, name + ' placeholder silently passed')
+
     def test_report_escapes_untrusted_descriptions(self):
         report = module('aidd-report')
         html = report.render({'ready': False, 'requirements': [{'id': '<svg>',

@@ -7,6 +7,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ### Added
 
+- Generated CI templates now fail until canonical build/test/lint commands are configured.
+  Official checkout, setup-python and upload-artifact actions are pinned to verified release
+  commits using supported runtimes; CI uses read-only repository permissions.
+
 - Source-bound execution receipts (ADR 022): bounded argv execution, source/output hashes,
   explicit host acknowledgment, stale-proof rejection and approved-requirement coverage.
   New change templates enable receipts-v1; legacy changes emit a warning at preflight.

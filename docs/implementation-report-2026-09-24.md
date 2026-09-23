@@ -22,6 +22,8 @@ commercial validation plan. No revenue, customers or competitive benchmark wins 
 | Standalone evidence report | Reviewers get a shareable criterion/blocker summary | `core/scripts/aidd-report.py`, HTML and JSON, no remote assets |
 | Offline first-run demo | Users can inspect the core value without an API key or agent setup | `scripts/demo-evidence.py` |
 | Verification recipes | Teams can adapt existing checks across common stacks and risk areas | `docs/verification-recipes.md` |
+| CI template fails closed | Unconfigured build/test/lint placeholders cannot silently produce green CI | `core/templates/ci-workflow.yml` |
+| Immutable action dependencies | Official checkout, Python setup and artifact upload actions use verified release commit hashes | Repository workflows and generated CI template |
 | Portable CI coverage | Minimum Python and macOS behavior get automated regression coverage | Added Linux/Python 3.9 and macOS/Python 3.13 jobs |
 | Pilot intake and business plan | Clear path from repository interest to a scoped evaluation | Team guide, inquiry form and commercial strategy |
 
@@ -36,12 +38,13 @@ ShellCheck and the pinned Markdown linter. The new and extended focused tests in
   shell-text handling, symlink escapes and approved-criterion omissions.
 - **21 delivery-readiness tests:** existing approval/gate protections plus receipts-v1
   integration, valid source evidence, missing receipts and stale source rejection.
-- **5 product-tool tests:** HTML escaping/CSP, missing setup, installed-tool interoperability,
-  the offline demo and preserving an existing report on an overwrite attempt.
+- **6 product-tool tests:** HTML escaping/CSP, missing setup, installed-tool interoperability,
+  the offline demo, preserving an existing report on an overwrite attempt, and failing CI placeholders.
 
 These are framework regression results, not proof of better AI-generated code or a full
-real-customer pipeline evaluation. Cloud CI results are tracked on the pushed commit; local
-results alone do not claim that remote jobs have run. Native Windows capture is unsupported;
+real-customer pipeline evaluation. The first implementation commit passed all three GitHub CI jobs, including Linux/Python 3.9
+and macOS/Python 3.13. Follow-up CI dependency maintenance is checked on its own pushed
+commit; the Actions history is the authoritative per-commit record. Native Windows capture is unsupported;
 Linux, macOS and WSL are the intended capture environments.
 
 ## Why this is commercially useful
