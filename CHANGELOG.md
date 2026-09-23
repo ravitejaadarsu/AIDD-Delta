@@ -7,6 +7,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ### Added
 
+- Portable delivery readiness preflight (`core/scripts/aidd-ready.py`, ADR 021): checks
+  all quality gates, allowed rigor exemptions, complete approval hashes and unresolved
+  records before push. Emits human-readable or JSON diagnostics without modifying state.
+- Multi-artifact approval bindings, behavioral readiness regression tests, and a prioritized
+  improvement plan covering source-bound evidence, use-case fixtures and comparative runs.
+- Duplicate YAML keys now fail parsing instead of silently overriding earlier state values.
+  Existing multi-file approvals require renewed approval with complete artifact bindings.
+
 - Execution-environment surface (ADR 020): the framework now manages *where and how* it
   runs, not only what it says.
   - **Dual-state context index** (`core/scripts/aidd-index.py`,

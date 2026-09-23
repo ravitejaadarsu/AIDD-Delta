@@ -231,10 +231,10 @@ python3 bench/scripts/bench-patch.py "${TMP}/f.txt" --expect "gamma" --replace "
 missing_rc=$?
 python3 bench/scripts/bench-patch.py "${TMP}/f.txt" --expect "alpha" --replace "x" >/dev/null 2>&1
 ambiguous_rc=$?
-[ "${missing_rc}" -eq 3 ]
-check "bench-patch rejects an absent anchor with exit 3" $?
-[ "${ambiguous_rc}" -eq 3 ]
-check "bench-patch rejects an ambiguous anchor with exit 3" $?
+if [ "${missing_rc}" -eq 3 ]; then missing_check=0; else missing_check=1; fi
+check "bench-patch rejects an absent anchor with exit 3" "${missing_check}"
+if [ "${ambiguous_rc}" -eq 3 ]; then ambiguous_check=0; else ambiguous_check=1; fi
+check "bench-patch rejects an ambiguous anchor with exit 3" "${ambiguous_check}"
 rm -rf "${TMP}"
 
 # 14. Lint the bench scripts when a linter is available (tests/run.sh lints only its own set).

@@ -89,6 +89,17 @@
         "additionalProperties": false,
         "properties": {
           "status": { "enum": ["pending", "awaiting", "approved", "revised", "stale", "aborted"] },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object", "required": ["path", "sha256"],
+              "additionalProperties": false,
+              "properties": {
+                "path": { "type": "string", "pattern": "^[^\\\\]+$" },
+                "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+              }
+            }
+          },
           "artifact": { "type": ["string", "null"] },
           "artifact_sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{8,64}$" },
           "approved_by": { "enum": ["human", "auto", null] },

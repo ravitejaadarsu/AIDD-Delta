@@ -28,7 +28,14 @@ Phase boundary: rebuild the snapshot pack
      (`git revert <sha>`), the migration down-path (the exact command), or the feature flag
      (its name and the value that disables it). "Not reversible" is an allowed answer only
      with the reason; a blank line is not.
-4. Push branch; open PR (`gh pr create`); watch CI (poll, bounded 30 min).
+4. **Mechanical preflight (all tiers).** Run
+   `python3 .aidd/framework/scripts/aidd-ready.py .aidd/changes/<change-id> --json`
+   immediately before pushing; save its output to `delivery/readiness.json`.
+   A nonzero exit blocks delivery. Resolve every reported issue and re-run; changed gate
+   artifacts require renewed approval per `../protocol/gates.md`, never silently rehash an
+   existing approval. The checker does not replace evidence review or execute tests.
+   If Python is unavailable, delivery blocks until this check runs on a capable host.
+   Then push branch; open PR (`gh pr create`); watch CI (poll, bounded 30 min).
    CI red → Build Fixer (max 2 attempts, re-push, re-watch) → exhausted = human
    escalation with logs.
 5. Optional Jira write-back per `../protocol/jira-sync.md` (config + per-run approval).

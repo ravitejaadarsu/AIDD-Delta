@@ -30,8 +30,10 @@ Normative rules for reading and writing AIDD state. Every runtime follows these 
 
 On start, if any change has `phase_status != complete` for its current phase:
 
-1. Verify every gate's `artifact_sha256` against the artifact on disk — mismatch flips the
-   gate to `stale` (see `gates.md`).
+1. Verify every entry in each gate's `artifacts` list against disk, including newly added
+   files in the gate's bound directories. Legacy single-file `artifact_sha256` entries
+   remain readable, but cannot cover multi-file gates. A mismatch or unbound file flips
+   the gate to `stale` (see `gates.md`).
 2. Revert any story with `status: in_progress` to `ready` (keep partial diffs in place; the
    re-dispatched builder reconciles or reverts its owned files).
 3. **Re-prove, never trust:** re-run the current phase's verification commands to establish

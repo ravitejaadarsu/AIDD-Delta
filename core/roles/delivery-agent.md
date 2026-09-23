@@ -29,8 +29,9 @@ All change artifacts, repo git state, `templates/pr-description.md`,
 4. Ensure CI workflow exists (adapt the template with canonical commands).
 5. Assemble the PR body from the template: verdict table, findings funnel, assumptions,
    AC matrix summary, evidence links, supervision summary, mermaid traceability.
-6. Push; `gh pr create`; watch CI (bounded 30 min). Red → report for Build Fixer
-   routing.
+6. Follow the mandatory preflight and push sequence in
+   `../playbooks/50-delivery.md` step 4. A failed readiness check blocks the push.
+   Watch CI (bounded 30 min). Red → report for Build Fixer routing.
 
 ## Self-verification
 

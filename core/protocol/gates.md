@@ -44,7 +44,40 @@ the ledger + PR body), REJECT→failed (blocks G3; re-enter the fix loop or esca
 
 ## Staleness (precision rule)
 
-Approval binds to content: the entry records each artifact's sha256. If a gated artifact
+Approval binds to content: the entry records each artifact's sha256 in `artifacts`, an
+array of `{path, sha256}` objects. Paths are relative to the change directory, unique,
+and must resolve to files inside it; hashes are full 64-character SHA-256 values.
+Expand directory patterns recursively to include every file at approval time. A newly
+added file in a bound directory also makes approval stale. Record hashes only when the
+human or automatic disposition is obtained, never refresh them to conceal a change.
+
+```yaml
+g1_prd:
+  status: approved
+  approved_by: human
+  at: "2026-09-24T12:00:00Z"
+  artifacts:
+    - path: prd.md
+      sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+```
+
+The hash above illustrates the format; compute the hash of the actual artifact bytes.
+Legacy `artifact` / `artifact_sha256` single-file entries remain schema-valid for resume,
+but delivery requires complete bindings and full hashes. Re-approve incomplete legacy
+gates; do not infer approval of additional files.
+
+The read-only `core/scripts/aidd-ready.py` enforces delivery readiness on every tier:
+all schema-defined quality gates, mode-specific exemptions, required approvals and artifact
+coverage, current hashes, unresolved cost stops, supervision, stories and repeatability
+records. It returns 0 for ready, 1 for blocked, 2 for invalid input. The Delivery playbook
+requires it immediately before push. It validates recorded evidence structure and freshness,
+not whether a test genuinely proves a requirement; the verification roles still own that.
+
+For `fast`, G3 does not require the skipped `evidence/post/` directory. All other bound
+artifact groups remain required. A recorded rigor escalation requires a human G3 approver
+in both modes. No runtime may replace this preflight with an asserted pass.
+
+If a gated artifact
 changes afterwards, the gate flips to `stale` and must re-pass. Auto and human approvals
 share an identical entry structure.
 

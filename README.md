@@ -14,7 +14,7 @@ afternoon discovering, in review, that a green test proved nothing.
 | **Authorship** | single author; no external contributors yet |
 | **External validation** | **none yet.** No third-party team has run this end to end and reported back. If you do, [we publish it](docs/case-studies/README.md) — including negative results |
 | **CI** | green on `main` ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) — self-tests plus pinned ShellCheck and markdownlint, with a linter-drift check so local and CI lint byte-identically |
-| **Self-tests** | `bash tests/run.sh` — zero-dependency bash + python3 stdlib; 17 suites at the time of writing. The runner prints `suites=N failures=N`; CI fails on any non-zero |
+| **Self-tests** | `bash tests/run.sh` — zero-dependency bash + python3 stdlib; automatically discovered suites. The runner prints `suites=N failures=N`; CI fails on any non-zero |
 | **Benchmarks** | **no published benchmark results yet.** The harness ships in [`bench/`](bench/harness.md) with its task set, defect corpus, and comparison arms — run it yourself and report what you get |
 | **Runtime tiers** | Tier 1 Claude Code · Tier 2 Codex CLI · Tier 3 any other agent CLI or plain LLM ([capability matrix](docs/capability-matrix.md)) |
 
@@ -153,18 +153,27 @@ so you can disagree with it precisely.
 Neither of these is a competitor to beat; they are different shapes of the same ambition,
 and the differences are worth knowing before you pick one.
 
-- **AI-DLC** (AWS's AI-Driven Development Lifecycle) — a methodology for restructuring the
-  software lifecycle around AI with human checkpoints at each phase. AIDD Delta shares the
-  staged, human-gated shape; it differs by shipping the lifecycle as executable playbooks
-  with a machine-checked state protocol and an adversarial verification layer, rather than as
-  guidance a team adapts.
-- **Superpowers** — a broad library of composable Claude Code skills, invoked as needed.
-  AIDD Delta is not a library: it is one opinionated end-to-end pipeline with a fixed phase
-  order and gates. The two are complementary — skills you reach for, versus a pipeline that
-  dispatches roles at you.
+- **[AI-DLC](https://github.com/awslabs/aidlc-workflows)** ships a structured lifecycle
+  implementation with an engine, approval gates, audit records and multiple agent-runtime
+  integrations. Compare actual enforcement, task success and cost; executable workflows
+  and portability alone are not unique to Delta.
+- **[Superpowers](https://github.com/obra/superpowers)** is a development methodology built
+  from composable skills, covering design, planning, test-first implementation and review
+  across multiple runtimes. It is an end-to-end workflow, not merely a skill collection.
+- **Delta's focus** is acceptance-criterion evidence, adversarial verification of findings,
+  and artifact-bound delivery approval. This is a testable design emphasis, not a measured
+  claim that Delta produces better code than either alternative.
 
 Both are defined as comparison arms in the harness so the difference can be measured instead
 of argued. **No results are published yet** ([docs/benchmarks.md](docs/benchmarks.md)).
+
+## Delivery readiness
+
+**[built]** A portable, read-only preflight checks all quality gates, complete approval
+hashes and unresolved state before delivery. It rejects stale or missing artifacts and
+invalid exemptions. Python 3.9+ is required; no third-party package is needed.
+See [delivery readiness](docs/delivery-readiness.md) for usage and limitations, and the
+[improvement plan](docs/improvement-plan.md) for the next measurable milestones.
 
 ## Quickstart
 

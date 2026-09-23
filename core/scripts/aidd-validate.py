@@ -114,6 +114,8 @@ def parse_map(lines, index, indent):
         if not match:
             raise ParseError(f'expected "key:" or "key: value", got: {content}')
         key, inline = match.group(1), match.group(2)
+        if key in result:
+            raise ParseError(f'duplicate key: {key}')
         if inline is not None and inline != '':
             result[key] = parse_scalar(inline)
             index += 1
