@@ -31,3 +31,25 @@ jobs:
           fi
       - name: Self-tests
         run: bash tests/run.sh
+
+  portable-evidence:
+    name: Evidence tools (${{ matrix.os }}, Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.9"
+          - os: macos-latest
+            python: "3.13"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Exercise receipts, delivery integration and installed tools
+        run: |
+          bash tests/evidence.test.sh
+          bash tests/readiness.test.sh
+          bash tests/product-tools.test.sh

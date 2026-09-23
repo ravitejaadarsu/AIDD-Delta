@@ -1,0 +1,50 @@
+name: Team pilot inquiry
+description: Propose a small evaluation of Delta's evidence workflow. No confidential information.
+title: "[Pilot] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a public issue. Do not include proprietary code, secrets, customer data, or private logs.
+        An inquiry is not a purchase, service agreement, or guarantee of availability.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What verification problem are you trying to solve?
+      description: Describe a recent example in general terms.
+    validations:
+      required: true
+  - type: dropdown
+    id: team-size
+    attributes:
+      label: Engineering team size
+      options:
+        - Solo
+        - 2–10
+        - 11–30
+        - 31–100
+        - More than 100
+    validations:
+      required: true
+  - type: input
+    id: stack
+    attributes:
+      label: Stack and agent workflow
+      placeholder: Python API, existing CI, preferred coding agent
+  - type: textarea
+    id: success
+    attributes:
+      label: What would make a pilot worthwhile?
+      description: Name a measurable outcome, proposed scope, and any constraints.
+    validations:
+      required: true
+  - type: dropdown
+    id: approach
+    attributes:
+      label: Evaluation approach
+      options:
+        - Self-service open-source evaluation
+        - Discuss paid assisted setup or a scoped pilot
+        - Exploring options
+    validations:
+      required: true

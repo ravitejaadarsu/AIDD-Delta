@@ -7,6 +7,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ### Added
 
+- Source-bound execution receipts (ADR 022): bounded argv execution, source/output hashes,
+  explicit host acknowledgment, stale-proof rejection and approved-requirement coverage.
+  New change templates enable receipts-v1; legacy changes emit a warning at preflight.
+- Read-only setup doctor, standalone HTML/JSON evidence reports and an offline first-run demo.
+- Cross-stack verification recipes, a team pilot intake form and a commercial validation plan.
+
 - Portable delivery readiness preflight (`core/scripts/aidd-ready.py`, ADR 021): checks
   all quality gates, allowed rigor exemptions, complete approval hashes and unresolved
   records before push. Emits human-readable or JSON diagnostics without modifying state.

@@ -4,8 +4,15 @@ The fastest honest way to judge AIDD Delta is to run it once against a tiny bund
 offline, and read the artifacts it produces. That takes about fifteen minutes and touches
 none of your own code.
 
-Prerequisites: `bash`, `python3`, `git`. Nothing else. No network calls are required for the
-fixture run.
+Prerequisites: `bash`, Python 3.9+, `git` on Linux, macOS or WSL. Nothing else. No network calls are required for the
+evidence demo; an agent-driven pipeline uses your configured model provider.
+
+## Quick preview without an agent
+
+From a checkout, run `python3 scripts/demo-evidence.py`. It uses a temporary Git repository,
+executes a passing check, exports a report and verifies that a source change invalidates the
+old receipt. It cleans up on exit. This tests the evidence mechanics, not an AI coding run.
+Run `python3 core/scripts/aidd-doctor.py` for read-only setup diagnostics.
 
 ## 1. Prove the framework itself is sound (2 minutes)
 
@@ -15,8 +22,8 @@ cd ~/AIDD-Delta
 bash tests/run.sh
 ```
 
-Expect a final line of the form `suites=N failures=0`. ShellCheck and markdownlint run only
-if installed; the runner says which it skipped. If `failures` is not zero on a clean
+Expect a final line of the form `suites=N failures=0`. ShellCheck runs if installed. Markdownlint uses the installed CLI or fetches its pinned
+version with npx, which may require network access; the runner reports unavailable tools. If `failures` is not zero on a clean
 checkout, that is a bug worth an issue —
 [`.github/ISSUE_TEMPLATE/bug_report.md`](../.github/ISSUE_TEMPLATE/bug_report.md).
 

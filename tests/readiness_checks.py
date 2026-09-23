@@ -3,6 +3,8 @@ import copy
 import hashlib
 import importlib.util
 import json
+import shutil
+import sys
 from pathlib import Path
 import subprocess
 import tempfile
@@ -109,6 +111,40 @@ class Readiness(unittest.TestCase):
         self.assertLess(playbook.index('aidd-ready.py'), playbook.index('Then push branch'))
         agent = (ROOT / 'core/roles/delivery-agent.md').read_text()
         self.assertIn('../playbooks/50-delivery.md', agent)
+
+    def test_receipts_contract_blocks_absent_evidence(self):
+        self.state['evidence_contract'] = 'receipts-v1'
+        self.assertIn('execution_evidence', self.run_cli(1))
+
+    def test_receipts_contract_integrates_with_approval_and_source_drift(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory).resolve()
+            subprocess.run(['git', 'init', '-q', str(repo)], check=True)
+            (repo / 'app.txt').write_text('source')
+            change = repo / '.aidd/changes/example'
+            shutil.copytree(self.root, change)
+            self.root = change
+            self.state['evidence_contract'] = 'receipts-v1'
+            out = change / 'evidence/receipts/suite'
+            result = subprocess.run([sys.executable, str(ROOT / 'core/scripts/aidd-evidence.py'),
+                'capture', '--host', '--repo', str(repo), '--out', str(out), '--',
+                sys.executable, '-c', 'print("PASS")'], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            requirement = {'id': 'AC-1', 'description': 'Example requirement'}
+            (change / 'requirements.json').write_text(json.dumps({'schema': 1, 'requirements': [requirement]}))
+            ref = 'evidence/receipts/suite/receipt.json'
+            (change / 'evidence/acceptance.json').write_text(json.dumps({'schema': 1,
+                'suite_receipts': [ref], 'requirements': [dict(requirement, receipts=[ref])]}))
+            for gate, names in {
+                'g1_prd': ['requirements.json'],
+                'g3_premerge': ['evidence/acceptance.json', ref, 'evidence/receipts/suite/output.log'],
+            }.items():
+                for name in names:
+                    self.state['gates'][gate]['artifacts'].append({'path': name,
+                        'sha256': hashlib.sha256((change / name).read_bytes()).hexdigest()})
+            self.run_cli(0)
+            (repo / 'app.txt').write_text('changed after tests')
+            self.assertIn('execution_evidence', self.run_cli(1))
 
     def test_every_quality_gate_is_required(self):
         original = copy.deepcopy(self.state)

@@ -44,6 +44,9 @@ mechanism named in the cell · **unsupported**: not available at all.
 | **Background / long-running work** | **supported** — a wide fan-out runs to completion inside one session | **degraded** — a long run spans sessions; `state.yaml` is the resume point and the resume prompt re-proves rather than trusts | **degraded** — same, with more manual steps per resume |
 | **Delivery readiness preflight** (`core/scripts/aidd-ready.py`) | **supported** — Python 3.9+ checks quality gates, approval hashes and unresolved records before push | **supported** — identical CLI and exit codes; invocation is a Delivery playbook duty | **supported with Python 3.9+** — otherwise delivery blocks until the check runs on a capable host; no assertion fallback |
 
+| **Execution receipts and acceptance evidence** (`core/scripts/aidd-evidence.py`) | **supported** — Python 3.9+, Git and POSIX capture; identical read-only verification | **supported** — same CLI; explicit host execution or caller-selected sandbox wrapper | **supported on Linux/macOS/WSL** — capture unavailable on native Windows; use a capable host, never an asserted receipt |
+| **Setup doctor and evidence report** (`core/scripts/aidd-doctor.py`, `core/scripts/aidd-report.py`) | **supported** — local diagnostics and static HTML/JSON export | **supported** — identical tools without model calls | **supported with Python 3.9+ and Git** — no execution ability means diagnostics/export must run on another host |
+
 ## The degradation contract
 
 This is the promise. It is deliberately narrow so that it is testable.

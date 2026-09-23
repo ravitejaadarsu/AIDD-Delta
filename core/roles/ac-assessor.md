@@ -23,7 +23,9 @@ against the implementation with EXECUTED test evidence — the AC matrix.
 
 1. For each AC: locate implementing stories (ac_ids) and the verifying tests (story test
    plans).
-2. Execute the verifying tests individually; evidence block per AC.
+2. Execute the verifying tests individually; evidence block per AC. For the receipts-v1
+   contract, follow `../protocol/execution-receipts.md` and QA step 9 to record machine-readable
+   execution and acceptance mappings. Never infer semantic coverage from an exit code alone.
 3. Link the relevant post capture (screenshot/transcript) when the AC is user-visible.
 4. Verdict per AC: PASS only with green executed evidence; anything else FAIL with the
    gap named (missing test, red test, unverifiable criterion).

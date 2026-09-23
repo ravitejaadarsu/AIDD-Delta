@@ -19,6 +19,9 @@ identically in all three modes.
    (`../protocol/autonomy-modes.md`). Zero open BLOCKING questions may remain.
 2. **PRD** — Product Analyst stage 2 → `prd.md` (testable ACs with ids; Jira ACs imported
    per `../protocol/jira-sync.md`; affected-flows table for evidence capture).
+   For `evidence_contract: receipts-v1`, also produce `requirements.json` from
+   `../templates/requirements.json`, with the identical AC ids and criterion text. G1 binds
+   both files; later criteria changes require renewed approval.
 3. **GATE G1** (`g1_prd`) per `../protocol/gates.md`.
 4. **Architecture candidates** — dispatch Architect (`../roles/architect.md`) three times
    in parallel with lenses `simplicity-first`, `scalability-first`, `risk-first` →

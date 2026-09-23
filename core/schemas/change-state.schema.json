@@ -8,6 +8,7 @@
     "schema": { "type": "integer", "enum": [1] },
     "change_id": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$" },
     "intent": { "type": "string" },
+    "evidence_contract": { "enum": ["receipts-v1"] },
     "mode": { "enum": ["take-care", "let-me-look"] },
     "rigor": {
       "type": "object",

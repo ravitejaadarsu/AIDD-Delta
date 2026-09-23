@@ -10,11 +10,15 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+import subprocess
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('state_validator', HERE / 'aidd-validate.py')
 validator = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(validator)
+evidence_spec = importlib.util.spec_from_file_location('evidence', HERE / 'aidd-evidence.py')
+evidence = importlib.util.module_from_spec(evidence_spec)
+evidence_spec.loader.exec_module(evidence)
 
 FAST_NA = {
     'auditor_approved', 'debate_complete', 'tally_reconciled', 'security_clean',
@@ -60,6 +64,15 @@ def check(root, state, schema):
         'g3_premerge': ['qa/**/*', 'qa/critic-verdict.md', 'ac-matrix.md'],
         'g_test_report': ['qa/test-report.md'],
     }
+    if state.get('evidence_contract') == 'receipts-v1':
+        groups['g1_prd'].append('requirements.json')
+        groups['g3_premerge'].extend(['evidence/acceptance.json', 'evidence/receipts/**/*'])
+        try:
+            report = evidence.check_manifest(root, evidence.repo_root(root))
+            for error in report['errors']:
+                block('execution_evidence', error)
+        except (OSError, ValueError, subprocess.SubprocessError) as exc:
+            block('execution_evidence', str(exc))
     if mode != 'fast':
         groups['g3_premerge'].append('evidence/post/**/*')
     for name, patterns in groups.items():
@@ -126,6 +139,7 @@ def main():
     parser.add_argument('change_directory', type=Path)
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args()
+    warnings = []
     try:
         root = args.change_directory.resolve()
         schema = json.loads((HERE.parent / 'schemas/change-state.schema.json').read_text())
@@ -136,16 +150,20 @@ def main():
             errors = [{'code': 'schema', 'message': message} for message in invalid]
             code = 2
         else:
+            if state.get('evidence_contract') != 'receipts-v1':
+                warnings.append('Legacy change: execution receipts are not required; source freshness is not checked.')
             errors = check(root, state, schema)
             code = int(bool(errors))
     except (OSError, ValueError, validator.ParseError) as exc:
         errors = [{'code': 'input', 'message': str(exc)}]
         code = 2
-    result = {'ready': code == 0, 'errors': errors}
+    result = {'ready': code == 0, 'errors': errors, 'warnings': warnings}
     if args.json:
         print(json.dumps(result, sort_keys=True))
     else:
         print('READY' if code == 0 else 'BLOCKED')
+        for warning in warnings:
+            print(f'  WARNING: {warning}')
         for error in errors:
             print(f'  {error["code"]}: {error["message"]}')
     return code

@@ -167,11 +167,25 @@ and the differences are worth knowing before you pick one.
 Both are defined as comparison arms in the harness so the difference can be measured instead
 of argued. **No results are published yet** ([docs/benchmarks.md](docs/benchmarks.md)).
 
+## Try the evidence workflow without an agent
+
+```bash
+python3 core/scripts/aidd-doctor.py
+python3 scripts/demo-evidence.py
+```
+
+The offline demo executes a check in a temporary repository, verifies acceptance evidence,
+exports an HTML report, then changes the source and demonstrates that old proof is blocked.
+No model, API key or container is required. Your repository is not modified by the demo.
+See [execution receipts](docs/execution-receipts.md) and
+[verification recipes](docs/verification-recipes.md) to apply this to your own work.
+
 ## Delivery readiness
 
 **[built]** A portable, read-only preflight checks all quality gates, complete approval
 hashes and unresolved state before delivery. It rejects stale or missing artifacts and
-invalid exemptions. Python 3.9+ is required; no third-party package is needed.
+invalid exemptions. New changes also require source-bound suite and acceptance receipts.
+Python 3.9+ is required; no third-party package is needed.
 See [delivery readiness](docs/delivery-readiness.md) for usage and limitations, and the
 [improvement plan](docs/improvement-plan.md) for the next measurable milestones.
 
@@ -193,6 +207,12 @@ See [delivery readiness](docs/delivery-readiness.md) for usage and limitations, 
 | `tests/` | Framework self-tests (zero-dependency bash + python3) |
 | `bench/` | Benchmark harness: task set, seeded defect corpus, comparison arms |
 | `docs/` | Human-oriented reference, ADRs, case studies |
+
+## Teams and pilot evaluations
+
+Interested in evaluating Delta for a team? Read the [pilot guide](docs/teams.md).
+The current tools run locally with no hosted account. A managed team service is a proposal,
+not a shipped product; comparative quality and willingness to pay still need validation.
 
 ## Contributing
 

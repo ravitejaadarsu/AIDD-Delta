@@ -11,14 +11,15 @@ and behavioral regression tests. See [delivery-readiness.md](delivery-readiness.
 Acceptance: missing, stale and contradictory state blocks delivery with an actionable error;
 valid fast, standard and critical fixtures pass without a model call.
 
-## 2. Source-bound evidence — next
+## 2. Source-bound evidence — implemented locally
 
-Capture execution receipts containing argv, working directory, source-tree fingerprint,
+The receipt runner now captures argv, working directory, source-tree fingerprint,
 exit code, timestamps, tool versions and output digest. Bind AC evidence to receipts; reject
 proof after a relevant source change. Test timeout, interruption, nonzero exits, dirty and
 untracked files, and missing tools. Never execute shell text extracted from a report.
-Acceptance: changing source invalidates its old proof; failed or interrupted execution cannot
-be presented as a passing receipt. Receipts remain distinct from semantic proof of an AC.
+Implemented checks reject source drift, failed/interrupted execution, modified logs and
+omitted approved criteria. Receipts remain unsigned local records, distinct from semantic
+proof of an AC. See [execution receipts](execution-receipts.md).
 
 ## 3. Use-case coverage — next
 
@@ -56,3 +57,10 @@ failures, confusing output and total time to first verified result. Prioritize t
 before adding roles. Add CI enforcement after defining trust and approval boundaries.
 Acceptance: three independently reproduced case studies, documented upgrade behavior,
 negative results, and a release checklist tied to actual tests and evaluated tasks.
+
+## 6. Commercial validation — materials available, demand unvalidated
+
+The [team guide](teams.md), public pilot inquiry form and
+[commercial strategy](commercial-strategy.md) define a narrow evaluation offer. No paid service
+or revenue is claimed. Validate willingness to pay and actual reviewer benefit before building
+a hosted platform. A useful next milestone is a paid pilot with permissioned, measured results.

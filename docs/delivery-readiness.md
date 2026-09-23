@@ -15,6 +15,8 @@ python3 .aidd/framework/scripts/aidd-ready.py .aidd/changes/<change-id> --json
 
 Exit 0 means the recorded state is ready; exit 1 means blockers; exit 2 means invalid input
 or schema. JSON always contains `ready` and an `errors` array with `code` and `message`.
+Legacy changes without `evidence_contract: receipts-v1` emit an explicit warning that
+source freshness is not checked. New change templates enable receipts-v1.
 The tool reads files only. It never approves, writes state, runs artifact commands, pushes,
 or merges. The Delivery playbook requires a successful run immediately before push.
 
@@ -40,10 +42,11 @@ A legacy incomplete approval is a blocker, not permission to approve additional 
 
 Readiness verifies recorded state, file coverage and hash consistency. A hash proves bytes
 have not changed since the recorded approval; it does not authenticate the approver or prove
-an agent ran a command. It does not inspect product-source changes, evaluate assertions,
-reconcile the AC matrix semantically, or reproduce test results. Existing reviewers and
+an agent ran a command. For receipts-v1 it rejects source changes, output tampering and omitted approved criteria
+using [execution receipts](execution-receipts.md). It does not evaluate assertions,
+reconcile the prose AC matrix semantically, or reproduce test results. Existing reviewers and
 verification roles remain required. Run their checks again after product changes.
 
 This CLI is a preflight, not a security boundary against an agent that can edit both state
-and evidence or ignore the playbook. Independent CI enforcement, source-bound execution
-receipts and externally authenticated approval records are future work.
+and evidence or ignore the playbook. Independent trusted CI enforcement and externally authenticated approval records are future
+work. Local source-bound execution receipts are available now.

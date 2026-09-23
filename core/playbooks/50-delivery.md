@@ -33,7 +33,10 @@ Phase boundary: rebuild the snapshot pack
    immediately before pushing; save its output to `delivery/readiness.json`.
    A nonzero exit blocks delivery. Resolve every reported issue and re-run; changed gate
    artifacts require renewed approval per `../protocol/gates.md`, never silently rehash an
-   existing approval. The checker does not replace evidence review or execute tests.
+   existing approval. If rebase or documentation preparation changed in-scope source after
+   QA, return to the affected QA checks, capture fresh suite/AC receipts and renew G3, then
+   resume here without repeating already completed delivery preparation. The checker does
+   not replace evidence review or execute tests.
    If Python is unavailable, delivery blocks until this check runs on a capable host.
    Then push branch; open PR (`gh pr create`); watch CI (poll, bounded 30 min).
    CI red → Build Fixer (max 2 attempts, re-push, re-watch) → exhausted = human

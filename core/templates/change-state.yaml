@@ -1,5 +1,6 @@
 # AIDD per-change state — seeded at change creation. Schema: change-state.schema.json
 schema: 1
+evidence_contract: receipts-v1 # source-bound suite and AC receipts required before delivery
 change_id: 2026-01-01-example-change
 intent: "REPLACE: verbatim user intent"
 mode: let-me-look

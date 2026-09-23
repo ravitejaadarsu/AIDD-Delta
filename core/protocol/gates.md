@@ -5,9 +5,9 @@ evidence-only (no approval semantics).
 
 | Gate | Key | After | Artifacts bound |
 |---|---|---|---|
-| G1 | `g1_prd` | PRD drafted | `prd.md` |
+| G1 | `g1_prd` | PRD drafted | `prd.md`; also `requirements.json` for receipts-v1 |
 | G2 | `g2_plan` | Pre-implementation review resolved | `architecture.md`, `counter-arguments.md`, `impact-report.md`, `epic.md`, `stories/*`, `pre-review/*` |
-| G3 | `g3_premerge` | QA verdict + critic verdict computed | `qa/*`, `qa/critic-verdict.md`, `ac-matrix.md`, `evidence/post/*` |
+| G3 | `g3_premerge` | QA verdict + critic verdict computed | `qa/*`, `qa/critic-verdict.md`, `ac-matrix.md`, `evidence/post/*`; also `evidence/acceptance.json` and `evidence/receipts/*` for receipts-v1 |
 | test-report | `g_test_report` | Exhaustive test report consolidated | `qa/test-report.md` |
 
 ## Uniform mechanism (both modes)
@@ -72,6 +72,8 @@ coverage, current hashes, unresolved cost stops, supervision, stories and repeat
 records. It returns 0 for ready, 1 for blocked, 2 for invalid input. The Delivery playbook
 requires it immediately before push. It validates recorded evidence structure and freshness,
 not whether a test genuinely proves a requirement; the verification roles still own that.
+For receipts-v1, it also verifies the approved requirement set, successful suite and AC
+receipts, output hashes, and current source fingerprints per `execution-receipts.md`.
 
 For `fast`, G3 does not require the skipped `evidence/post/` directory. All other bound
 artifact groups remain required. A recorded rigor escalation requires a human G3 approver

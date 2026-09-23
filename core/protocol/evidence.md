@@ -26,3 +26,10 @@ marks the step FAILED.
   bench records `na` with a reason. Nothing is silently skipped.
 - **Perf budget.** `architecture.md` sets thresholds (e.g. p95 latency, run duration). A
   post bench regressing beyond threshold fails `perf_within_budget` and feeds the fix loop.
+
+## Execution receipts
+
+New changes use `evidence_contract: receipts-v1`. The machine-readable companion to evidence
+blocks is defined in `execution-receipts.md`. It binds final suite and per-AC results to
+source fingerprints and output hashes. Prose reports remain necessary to explain what a
+command proves; a receipt alone does not establish semantic correctness.
